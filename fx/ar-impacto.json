@@ -1,0 +1,699 @@
+{
+ "frames": [
+  {
+   "filename": "ar-impacto 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 1",
+   "frame": {
+    "x": 196,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 2",
+   "frame": {
+    "x": 392,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 3",
+   "frame": {
+    "x": 588,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 4",
+   "frame": {
+    "x": 784,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 5",
+   "frame": {
+    "x": 980,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 6",
+   "frame": {
+    "x": 0,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 7",
+   "frame": {
+    "x": 196,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 8",
+   "frame": {
+    "x": 392,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 9",
+   "frame": {
+    "x": 588,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 10",
+   "frame": {
+    "x": 784,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 11",
+   "frame": {
+    "x": 980,
+    "y": 168,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 12",
+   "frame": {
+    "x": 0,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 13",
+   "frame": {
+    "x": 196,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 14",
+   "frame": {
+    "x": 392,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 15",
+   "frame": {
+    "x": 588,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 16",
+   "frame": {
+    "x": 784,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 17",
+   "frame": {
+    "x": 980,
+    "y": 336,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 18",
+   "frame": {
+    "x": 0,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 19",
+   "frame": {
+    "x": 196,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 20",
+   "frame": {
+    "x": 392,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 21",
+   "frame": {
+    "x": 588,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 22",
+   "frame": {
+    "x": 784,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 23",
+   "frame": {
+    "x": 980,
+    "y": 504,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 24",
+   "frame": {
+    "x": 0,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 25",
+   "frame": {
+    "x": 196,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 26",
+   "frame": {
+    "x": 392,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 27",
+   "frame": {
+    "x": 588,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 28",
+   "frame": {
+    "x": 784,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  },
+  {
+   "filename": "ar-impacto 29",
+   "frame": {
+    "x": 980,
+    "y": 672,
+    "w": 196,
+    "h": 168
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 196,
+    "h": 168
+   },
+   "sourceSize": {
+    "w": 196,
+    "h": 168
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "ar-impacto.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1176,
+   "h": 840
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "ar-impacto",
+    "from": 0,
+    "to": 29,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "nature/tornado",
+   "name": "Tornado",
+   "fps": 30,
+   "loop": true,
+   "frames": 30,
+   "frameSize": [
+    196,
+    168
+   ],
+   "pivot": [
+    98,
+    152
+   ],
+   "columns": 6
+  }
+ }
+}

@@ -1,0 +1,699 @@
+{
+ "frames": [
+  {
+   "filename": "terra-impacto 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 1",
+   "frame": {
+    "x": 272,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 2",
+   "frame": {
+    "x": 544,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 3",
+   "frame": {
+    "x": 816,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 4",
+   "frame": {
+    "x": 1088,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 5",
+   "frame": {
+    "x": 0,
+    "y": 150,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 6",
+   "frame": {
+    "x": 272,
+    "y": 150,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 7",
+   "frame": {
+    "x": 544,
+    "y": 150,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 8",
+   "frame": {
+    "x": 816,
+    "y": 150,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 9",
+   "frame": {
+    "x": 1088,
+    "y": 150,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 10",
+   "frame": {
+    "x": 0,
+    "y": 300,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 11",
+   "frame": {
+    "x": 272,
+    "y": 300,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 12",
+   "frame": {
+    "x": 544,
+    "y": 300,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 13",
+   "frame": {
+    "x": 816,
+    "y": 300,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 14",
+   "frame": {
+    "x": 1088,
+    "y": 300,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 15",
+   "frame": {
+    "x": 0,
+    "y": 450,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 16",
+   "frame": {
+    "x": 272,
+    "y": 450,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 17",
+   "frame": {
+    "x": 544,
+    "y": 450,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 18",
+   "frame": {
+    "x": 816,
+    "y": 450,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 19",
+   "frame": {
+    "x": 1088,
+    "y": 450,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 20",
+   "frame": {
+    "x": 0,
+    "y": 600,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 21",
+   "frame": {
+    "x": 272,
+    "y": 600,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 22",
+   "frame": {
+    "x": 544,
+    "y": 600,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 23",
+   "frame": {
+    "x": 816,
+    "y": 600,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 24",
+   "frame": {
+    "x": 1088,
+    "y": 600,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 25",
+   "frame": {
+    "x": 0,
+    "y": 750,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 26",
+   "frame": {
+    "x": 272,
+    "y": 750,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 27",
+   "frame": {
+    "x": 544,
+    "y": 750,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 28",
+   "frame": {
+    "x": 816,
+    "y": 750,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  },
+  {
+   "filename": "terra-impacto 29",
+   "frame": {
+    "x": 1088,
+    "y": 750,
+    "w": 272,
+    "h": 150
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 150
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 150
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "terra-impacto.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1360,
+   "h": 900
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "terra-impacto",
+    "from": 0,
+    "to": 29,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "nature/earth-spike",
+   "name": "Earth spike",
+   "fps": 30,
+   "loop": false,
+   "frames": 30,
+   "frameSize": [
+    272,
+    150
+   ],
+   "pivot": [
+    136,
+    132
+   ],
+   "columns": 5
+  }
+ }
+}

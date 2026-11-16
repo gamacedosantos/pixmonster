@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixMonster: Wiki</title>
+<style>
+  @font-face { font-family: 'Pixelify Sans'; src: url(fonts/pixelify-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #14110f; color: #e8f1ff; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700; line-height: 1.35; }
+  main { max-width: 640px; margin: 0 auto; padding: 10px 12px 40px; }
+  h1 { margin: 6px 0 2px; font-size: 28px; color: #ffd35a; text-shadow: 0 2px 0 #14285a; }
+  h2 { margin: 22px 0 6px; font-size: 20px; color: #ffd35a; border-bottom: 2px solid #3a5ea6; padding-bottom: 3px; }
+  h3 { margin: 12px 0 4px; font-size: 16px; color: #8fd0ff; }
+  p, li { font-size: 15px; color: #cfdcff; }
+  ul { padding-left: 20px; margin: 4px 0; }
+  a { color: #ffd35a; }
+  .caixa { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px 12px; box-shadow: inset 0 0 0 4px #14285a; margin-top: 8px; }
+  .tabela { overflow-x: auto; margin-top: 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; background: #0f2147; border-radius: 8px; overflow: hidden; }
+  th, td { padding: 5px 7px; border-bottom: 1px solid #24417f; text-align: left; white-space: nowrap; }
+  th { background: #16306a; color: #ffd35a; }
+  .el { display: inline-block; padding: 0 8px; border-radius: 10px; color: #1b1020; border: 1px solid #ffffff55; }
+  .nota { font-size: 13px; color: #8fb0ff; }
+  .topo { display: flex; justify-content: space-between; align-items: center; }
+  .roda { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0; font-size: 15px; }
+  .bom { color: #6fd66f; } .ruim { color: #ff7a6a; }
+</style>
+</head>
+<body>
+<main>
+  <div class="topo"><h1>PixMonster · Wiki</h1><a href="index.html">Voltar ao jogo</a></div>
+  <p class="nota">Esta página é montada a partir dos números do próprio jogo (<code>battle.js</code>): se um valor mudar lá, ela muda junto.</p>
+
+  <h2>Como funciona a luta</h2>
+  <div class="caixa">
+    <ul>
+      <li><b>Time de 3:</b> você escolhe 3 monstros (sem repetir) e o adversário sorteia outros 3. Um monstro de cada lado fica em campo; quando ele cai, o próximo do time entra.</li>
+      <li><b>Quatro botões:</b> forte, rápido, defesa e ultimate. Cada um tem a sua recarga, e os ataques passam por um tempo de carga (o anel que fecha) antes de acertar.</li>
+      <li><b>Defesa:</b> evita 1 ataque dentro da janela de <span id="defDur"></span> s. Quando o adversário carrega um ataque forte, aparece um "!": é a hora de defender.</li>
+      <li><b>Trocar de monstro:</b> toque num dos 3 retratos embaixo da arena. A troca cancela a carga e a defesa, o novo monstro fica <span id="entraMs"></span> s sem agir, e só dá para trocar de novo depois de <span id="trocaCd"></span> s. Depois de um nocaute, você escolhe quem entra (se não escolher, entra o melhor contra o adversário).</li>
+      <li><b>O que descansa não recarrega:</b> as recargas e os status só correm para quem está em campo.</li>
+      <li><b>Crítico</b> (<span id="critCh"></span>% de chance, dano x<span id="critMu"></span>) e <b>esquiva</b> (<span id="esqCh"></span>%): sorteados em cada golpe.</li>
+      <li><b>Luta automática:</b> opcional, escolhida antes de lutar: o seu time joga sozinho (inclusive as trocas).</li>
+    </ul>
+  </div>
+
+  <h2>Elementos</h2>
+  <p>Cada elemento tem <b class="bom">vantagem</b> sobre um, <b class="ruim">desvantagem</b> contra outro e é <b>normal</b> contra os outros dois.</p>
+  <div class="caixa">
+    <div class="roda" id="roda"></div>
+    <p>Golpe com vantagem causa <b class="bom">x<span id="vant"></span></b> de dano; com desvantagem, <b class="ruim">x<span id="desv"></span></b>; nos outros casos, x1. O ultimate de cada monstro é de <i>outro</i> elemento, para cobrir a fraqueza do próprio monstro.</p>
+  </div>
+  <h3>Força de cada elemento</h3>
+  <p>De propósito, os elementos não são iguais: uns batem mais forte, outros aguentam mais. Todos os monstros têm o mesmo nível (<span id="nivel"></span>) e o mesmo ataque base; o que muda é o elemento, o ritmo e os golpes.</p>
+  <div class="tabela"><table id="tabEl"></table></div>
+
+  <h2>Cenários</h2>
+  <p>Cada cenário favorece um elemento: os monstros desse elemento causam <b class="bom">+<span id="bonusBioma"></span>%</b> de dano lá. O cenário aparece em uma faixa no alto da arena. Na tela de escolha dá para fixar o cenário ou deixar no sorteio. O fogo não tem cenário de casa, mas é o elemento que mais bate.</p>
+  <div class="tabela"><table id="tabBioma"></table></div>
+
+  <h2>Status</h2>
+  <p>Alguns golpes podem aplicar um status quando acertam (não acontece em golpe bloqueado ou esquivado). O ultimate aplica o status do elemento dele em <b id="ultSt"></b>% dos acertos.</p>
+  <div class="tabela"><table id="tabStatus"></table></div>
+  <div class="tabela"><table id="tabChance"></table></div>
+
+  <h2>Objetos quebráveis</h2>
+  <p>Barris, caixotes e jarros espalhados pela arena quebram quando uma investida, um projétil ou um impacto passa por perto. Quem quebra leva um sorteio:</p>
+  <div class="tabela"><table id="tabItens"></table></div>
+
+  <h2>Talentos</h2>
+  <p>Antes da luta, o time gasta <b id="orc"></b> pontos em <b>talentos do time</b> (valem para os 3 monstros) e cada monstro leva <b>1 talento próprio</b>, grátis. O adversário recebe talentos sorteados. Os bônus são pequenos de propósito: o que decide é a combinação com o time e o cenário.</p>
+  <h3>Talentos do time</h3>
+  <div class="tabela"><table id="tabTalTime"></table></div>
+  <h3>Talentos do monstro</h3>
+  <div class="tabela"><table id="tabTalMon"></table></div>
+
+  <h2>Torneio</h2>
+  <p>Cinco lutas seguidas contra adversários cada vez melhores, com <b id="tVidas"></b> vidas. No torneio os talentos começam <b>travados</b> (só os iniciais estão liberados) e o orçamento começa em <b id="tOrc"></b> pontos. Cada vitória deixa escolher <b>1 de 3 prêmios</b>: um talento novo (do time ou de monstro) ou <b>+1 ponto</b> de orçamento (até +<span id="tMax"></span>). O time é escolhido na primeira luta e não muda; os talentos e as regras do automático podem ser ajustados entre as lutas. Perder uma luta custa 1 vida (você tenta a fase de novo); sem vidas, o torneio acaba.</p>
+  <p><b>A vida do time vai de uma luta para a outra</b>: depois de cada vitória, cada monstro vivo recupera <span id="tCura"></span>% e os caídos voltam com <span id="tRev"></span>%; o prêmio <b>Descanso completo</b> devolve toda a vida. Ao tentar uma fase de novo, o time volta à vida de antes da luta. O chefe (fase 5) tem talentos fixos além dos sorteados.</p>
+  <div class="tabela"><table id="tabTorneio"></table></div>
+  <h3>Dificuldade</h3>
+  <div class="tabela"><table id="tabDif"></table></div>
+  <p class="nota">Talentos iniciais: <span id="tIni"></span>. Nas fases 4 e 5, cada vaga do adversário tem 20% de chance de ser o monstro com vantagem sobre um dos seus.</p>
+
+  <h2>Treinadores e insígnias</h2>
+  <p>Na aba <b>Treinadores</b> há 15 treinadores em 5 níveis. Cada um tem o seu time, o seu jeito de jogar e talentos fixos. Os 3 do nível 1 estão liberados; os outros níveis pedem uma <b>insígnia</b>. A <b>primeira vitória</b> contra um treinador dá <b>10 x o nível</b> em pontos; repetir a vitória dá <b>3</b>. Os pontos compram as insígnias, em ordem.</p>
+  <div class="tabela"><table id="tabIns"></table></div>
+  <div class="tabela"><table id="tabTrein"></table></div>
+
+  <h2>Os 10 monstros</h2>
+  <div class="tabela"><table id="tabMon"></table></div>
+  <p class="nota">Ritmo: recarga e carga em relação ao padrão (menor = mais rápido). Quem recarrega devagar bate mais forte em cada golpe.</p>
+
+  <h2>Dicas</h2>
+  <div class="caixa"><ul>
+    <li>Monte o time para cobrir as fraquezas: se um monstro leva vantagem do adversário, troque por um que tenha vantagem contra ele.</li>
+    <li>Escolha o cenário a seu favor (ou jogue com um monstro do elemento do cenário sorteado).</li>
+    <li>Defenda quando aparecer o "!", e guarde a troca para quando levar vantagem do adversário: ela tem espera longa.</li>
+    <li>Stun cancela a carga do adversário; paralisia o impede de defender.</li>
+  </ul></div>
+</main>
+<script src="battle.js"></script>
+<script>
+(function () {
+  const B = window.PixmonBatalha, $ = (id) => document.getElementById(id);
+  const N = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
+  const COR = { fogo: '#ff9a3a', agua: '#5ab0ff', terra: '#c8a468', ar: '#cfe9ee', eletrico: '#ffe84a' };
+  const el = (t) => '<span class="el" style="background:' + COR[t] + '">' + N[t] + '</span>';
+  const pct = (v) => Math.round((v - 1) * 100);
+  const sinal = (v) => (v >= 1 ? '+' : '') + pct(v) + '%';
+  const tabela = (id, cab, linhas) => { $(id).innerHTML = '<tr>' + cab.map((c) => '<th>' + c + '</th>').join('') + '</tr>' + linhas.map((l) => '<tr>' + l.map((c) => '<td>' + c + '</td>').join('') + '</tr>').join(''); };
+  $('defDur').textContent = (B.BASE.defesa.dur / 1000).toFixed(1); $('entraMs').textContent = '0,6'; $('trocaCd').textContent = B.TROCA_CD / 1000;
+  $('critCh').textContent = Math.round(B.CRIT_CHANCE * 100); $('critMu').textContent = B.CRIT_MULT; $('esqCh').textContent = Math.round(B.ESQUIVA_CHANCE * 100);
+  $('vant').textContent = B.VANTAGEM; $('desv').textContent = B.DESVANTAGEM; $('nivel').textContent = B.NIVEL;
+  $('bonusBioma').textContent = pct(B.BONUS_BIOMA); $('ultSt').textContent = 60;
+  // roda: cada elemento vence o seguinte
+  const ordem = ['agua']; while (ordem.length < 5) ordem.push(B.VENCE[ordem[ordem.length - 1]]);
+  $('roda').innerHTML = ordem.map((t) => el(t)).join(' <span class="bom">vence</span> ') + ' <span class="bom">vence</span> ' + el(ordem[0]);
+  tabela('tabEl', ['Elemento', 'Vence', 'Perde para', 'Normal contra', 'Dano', 'Vida', 'Casa'], Object.keys(B.EL).map((t) => {
+    const fraco = Object.keys(B.VENCE).find((e) => B.VENCE[e] === t), neutros = Object.keys(B.EL).filter((e) => e !== t && e !== B.VENCE[t] && e !== fraco);
+    const casa = Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === t).join(', ') || '—';
+    return [el(t), el(B.VENCE[t]), el(fraco), neutros.map(el).join(' '), 'x' + B.EL[t].dano + ' (' + sinal(B.EL[t].dano) + ')', 'x' + B.EL[t].hp + ' (' + sinal(B.EL[t].hp) + ')', casa];
+  }));
+  tabela('tabBioma', ['Cenário', 'Elemento favorecido', 'Bônus de dano'], Object.keys(B.BIOMA_ELEMENTO).map((b) => [b[0].toUpperCase() + b.slice(1), el(B.BIOMA_ELEMENTO[b]), '+' + pct(B.BONUS_BIOMA) + '%']));
+  tabela('tabStatus', ['Status', 'Efeito', 'Duração'], [
+    ['<b style="color:#5cc84a">Veneno</b>', 'perde ' + (1.5) + '% da vida máxima por segundo', (B.DURACAO.veneno / 1000) + ' s'],
+    ['<b style="color:#5ab0ff">Lentidão</b>', 'recargas 30% mais lentas e cargas 30% mais longas', (B.DURACAO.lento / 1000) + ' s'],
+    ['<b style="color:#ffd35a">Paralisia</b>', 'não pode atacar nem defender (a carga em andamento termina)', (B.DURACAO.paralisia / 1000) + ' s'],
+    ['<b style="color:#ff6a5a">Stun</b>', 'cancela a carga em andamento e trava tudo', (B.DURACAO.stun / 1000) + ' s'],
+  ]);
+  const linhasC = []; Object.keys(B.EFEITO).forEach((t) => { const e = B.EFEITO[t]; ['rapido', 'forte'].forEach((s) => { if (e[s]) linhasC.push([el(t), s === 'rapido' ? 'Rápido' : 'Forte', e[s][0], Math.round(e[s][1] * 100) + '%']); }); });
+  tabela('tabChance', ['Golpe de', 'Slot', 'Status', 'Chance'], linhasC);
+  tabela('tabItens', ['Item', 'Efeito', 'Chance'], [
+    ['Cura', '+' + Math.round(15) + '% da vida máxima', '22%'], ['Força', 'x' + B.FORCA_MULT + ' de dano por 8 s', '18%'], ['Recarga', 'zera todas as recargas (ultimate incluído)', '20%'],
+    ['<span class="ruim">Maldição: dano</span>', 'perde 10% da vida (não mata)', '14%'], ['<span class="ruim">Maldição: stun</span>', 'de 1 a 3 s', '14%'], ['<span class="ruim">Maldição: veneno</span>', 'veneno normal', '12%'],
+  ]);
+  $('orc').textContent = B.ORCAMENTO;
+  tabela('tabTalTime', ['Talento', 'Custo', 'Efeito'], Object.values(B.TAL_TIME).map((t) => ['<b>' + t.nome + '</b>', t.custo + ' pt' + (t.custo > 1 ? 's' : ''), t.desc]));
+  tabela('tabTalMon', ['Talento', 'Efeito'], Object.values(B.TAL_MON).map((t) => ['<b>' + t.nome + '</b>', t.desc]));
+  const T = B.TORNEIO; $('tVidas').textContent = T.vidas; $('tOrc').textContent = T.orcBase; $('tMax').textContent = T.bonusMax;
+  $('tIni').textContent = [...T.iniciais.time.map((id) => B.TAL_TIME[id].nome), ...T.iniciais.mon.map((id) => B.TAL_MON[id].nome)].join(', ');
+  $('tCura').textContent = Math.round(T.curaEntre * 100); $('tRev').textContent = Math.round(T.revive * 100);
+  tabela('tabTorneio', ['Fase', 'Adversário', 'Jeito de jogar', 'Reação / ritmo', 'Talentos (pontos)'], T.adv.map((a, i) => [i + 1, '<b>' + a.nome + '</b>, ' + a.titulo + (a.chefe ? ' (chefe)' : '') + '<br><i>“' + a.frase + '”</i>', B.ESTILOS[a.pol.estilo].nome + ' · defesa: ' + a.pol.defesa + ' · ultimate: ' + a.pol.ultimate, Math.round(a.ia.reacao * 100) + '% / ' + Math.round(a.ia.ritmo * 100) + '%', a.orc + (a.fixos ? ' + fixos: ' + [...a.fixos.time.map((id) => B.TAL_TIME[id].nome), ...a.fixos.mon.map((id) => B.TAL_MON[id].nome)].join(', ') : '')]));
+  tabela('tabDif', ['Dificuldade', 'Vidas', 'Adversário', 'Talentos do adversário'], Object.values(T.dificuldades).map((d) => [d.nome, d.vidas, 'reage e ataca x' + d.ia, (d.orc >= 0 ? '+' : '') + d.orc + ' pt']));
+  tabela('tabIns', ['Insígnia', 'Custo', 'Libera'], B.INSIGNIAS.map((i) => [i.nome, i.custo + ' pts', 'treinadores do nível ' + i.libera]));
+  tabela('tabTrein', ['Nível', 'Treinador', 'Time', 'Jeito de jogar', 'Pontos (1ª vitória)'], B.TREINADORES.map((t) => [t.nivel, '<b>' + t.nome + '</b><br><i>“' + t.frase + '”</i>', B.timeDoTreinador(t).map((m) => m.nome).join(', '), B.ESTILOS[t.pol.estilo].nome + ' · defesa: ' + t.pol.defesa + ' · ultimate: ' + t.pol.ultimate, B.PONTOS_TREINADOR.primeira(t.nivel)]));
+  tabela('tabMon', ['Monstro', 'Elemento', 'Vida', 'Ritmo', 'Rápido', 'Forte', 'Defesa', 'Ultimate'], B.MONSTROS.map((m) => [
+    '<b>' + m.nome + '</b>', el(m.tipo), m.hp, 'rec ' + m.rc + ' · carga ' + m.cg,
+    m.golpes.rapido.nome, m.golpes.forte.nome, m.golpes.defesa.nome, m.golpes.ultimate.nome + ' (' + N[m.golpes.ultimate.tipo] + ')',
+  ]));
+})();
+</script>
+</body>
+</html>

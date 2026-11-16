@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "pixmon-escudo-eletrico 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 1.png",
+   "frame": {
+    "x": 61,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 2.png",
+   "frame": {
+    "x": 122,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 3.png",
+   "frame": {
+    "x": 183,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 4.png",
+   "frame": {
+    "x": 0,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 5.png",
+   "frame": {
+    "x": 61,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 6.png",
+   "frame": {
+    "x": 122,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 7.png",
+   "frame": {
+    "x": 183,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 8.png",
+   "frame": {
+    "x": 0,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 9.png",
+   "frame": {
+    "x": 61,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 10.png",
+   "frame": {
+    "x": 122,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-eletrico 11.png",
+   "frame": {
+    "x": 183,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "pixmon-escudo-eletrico.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 244,
+   "h": 183
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 30,
+   "y": 30
+  },
+  "frameTags": [
+   {
+    "name": "pixmon-escudo-eletrico",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

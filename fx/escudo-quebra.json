@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "pixmon-escudo-quebra 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 1.png",
+   "frame": {
+    "x": 69,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 2.png",
+   "frame": {
+    "x": 138,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 3.png",
+   "frame": {
+    "x": 207,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 4.png",
+   "frame": {
+    "x": 0,
+    "y": 94,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 5.png",
+   "frame": {
+    "x": 69,
+    "y": 94,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 6.png",
+   "frame": {
+    "x": 138,
+    "y": 94,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 7.png",
+   "frame": {
+    "x": 207,
+    "y": 94,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 8.png",
+   "frame": {
+    "x": 0,
+    "y": 188,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 9.png",
+   "frame": {
+    "x": 69,
+    "y": 188,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 10.png",
+   "frame": {
+    "x": 138,
+    "y": 188,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  },
+  {
+   "filename": "pixmon-escudo-quebra 11.png",
+   "frame": {
+    "x": 207,
+    "y": 188,
+    "w": 69,
+    "h": 94
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 69,
+    "h": 94
+   },
+   "sourceSize": {
+    "w": 69,
+    "h": 94
+   },
+   "pivot": {
+    "x": 0.5507246376811594,
+    "y": 0.32978723404255317
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "pixmon-escudo-quebra.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 276,
+   "h": 282
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 38,
+   "y": 31
+  },
+  "frameTags": [
+   {
+    "name": "pixmon-escudo-quebra",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

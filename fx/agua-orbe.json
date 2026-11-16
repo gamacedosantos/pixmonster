@@ -1,0 +1,2019 @@
+{
+ "frames": [
+  {
+   "filename": "agua-orbe 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 1",
+   "frame": {
+    "x": 100,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 2",
+   "frame": {
+    "x": 200,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 3",
+   "frame": {
+    "x": 300,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 4",
+   "frame": {
+    "x": 400,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 5",
+   "frame": {
+    "x": 500,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 6",
+   "frame": {
+    "x": 600,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 7",
+   "frame": {
+    "x": 700,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 8",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 9",
+   "frame": {
+    "x": 900,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 10",
+   "frame": {
+    "x": 0,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 11",
+   "frame": {
+    "x": 100,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 12",
+   "frame": {
+    "x": 200,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 13",
+   "frame": {
+    "x": 300,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 14",
+   "frame": {
+    "x": 400,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 15",
+   "frame": {
+    "x": 500,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 16",
+   "frame": {
+    "x": 600,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 17",
+   "frame": {
+    "x": 700,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 18",
+   "frame": {
+    "x": 800,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 19",
+   "frame": {
+    "x": 900,
+    "y": 108,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 20",
+   "frame": {
+    "x": 0,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 21",
+   "frame": {
+    "x": 100,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 22",
+   "frame": {
+    "x": 200,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 23",
+   "frame": {
+    "x": 300,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 24",
+   "frame": {
+    "x": 400,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 25",
+   "frame": {
+    "x": 500,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 26",
+   "frame": {
+    "x": 600,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 27",
+   "frame": {
+    "x": 700,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 28",
+   "frame": {
+    "x": 800,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 29",
+   "frame": {
+    "x": 900,
+    "y": 216,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 30",
+   "frame": {
+    "x": 0,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 31",
+   "frame": {
+    "x": 100,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 32",
+   "frame": {
+    "x": 200,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 33",
+   "frame": {
+    "x": 300,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 34",
+   "frame": {
+    "x": 400,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 35",
+   "frame": {
+    "x": 500,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 36",
+   "frame": {
+    "x": 600,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 37",
+   "frame": {
+    "x": 700,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 38",
+   "frame": {
+    "x": 800,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 39",
+   "frame": {
+    "x": 900,
+    "y": 324,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 40",
+   "frame": {
+    "x": 0,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 41",
+   "frame": {
+    "x": 100,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 42",
+   "frame": {
+    "x": 200,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 43",
+   "frame": {
+    "x": 300,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 44",
+   "frame": {
+    "x": 400,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 45",
+   "frame": {
+    "x": 500,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 46",
+   "frame": {
+    "x": 600,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 47",
+   "frame": {
+    "x": 700,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 48",
+   "frame": {
+    "x": 800,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 49",
+   "frame": {
+    "x": 900,
+    "y": 432,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 50",
+   "frame": {
+    "x": 0,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 51",
+   "frame": {
+    "x": 100,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 52",
+   "frame": {
+    "x": 200,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 53",
+   "frame": {
+    "x": 300,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 54",
+   "frame": {
+    "x": 400,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 55",
+   "frame": {
+    "x": 500,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 56",
+   "frame": {
+    "x": 600,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 57",
+   "frame": {
+    "x": 700,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 58",
+   "frame": {
+    "x": 800,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 59",
+   "frame": {
+    "x": 900,
+    "y": 540,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 60",
+   "frame": {
+    "x": 0,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 61",
+   "frame": {
+    "x": 100,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 62",
+   "frame": {
+    "x": 200,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 63",
+   "frame": {
+    "x": 300,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 64",
+   "frame": {
+    "x": 400,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 65",
+   "frame": {
+    "x": 500,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 66",
+   "frame": {
+    "x": 600,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 67",
+   "frame": {
+    "x": 700,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 68",
+   "frame": {
+    "x": 800,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 69",
+   "frame": {
+    "x": 900,
+    "y": 648,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 70",
+   "frame": {
+    "x": 0,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 71",
+   "frame": {
+    "x": 100,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 72",
+   "frame": {
+    "x": 200,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 73",
+   "frame": {
+    "x": 300,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 74",
+   "frame": {
+    "x": 400,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 75",
+   "frame": {
+    "x": 500,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 76",
+   "frame": {
+    "x": 600,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 77",
+   "frame": {
+    "x": 700,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 78",
+   "frame": {
+    "x": 800,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 79",
+   "frame": {
+    "x": 900,
+    "y": 756,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 80",
+   "frame": {
+    "x": 0,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 81",
+   "frame": {
+    "x": 100,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 82",
+   "frame": {
+    "x": 200,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 83",
+   "frame": {
+    "x": 300,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 84",
+   "frame": {
+    "x": 400,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 85",
+   "frame": {
+    "x": 500,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 86",
+   "frame": {
+    "x": 600,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 87",
+   "frame": {
+    "x": 700,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 88",
+   "frame": {
+    "x": 800,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  },
+  {
+   "filename": "agua-orbe 89",
+   "frame": {
+    "x": 900,
+    "y": 864,
+    "w": 100,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 108
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "agua-orbe.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1000,
+   "h": 972
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "agua-orbe",
+    "from": 0,
+    "to": 89,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "water/water-orb",
+   "name": "Water orb",
+   "fps": 30,
+   "loop": true,
+   "frames": 90,
+   "frameSize": [
+    100,
+    108
+   ],
+   "pivot": [
+    50,
+    100
+   ],
+   "columns": 10
+  }
+ }
+}

@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixMonster: protótipo de batalha</title>
+<style>
+  @font-face { font-family: 'Pixelify Sans'; src: url(fonts/pixelify-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
+  @font-face { font-family: 'Press Start 2P'; src: url(fonts/press-start-2p-latin-400-normal.woff2) format('woff2'); }
+  :root { color-scheme: dark; --s: 64px; /* lado do ícone de habilidade na tela (a folha tem ícones de 32 px, em 2x) */ }
+  @media (max-width: 340px) { :root { --s: 48px; } }
+  body { margin: 0; background: #14110f; color: #efe0b8; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700; }
+  main { max-width: 420px; margin: 0 auto; padding: 8px; }
+  button { font: inherit; width: 100%; padding: 12px; margin: 4px 0; border: 2px solid #e0b040; border-radius: 4px; background: #2a1c12; color: #efe0b8; font-size: 16px; }
+  #mudo { position: fixed; top: 6px; right: 6px; z-index: 5; width: auto; padding: 4px 8px; margin: 0; font-size: 12px; opacity: .85; }
+  canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+
+  /* ---------- luta: o campo em cima e os 4 botões de habilidade embaixo, na mesma largura ---------- */
+  .coluna { width: min(100%, calc((100dvh - 206px) * 360 / 640)); margin: 0 auto; }
+  .palco { position: relative; width: 100%; aspect-ratio: 360 / 640; }
+  /* cartão de resultado: mesmo estilo azul e dourado da escolha, entra com um pulo */
+  #resultado { position: absolute; left: 10px; right: 10px; bottom: 12px; padding: 14px 12px 12px; text-align: center; color: #e8f1ff; background: #1b3366; border: 3px solid #ffd35a; border-radius: 12px; box-shadow: inset 0 0 0 4px #14285a, 0 6px 0 #0b1633, 0 0 0 3px #0b1633; animation: entra .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+  #resultado[hidden] { display: none; }
+  @keyframes entra { from { transform: translateY(40px) scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
+  #resTitulo { margin: 0; font-size: 34px; letter-spacing: 2px; color: #ffd35a; text-shadow: 0 3px 0 #14285a, 0 0 12px #ffd35a66; }
+  #resultado.derrota #resTitulo { color: #ff7a6a; text-shadow: 0 3px 0 #14285a, 0 0 12px #ff7a6a55; }
+  #resultado.empate #resTitulo { color: #cfe0ff; text-shadow: 0 3px 0 #14285a; }
+  #resSub { margin: 4px 0 8px; font-size: 14px; color: #8fb0ff; }
+  .stats { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+  .stats span { background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; padding: 3px 8px; font-size: 12px; color: #e3c35c; }
+  .stats b { color: #fff; }
+  #resultado .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  #resultado button { margin: 0; padding: 11px 6px; font-size: 15px; border-radius: 8px; background: #24417f; border: 2px solid #4a6fb8; color: #dfe9ff; }
+  #resultado button.principal { background: #ffd35a; color: #1b1020; border-color: #ffffff; box-shadow: 0 0 10px #ffd35a88; }
+  #habs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+  .hab { position: relative; width: auto; margin: 0; padding: 4px 2px 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #1b3366; border: 2px solid #4a6fb8; border-radius: 8px; color: #e8f1ff; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+  .ico { position: relative; width: var(--s); height: var(--s); image-rendering: pixelated; background-image: url(ui/habilidades.png); background-size: calc(var(--s) * 4) calc(var(--s) * 4); background-position: calc(var(--s) * var(--c) * -1) calc(var(--s) * var(--r) * -1); border-radius: 4px; overflow: hidden; }
+  .ico.escudo { background-size: 100% 100%; background-position: 0 0; }
+  .hab .cd { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(8, 12, 30, .72); }
+  .hab .seg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
+  .hab .nome { font-size: 11px; line-height: 1.1; text-align: center; min-height: 24px; display: flex; align-items: center; }
+  .hab small { font-size: 10px; color: #8fb0ff; }
+  .hab.pronto { border-color: #ffd35a; box-shadow: 0 0 6px #ffd35a88; }
+  .hab[data-slot="ultimate"].pronto { border-color: #ff7af0; box-shadow: 0 0 8px #ff7af0aa; }
+  .hab.ocupado { opacity: .6; }
+  .hab.ativo { border-color: #9fd0ff; box-shadow: 0 0 8px #9fd0ffaa; }
+
+  /* ---------- escolha: grade de monstros e ficha, em coluna para celular ---------- */
+  #escolha { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px; color: #e8f1ff; box-shadow: inset 0 0 0 4px #14285a; }
+  .topo { display: flex; justify-content: space-between; align-items: center; padding-right: 92px; /* espaço do botão de som fixo */ }
+  .topo h2 { margin: 0; font-size: 22px; color: #ffd35a; text-shadow: 0 2px 0 #14285a; }
+  #contagem { font-size: 13px; color: #8fb0ff; }
+  #grade { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 10px 0; }
+  .celula { width: auto; aspect-ratio: 1; padding: 2px; margin: 0; background: #24417f; border: 2px solid #4a6fb8; border-radius: 6px; }
+  .celula.sel { border-color: #ffffff; background: #2f5aa8; box-shadow: 0 0 0 2px #ffd35a; }
+  .celula canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+  .ficha { background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; padding: 10px; }
+  .cab { display: flex; justify-content: space-between; align-items: baseline; }
+  .cab h3 { margin: 0; font-size: 24px; color: #ffffff; }
+  #fNum { color: #8fb0ff; font-size: 13px; letter-spacing: 1px; }
+  .pill { display: inline-block; margin-top: 4px; padding: 2px 14px; border-radius: 12px; color: #1b1020; font-weight: 700; font-size: 13px; border: 2px solid #ffffff55; }
+  .barra { display: grid; grid-template-columns: 40px 1fr 44px; gap: 6px; align-items: center; margin: 5px 0; font-size: 15px; }
+  .barra b { text-align: right; font-weight: 700; }
+  .trilho { height: 10px; background: #152a55; border: 1px solid #3d5f9e; border-radius: 4px; overflow: hidden; }
+  .trilho i { display: block; height: 100%; transition: width .3s; }
+  #bPs { background: #6fd66f; }
+  #bAtq { background: #ff7a5a; }
+  #bVel { background: #5ab0ff; }
+  .texto { color: #8fd0ff; font-size: 13px; margin: 6px 0 2px; }
+  .golpe { display: grid; grid-template-columns: 1fr 36px; gap: 0 8px; align-items: center; padding: 5px 8px; background: #16306a; border-radius: 6px; margin-top: 5px; }
+  .golpe .rot { color: #ffd35a; font-size: 12px; }
+  .golpe .nm { font-size: 16px; }
+  .golpe .info { color: #e3c35c; font-size: 11px; }
+  .golpe .mini { grid-column: 2; grid-row: 1 / span 3; width: 32px; height: 32px; image-rendering: pixelated; background-image: url(ui/habilidades.png); background-position: calc(var(--c) * -32px) calc(var(--r) * -32px); border-radius: 3px; }
+  .golpe .mini.escudo { background-size: 100% 100%; background-position: 0 0; }
+  .autoluta { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 8px 10px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; font-size: 13px; color: #8fb0ff; }
+  .autoluta button { width: auto; margin: 0; padding: 6px 12px; font-size: 14px; flex: none; background: #24417f; border: 2px solid #4a6fb8; border-radius: 14px; color: #dfe9ff; }
+  .autoluta button.sel { background: #ffd35a; color: #1b1020; border-color: #fff; }
+  #habs.auto .hab { opacity: .75; pointer-events: none; }
+  #habs.auto::before { content: 'AUTO'; grid-column: 1 / -1; text-align: center; font-size: 12px; letter-spacing: 3px; color: #ffd35a; }
+  /* time de 3: faixa de escolha e linha de troca na luta */
+  .wiki { position: fixed; top: 6px; right: 90px; z-index: 5; padding: 4px 8px; font-size: 12px; color: #efe0b8; background: #2a1c12; border: 2px solid #e0b040; border-radius: 4px; text-decoration: none; opacity: .85; }
+  #meuTime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+  .vaga { position: relative; width: auto; margin: 0; padding: 4px 2px; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: #0f2147; border: 2px dashed #4a6fb8; border-radius: 8px; font-size: 12px; color: #8fb0ff; }
+  .vaga.cheia { border-style: solid; border-color: #ffd35a; background: #24417f; color: #fff; }
+  .vaga canvas { width: 44px; height: 44px; image-rendering: pixelated; }
+  .celula[data-ordem]::after { content: attr(data-ordem); position: absolute; top: 1px; right: 3px; font-size: 12px; color: #1b1020; background: #ffd35a; border-radius: 8px; padding: 0 5px; }
+  .celula { position: relative; }
+  #lutar:disabled { opacity: .55; background: #8a7a4a; }
+  .sortear { margin-top: 6px; padding: 7px; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 8px; color: #dfe9ff; }
+  #time { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
+  .reserva { position: relative; width: auto; margin: 0; padding: 3px 2px; display: flex; align-items: center; gap: 4px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 8px; color: #e8f1ff; touch-action: manipulation; user-select: none; text-align: left; }
+  .reserva canvas { width: 34px; height: 34px; flex: none; image-rendering: pixelated; background: #0f2147; border-radius: 4px; }
+  .reserva .inf { flex: 1; min-width: 0; font-size: 11px; line-height: 1.15; }
+  .reserva .inf b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+  .reserva .vida { height: 5px; margin-top: 2px; background: #0b1633; border-radius: 3px; overflow: hidden; }
+  .reserva .vida i { display: block; height: 100%; background: #6fd66f; }
+  .reserva.ativo { border-color: #ffd35a; box-shadow: 0 0 6px #ffd35a88; }
+  .reserva.caido { opacity: .35; filter: grayscale(1); pointer-events: none; }
+  .reserva.espera:not(.ativo) { opacity: .6; }
+  .reserva.escolher { border-color: #ff7af0; animation: pisca .5s infinite alternate; }
+  @keyframes pisca { to { box-shadow: 0 0 10px #ff7af0cc; } }
+  #time.auto .reserva { pointer-events: none; }
+  /* talentos: cartões do time (orçamento de pontos) e um seletor por monstro */
+  #talTime { display: grid; gap: 6px; margin-top: 4px; }
+  .tal { width: auto; margin: 0; padding: 6px 10px; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 0 8px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; color: #e8f1ff; font-size: 14px; }
+  .tal small { grid-column: 1 / -1; font-size: 12px; color: #8fb0ff; font-weight: 400; }
+  .tal .custo { color: #ffd35a; }
+  .tal.sel { border-color: #ffd35a; background: #24417f; box-shadow: 0 0 6px #ffd35a66; }
+  .tal:disabled { opacity: .45; }
+  #talMon { display: grid; gap: 6px; margin-top: 4px; }
+  .talm { display: grid; grid-template-columns: 90px 1fr; gap: 6px; align-items: center; font-size: 13px; color: #cfe0ff; }
+  .talm select { font: inherit; width: 100%; padding: 6px; background: #0f2147; color: #e8f1ff; border: 2px solid #4a6fb8; border-radius: 8px; }
+  .talm small { grid-column: 1 / -1; font-size: 12px; color: #8fb0ff; font-weight: 400; margin-top: -3px; }
+  #talInfo { margin-top: 4px; font-size: 11px; color: #8fb0ff; text-align: center; }
+  .regras { margin-top: 8px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; padding: 6px 10px; font-size: 13px; color: #8fb0ff; }
+  .regras summary { cursor: pointer; color: #ffd35a; font-size: 14px; }
+  .regra { display: grid; gap: 2px; margin-top: 8px; }
+  .regra select { font: inherit; width: 100%; padding: 6px; background: #14285a; color: #e8f1ff; border: 2px solid #4a6fb8; border-radius: 8px; }
+  .modos { display: flex; gap: 6px; margin-top: 8px; }
+  .modos .aba { flex: 1; }
+  #torneioInfo { margin-top: 6px; font-size: 13px; color: #8fb0ff; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  #torneioInfo button { width: auto; margin: 0; padding: 4px 10px; font-size: 12px; background: #3a1c1c; border: 2px solid #b85a4a; border-radius: 12px; color: #ffd0c8; }
+  #premios { display: grid; gap: 6px; margin-bottom: 8px; text-align: left; }
+  #premios .tal { font-size: 13px; }
+  #revanche:disabled { opacity: .4; }
+  .tal.trava { opacity: .5; }
+  #intro { position: absolute; left: 0; right: 0; top: 30%; text-align: center; pointer-events: none; text-shadow: 0 0 4px #000, 0 0 4px #000, 0 2px 0 #000; animation: introAnim 3.2s both; }
+  #intro[hidden] { display: none; }
+  #intro .f { font-size: 14px; color: #ffd35a; letter-spacing: 3px; }
+  #intro .n { font-size: 24px; color: #fff; }
+  #intro .q { font-size: 13px; color: #cfe0ff; font-weight: 400; font-style: italic; }
+  #intro.chefe .f { color: #ff6a5a; }
+  @keyframes introAnim { 0% { opacity: 0; transform: scale(1.6); } 12% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+  #torneioInfo select { font: inherit; padding: 3px 6px; background: #14285a; color: #e8f1ff; border: 2px solid #4a6fb8; border-radius: 8px; }
+  /* ---------- escolha em páginas de cards ---------- */
+  #escolha { background: transparent; border: 0; box-shadow: none; padding: 0 0 8px; }
+  .tabsnav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; }
+  .tabsnav button { width: auto; margin: 0; padding: 8px 2px; font-size: 13px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; color: #8fb0ff; }
+  .tabsnav button.sel { background: #ffd35a; color: #1b1020; border-color: #fff; }
+  .pagina[hidden] { display: none; }
+  .cartao { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 3px #14285a; margin-top: 10px; color: #e8f1ff; }
+  .cartao > h3, .cartao > .texto { margin: 0 0 6px; color: #ffd35a; font-size: 16px; }
+  .cartao .ficha { border: 0; padding: 0; background: transparent; }
+  .modos3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .modo { width: auto; margin: 0; padding: 8px 4px; display: flex; flex-direction: column; gap: 2px; text-align: center; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; color: #cfe0ff; }
+  .modo b { font-size: 14px; } .modo small { font-size: 10px; color: #8fb0ff; font-weight: 400; line-height: 1.2; }
+  .modo.sel { background: #24417f; border-color: #ffd35a; box-shadow: 0 0 8px #ffd35a66; }
+  .modo.sel b { color: #ffd35a; }
+  .linkbtn { display: block; box-sizing: border-box; width: 100%; margin: 8px 0 0; padding: 8px; font: inherit; font-size: 13px; text-align: center; text-decoration: none; background: #24417f; border: 2px solid #4a6fb8; border-radius: 8px; color: #dfe9ff; }
+  .linkbtn.perigo { background: #3a1c1c; border-color: #b85a4a; color: #ffd0c8; }
+  #resumoTime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .rmon { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; font-size: 12px; }
+  .rmon canvas { width: 44px; height: 44px; image-rendering: pixelated; }
+  .rmon.vazio { opacity: .5; justify-content: center; min-height: 66px; }
+  #resumoTime + .nota, .cartao .nota { font-size: 12px; color: #8fb0ff; margin: 6px 0 0; }
+  #barraLutar { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px; background: #14285aee; border: 2px solid #ffd35a; border-radius: 12px; }
+  #miniTime { display: flex; gap: 2px; flex: none; }
+  #miniTime canvas { width: 34px; height: 34px; image-rendering: pixelated; background: #24417f; border-radius: 6px; }
+  #barraLutar #lutar { margin: 0; flex: 1; padding: 12px 8px; font-size: 16px; }
+  .pontos { display: flex; justify-content: space-between; align-items: baseline; }
+  .pontos b { font-size: 26px; color: #ffd35a; }
+  .insignia { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; margin-top: 6px; padding: 6px 8px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; font-size: 13px; }
+  .insignia small { grid-column: 1 / -1; color: #8fb0ff; font-weight: 400; font-size: 11px; }
+  .insignia button { width: auto; margin: 0; padding: 4px 10px; font-size: 12px; background: #ffd35a; color: #1b1020; border: 2px solid #fff; border-radius: 10px; }
+  .insignia button:disabled { opacity: .45; background: #8a7a4a; }
+  .insignia.tem { border-color: #ffd35a; } .insignia.tem b { color: #ffd35a; }
+  .nivelTit { margin: 14px 2px 0; color: #ffd35a; font-size: 14px; display: flex; justify-content: space-between; }
+  .trein { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; margin-top: 6px; padding: 8px; background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; box-shadow: inset 0 0 0 3px #14285a; }
+  .trein.sel { border-color: #ffd35a; box-shadow: 0 0 8px #ffd35a66, inset 0 0 0 3px #14285a; }
+  .trein.trava { opacity: .55; }
+  .tmons { display: flex; gap: 2px; } .tmons canvas { width: 36px; height: 36px; image-rendering: pixelated; background: #24417f; border-radius: 6px; }
+  .trein .inf b { display: block; font-size: 15px; } .trein .inf small { display: block; font-size: 11px; color: #8fb0ff; font-weight: 400; line-height: 1.25; }
+  .trein button { width: auto; margin: 0; padding: 8px 10px; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 10px; color: #dfe9ff; }
+  .trein button.principal { background: #ffd35a; color: #1b1020; border-color: #fff; }
+  .trein button:disabled { opacity: .5; }
+  /* ---------- cards de talento: imagem em cima, nome, custo e descrição ---------- */
+  .talgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .tcard { position: relative; width: auto; margin: 0; padding: 0 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; overflow: hidden; background: #14285a; border: 2px solid #3a5ea6; border-radius: 12px; color: #e8f1ff; }
+  .tcard .timg { width: 100%; height: 72px; display: flex; align-items: center; justify-content: center; background: linear-gradient(#2c4f96, #1d3a78); }
+  .tcard .timg img { width: 48px; height: 48px; image-rendering: pixelated; filter: drop-shadow(0 2px 0 #0b1633); }
+  .tcard[data-g="cura"] .timg { background: linear-gradient(#2f8a4a, #1d5a30); }
+  .tcard[data-g="sorte"] .timg { background: linear-gradient(#b8941a, #7a5e10); }
+  .tcard[data-g="ritmo"] .timg { background: linear-gradient(#7a4ac0, #4a2a80); }
+  .tcard[data-g="ataque"] .timg { background: linear-gradient(#c0453a, #802a24); }
+  .tcard[data-g="defesa"] .timg { background: linear-gradient(#3a7ac0, #24508a); }
+  .tcard .tnome { font-size: 14px; padding: 0 6px; line-height: 1.15; }
+  .tcard .tdesc { font-size: 11px; color: #8fb0ff; font-weight: 400; line-height: 1.25; padding: 0 8px; }
+  .tcard .tcusto { position: absolute; top: 4px; right: 4px; padding: 1px 7px; font-size: 12px; color: #1b1020; background: #ffd35a; border: 2px solid #fff; border-radius: 10px; }
+  .tcard.sel { border-color: #ffd35a; box-shadow: 0 0 10px #ffd35a88; }
+  .tcard.sel::after { content: '✓'; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; line-height: 20px; font-size: 14px; color: #1b1020; background: #6fd66f; border: 2px solid #fff; border-radius: 12px; }
+  .tcard:disabled { opacity: .45; }
+  .tcard.trava { filter: grayscale(.8); }
+  .tcard.trava .timg::after { content: '🔒'; position: absolute; top: 24px; font-size: 26px; }
+  .talm { display: block; margin-top: 10px; }
+  .talm .th { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: #ffd35a; margin-bottom: 4px; }
+  .talm .th small { color: #8fb0ff; font-weight: 400; font-size: 12px; }
+  .mgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .mchip { position: relative; width: auto; margin: 0; padding: 4px 1px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; color: #cfe0ff; font-size: 10px; line-height: 1.1; text-align: center; }
+  .mchip img { width: 36px; height: 36px; image-rendering: pixelated; }
+  .mchip.sel { border-color: #ffd35a; background: #24417f; box-shadow: 0 0 6px #ffd35a88; }
+  .mchip.trava { opacity: .4; filter: grayscale(1); }
+  .talm .desc { font-size: 12px; color: #8fb0ff; font-weight: 400; margin-top: 4px; min-height: 14px; }
+  .cenario { margin-top: 10px; font-size: 13px; color: #8fb0ff; }
+  .abas { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .aba { flex: 1 1 auto; width: auto; padding: 8px 6px; margin: 0; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 14px; color: #dfe9ff; }
+  .aba.sel { border-color: #ffd35a; color: #ffd35a; background: #2f5aa8; }
+  #lutar { margin-top: 0; padding: 14px; font-size: 18px; background: #ffd35a; color: #1b1020; border: 2px solid #ffffff; border-radius: 8px; }
+</style>
+</head>
+<body>
+<button id="mudo" aria-label="Ligar ou desligar o som"></button>
+<main>
+  <div id="escolha">
+    <div class="topo">
+      <h2>PixMonster</h2>
+      <span id="contagem"></span>
+    </div>
+    <a class="wiki" href="wiki.html" target="_blank" rel="noopener">Wiki</a>
+    <nav class="tabsnav">
+      <button data-p="jogar" class="sel">Jogar</button><button data-p="time">Time</button><button data-p="trein">Treinadores</button><button data-p="opcoes">Opções</button>
+    </nav>
+
+    <section class="pagina" id="p-jogar">
+      <div class="cartao">
+        <h3>Modo de jogo</h3>
+        <div class="modos3">
+          <button class="modo sel" id="mRapido"><b>Luta rápida</b><small>todos os talentos liberados</small></button>
+          <button class="modo" id="mTorneio"><b>Torneio</b><small id="mTorneioTxt">5 lutas contra campeões</small></button>
+          <button class="modo" id="mTrein"><b>Treinador</b><small id="mTreinTxt">desafie um treinador</small></button>
+        </div>
+        <div id="torneioInfo"></div>
+      </div>
+      <div class="cartao">
+        <h3>Seu time</h3>
+        <div id="resumoTime"></div>
+        <button class="linkbtn" data-ir="time">Editar time, talentos e regras</button>
+      </div>
+      <div class="cartao">
+        <h3>Cenário</h3>
+        <div id="abas" class="abas"></div>
+      </div>
+      <div class="cartao">
+        <h3>Luta automática</h3>
+        <div class="autoluta"><button id="auto" aria-pressed="false">Luta automática: não</button><span>O seu time luta sozinho, pelas regras que você escolher. Vale a partir da próxima luta.</span></div>
+        <button class="linkbtn" data-ir="time">Mudar as regras do automático</button>
+      </div>
+    </section>
+
+    <section class="pagina" id="p-time" hidden>
+      <div class="cartao">
+        <h3>Monstros</h3>
+        <div id="grade"></div>
+        <button class="sortear" id="sortear">Sortear time</button>
+      </div>
+      <div class="cartao">
+        <h3 id="tituloTime">Seu time (0/3)</h3>
+        <div id="meuTime"></div>
+      </div>
+      <div class="cartao">
+        <section class="ficha">
+          <div class="cab"><h3 id="fNome"></h3><span id="fNum"></span></div>
+          <span id="fTipo" class="pill"></span>
+          <div class="barra"><span>Ps</span><div class="trilho"><i id="bPs"></i></div><b id="vPs"></b></div>
+          <div class="barra"><span>Atq</span><div class="trilho"><i id="bAtq"></i></div><b id="vAtq"></b></div>
+          <div class="barra"><span>Vel</span><div class="trilho"><i id="bVel"></i></div><b id="vVel"></b></div>
+          <p id="fTexto" class="texto"></p>
+          <div id="golpes"></div>
+        </section>
+      </div>
+      <div class="cartao">
+        <h3 id="tituloTal">Talentos do time</h3>
+        <div id="talTime"></div>
+      </div>
+      <div class="cartao">
+        <h3>Talento de cada monstro</h3>
+        <div id="talMon"></div>
+      </div>
+      <div class="cartao">
+        <h3>Regras do modo automático</h3>
+        <div id="regras"></div>
+      </div>
+    </section>
+
+    <section class="pagina" id="p-trein" hidden>
+      <div class="cartao" id="cartaoPontos"></div>
+      <div id="listaTrein"></div>
+    </section>
+
+    <section class="pagina" id="p-opcoes" hidden>
+      <div class="cartao">
+        <h3>Som</h3>
+        <button class="linkbtn" id="somOpcao">Ligar ou desligar o som</button>
+      </div>
+      <div class="cartao">
+        <h3>Progresso</h3>
+        <p id="progresso" class="nota"></p>
+        <button class="linkbtn perigo" id="apagar">Apagar torneio e treinadores</button>
+      </div>
+      <div class="cartao">
+        <h3>Wiki</h3>
+        <p class="nota">Regras, elementos, cenários, status, talentos, torneio e treinadores explicados.</p>
+        <a class="linkbtn" href="wiki.html" target="_blank" rel="noopener">Abrir a wiki</a>
+      </div>
+    </section>
+
+    <div id="barraLutar"><div id="miniTime"></div><button id="lutar">Lutar!</button></div>
+  </div>
+  <div id="luta" hidden>
+    <div class="coluna">
+      <div class="palco">
+        <canvas id="arena" width="360" height="640"></canvas>
+        <div id="intro" hidden></div>
+        <div id="resultado" hidden>
+          <h2 id="resTitulo"></h2>
+          <p id="resSub"></p>
+          <div class="stats"><span>Duração <b id="rsDur"></b></span><span>Críticos <b id="rsCrit"></b></span><span>Status <b id="rsSt"></b></span></div>
+          <div id="premios"></div>
+          <div class="acoes"><button id="revanche" class="principal">Revanche</button><button id="outro">Trocar time</button></div>
+        </div>
+      </div>
+      <div id="time"></div>
+      <div id="talInfo"></div>
+      <div id="habs"></div>
+    </div>
+  </div>
+</main>
+<script src="pixel.js"></script>
+<script src="icones.js"></script>
+<script src="som.js"></script>
+<script src="battle.js"></script>
+<script src="arena.js"></script>
+<script>
+(function () {
+  const B = window.PixmonBatalha, A = window.PixmonArena, S = window.PixmonSom;
+  const NOMES = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
+  const ROTULO = { rapido: 'Rápido', forte: 'Forte', defesa: 'Defesa', ultimate: 'Ultimate' };
+  const ORDEM_BOTOES = ['forte', 'rapido', 'defesa', 'ultimate']; // teclas 1, 2, 3, 4
+  const CENAS = [['sorteio', 'Sorteio'], ...['campo', 'floresta', 'lago', 'montanha'].map((b) => [b, b[0].toUpperCase() + b.slice(1) + ' · ' + NOMES[B.BIOMA_ELEMENTO[b]] + ' +' + Math.round((B.BONUS_BIOMA - 1) * 100) + '%'])];
+  const MAX_HP = Math.max(...B.MONSTROS.map((m) => m.hp)), MAX_ATK = Math.max(...B.MONSTROS.map((m) => m.atk));
+  const MAX_VEL = Math.max(...B.MONSTROS.map((m) => 1 / m.rc));
+  const cv = document.getElementById('arena'), habs = document.getElementById('habs');
+  let bt = null, rng = null, pend = null, ultimoT = 0;
+  let sel = 0, cena = 'sorteio', ultimoBioma = null, time = [], ultimoTime = null; // time: índices dos monstros escolhidos (até 3)
+  let auto = false; try { auto = localStorage.getItem('pixmon-auto') === '1'; } catch (e) { /* ok */ } // luta automática: escolhida antes de lutar
+  // Talentos escolhidos (lembrados no navegador): time = ids dos talentos do time; mon = talento por id de monstro
+  let tal = { time: [], mon: {} }; try { tal = Object.assign(tal, JSON.parse(localStorage.getItem('pixmon-tal'))); } catch (e) { /* ok */ }
+  tal.time = B.normalizarTalentos({ time: tal.time }).time;
+  // Regras do modo automático (valem só na luta automática); lembradas no navegador
+  let pol = Object.assign({}, B.POLITICA_PADRAO); try { pol = Object.assign(pol, JSON.parse(localStorage.getItem('pixmon-pol'))); } catch (e) { /* ok */ }
+  // Torneio: 5 lutas, 2 vidas, talentos travados que se destravam com prêmios (regras em B.TORNEIO). Persistido no navegador.
+  const TORN = B.TORNEIO;
+  let modo = 'rapido', torneio = null, stat = { torneios: 0, melhor: 0 }, iaAdv = B.IA_FACIL, polAdv = null; // polAdv: jeito de jogar do adversário do torneio (null = IA simples)
+  try { torneio = JSON.parse(localStorage.getItem('pixmon-torneio')); stat = Object.assign(stat, JSON.parse(localStorage.getItem('pixmon-stat'))); if (localStorage.getItem('pixmon-modo') === 'torneio' && torneio) modo = 'torneio'; } catch (e) { /* ok */ }
+  if (torneio && !torneio.hp) { torneio.hp = [1, 1, 1]; torneio.hpIni = [1, 1, 1]; torneio.dif = torneio.dif || 'normal'; } // torneio salvo por uma versão antiga
+  const salvarT = () => { try { localStorage.setItem('pixmon-torneio', JSON.stringify(torneio)); localStorage.setItem('pixmon-stat', JSON.stringify(stat)); localStorage.setItem('pixmon-modo', modo); } catch (e) { /* ok */ } };
+  const novoTorneio = (dif = 'normal') => ({ fase: 1, vidas: TORN.dificuldades[dif].vidas, dif, time: null, dt: [...TORN.iniciais.time], dm: [...TORN.iniciais.mon], bonus: 0, hp: [1, 1, 1], hpIni: [1, 1, 1] });
+  const emTorneio = () => modo === 'torneio' && !!torneio;
+  const orcAtual = () => (emTorneio() ? TORN.orcBase + torneio.bonus : B.ORCAMENTO);
+  const liberadoTime = (id) => !emTorneio() || torneio.dt.includes(id), liberadoMon = (id) => !emTorneio() || torneio.dm.includes(id);
+  const timeTravado = () => emTorneio() && !!torneio.time; // depois da primeira luta o time do torneio não muda
+  // talentos que valem de verdade na luta: só os liberados e dentro do orçamento
+  function talEfetivo(meuTime) {
+    const t = { time: tal.time.filter(liberadoTime), mon: meuTime.map((i) => { const id = tal.mon[B.MONSTROS[i].id]; return id && liberadoMon(id) ? id : null; }) };
+    return B.normalizarTalentos(t, meuTime.length, orcAtual());
+  }
+  // Treinadores: pontos, insígnias compradas e vitórias por treinador (persistido). treinadorSel = treinador escolhido para desafiar.
+  let trein = { pontos: 0, insignias: [], venceu: {}, sel: null }; try { trein = Object.assign(trein, JSON.parse(localStorage.getItem('pixmon-trein'))); } catch (e) { /* ok */ }
+  let treinadorSel = trein.sel && B.treinadorPorId(trein.sel) ? trein.sel : null;
+  const salvarTrein = () => { trein.sel = treinadorSel; try { localStorage.setItem('pixmon-trein', JSON.stringify(trein)); } catch (e) { /* ok */ } };
+  const emTreinador = () => modo === 'treinador' && !!treinadorSel;
+  const nivelLiberado = (n) => n <= 1 || trein.insignias.some((id) => B.INSIGNIAS.find((x) => x.id === id).libera === n);
+  try { if (localStorage.getItem('pixmon-modo') === 'treinador' && treinadorSel) modo = 'treinador'; } catch (e) { /* ok */ }
+  let ultPronto = null; // para o bipe só na hora em que o ultimate fica pronto
+  const stats = { crit: 0, st: 0 }; // contados na luta para o cartão final
+
+  // Ícones das habilidades: recortes da folha ui/habilidades.png (grade 4x4 de 32 px): [coluna, linha].
+  // Fogo e ar só têm 2 ícones: o ultimate repete o do forte, e a defesa usa um escudo desenhado aqui.
+  const ICO = {
+    agua: { rapido: [1, 0], forte: [2, 0], defesa: null, ultimate: [3, 0] },
+    terra: { rapido: [1, 1], forte: [2, 1], defesa: null, ultimate: [3, 1] },
+    eletrico: { rapido: [1, 2], forte: [2, 2], defesa: null, ultimate: [3, 2] },
+    fogo: { rapido: [0, 3], forte: [1, 3], defesa: null, ultimate: [1, 3] },
+    ar: { rapido: [2, 3], forte: [3, 3], defesa: null, ultimate: [3, 3] },
+  };
+  const DEFESA = { terra: [3, 0], agua: [0, 1], fogo: [0, 2], eletrico: [2, 2], ar: [0, 3] }; // folha ui/defesas.png
+  const escudos = {};
+  function escudoUrl(tipo) { // escudo de pixel art na cor do elemento (32x32), para as defesas sem ícone na folha
+    if (escudos[tipo]) return escudos[tipo];
+    const k = A.CORES[tipo], c = document.createElement('canvas'); c.width = c.height = 32;
+    const x = c.getContext('2d');
+    x.fillStyle = '#1c2748'; x.fillRect(0, 0, 32, 32);
+    const meia = (y) => (y < 15 ? 10 : Math.round(10 * Math.sqrt(Math.max(0, 1 - ((y - 15) / 13) ** 2))));
+    for (let y = 2; y < 30; y++) { const w = meia(Math.min(27, Math.max(4, y))) + 2; x.fillStyle = '#0c1126'; x.fillRect(16 - w, y, 2 * w, 1); }
+    for (let y = 4; y < 28; y++) {
+      const w = meia(y);
+      x.fillStyle = k.c; x.fillRect(16 - w, y, 2 * w, 1);
+      x.fillStyle = k.l; x.fillRect(16 - w, y, Math.min(4, w), 1);
+      x.fillStyle = k.d; x.fillRect(16 + w - Math.min(3, w), y, Math.min(3, w), 1);
+    }
+    x.fillStyle = k.a; x.fillRect(15, 9, 2, 14); x.fillRect(11, 13, 10, 2); // cruz no meio
+    return (escudos[tipo] = c.toDataURL());
+  }
+  // preenche um elemento .ico/.mini com o recorte (ou o escudo) da habilidade g do monstro m
+  function pintaIcone(el, g, slot) {
+    const p = slot === 'defesa' ? DEFESA[g.tipo] : ICO[g.tipo][slot];
+    if (slot === 'defesa') el.style.backgroundImage = 'url(ui/defesas.png)';
+    if (p) { el.style.setProperty('--c', p[0]); el.style.setProperty('--r', p[1]); }
+    else { el.classList.add('escudo'); el.style.backgroundImage = 'url(' + escudoUrl(g.tipo) + ')'; }
+  }
+
+  const btnMudo = document.getElementById('mudo');
+  const rotuloMudo = () => { btnMudo.textContent = S.mudo() ? 'Som: não' : 'Som: sim'; };
+  btnMudo.onclick = () => {
+    S.alternar(); rotuloMudo(); S.tocar('toque');
+    if (S.mudo()) S.musica(false); else if (bt && !bt.fim) S.musica(true);
+  };
+  rotuloMudo();
+
+  // ---------- luta em tempo real ----------
+  // O jogador aperta um botão: o comando fica pendente por 350 ms (para não perder o toque feito um instante antes de a
+  // habilidade ficar pronta) e vale assim que a lógica aceitar. O adversário decide pela IA da lógica.
+  function apertar(slot) {
+    if (!bt || bt.fim || auto) return;
+    pend = { slot, resta: 350 };
+  }
+  function logica(t) {
+    if (!bt || bt.fim) return;
+    const dt = Math.min(50, t - ultimoT);
+    ultimoT = t;
+    if (dt <= 0) return;
+    let cmd = null;
+    if (auto) cmd = B.iaPolitica(bt, 0, rng, dt, pol); // o monstro do jogador joga sozinho, pelas regras escolhidas
+    else if (pend && B.podeUsar(bt, 0, pend.slot)) { cmd = pend.slot; pend = null; }
+    else if (pend && (pend.resta -= dt) <= 0) pend = null; // o toque vale por 350 ms de luta
+    if (auto) { const tr = B.iaTroca(bt, 0, rng, dt, pol); if (tr != null) B.trocar(bt, 0, tr); }
+    { const tr = B.iaTroca(bt, 1, rng, dt, polAdv); if (tr != null) B.trocar(bt, 1, tr); }
+    B.passo(bt, rng, dt, [cmd, polAdv ? B.iaPolitica(bt, 1, rng, dt, polAdv, iaAdv) : B.ia(bt, 1, rng, dt, iaAdv.reacao, iaAdv.ritmo)]);
+    A.eventos(bt.eventos);
+    if (bt.eventos.some((e) => e.ev === 'troca' && e.i === 0)) montarBotoes(bt.lados[0].m); // o novo monstro tem outros golpes e nomes
+    for (const e of bt.eventos) { if (e.ev === 'golpe' && e.crit) stats.crit++; else if (e.ev === 'status') stats.st++; }
+    if (bt.fim) terminar();
+  }
+  function terminar() {
+    pend = null;
+    const fim = bt.fim, esta = bt; // o aviso final só vale se ainda for a mesma luta
+    setTimeout(() => S.musica(false), 1600); // a música cai junto com o K.O.
+    setTimeout(() => {
+      if (bt !== esta) return;
+      const r = document.getElementById('resultado'), v = fim.vencedor;
+      r.className = v === 0 ? '' : v === 1 ? 'derrota' : 'empate'; r.hidden = false;
+      document.getElementById('resTitulo').textContent = v === 0 ? 'VITÓRIA!' : v === 1 ? 'DERROTA' : 'EMPATE';
+      document.getElementById('resSub').textContent = v == null ? 'Os dois caíram juntos.' : esta.lados[v].m.nome + ' venceu com ' + Math.max(0, Math.round(esta.lados[v].hp)) + ' de vida';
+      document.getElementById('rsDur').textContent = Math.round(esta.t / 1000) + ' s';
+      document.getElementById('rsCrit').textContent = stats.crit; document.getElementById('rsSt').textContent = stats.st;
+      resultadoModo(v);
+      S.tocar(fim.vencedor === 0 ? 'vitoria' : 'derrota');
+    }, 2600);
+  }
+
+  // botões: forte, rápido, defesa e ultimate do monstro escolhido, cada um com o nome da habilidade e a recarga
+  function montarBotoes(m) {
+    habs.innerHTML = '';
+    ORDEM_BOTOES.forEach((slot, n) => {
+      const g = m.golpes[slot], b = document.createElement('button');
+      b.className = 'hab'; b.dataset.slot = slot;
+      b.innerHTML = '<div class="ico"><div class="cd"></div><span class="seg"></span></div><span class="nome"></span><small></small>';
+      pintaIcone(b.querySelector('.ico'), g, slot);
+      b.querySelector('.nome').textContent = g.nome;
+      b.querySelector('small').textContent = (n + 1) + ' · ' + ROTULO[slot];
+      b.onpointerdown = (ev) => { ev.preventDefault(); apertar(slot); };
+      habs.appendChild(b);
+    });
+  }
+  function atualizarBotoes() {
+    if (!bt) return;
+    const l = bt.lados[0];
+    for (const b of habs.children) {
+      const s = b.dataset.slot, cd = l.cd[s], tot = l.cdTotal[s];
+      const ativo = s === 'defesa' && l.defesaAte > bt.t;
+      b.querySelector('.cd').style.height = (tot ? (cd / tot) * 100 : 0).toFixed(1) + '%';
+      b.querySelector('.seg').textContent = cd > 0 ? (cd < 10000 ? (cd / 1000).toFixed(1) : Math.ceil(cd / 1000)) : '';
+      b.classList.toggle('pronto', !bt.fim && cd <= 0 && !ativo);
+      if (s === 'ultimate') { const pronto = !bt.fim && cd <= 0; if (pronto && ultPronto === false) S.tocar('pronto'); ultPronto = pronto; }
+      b.classList.toggle('ocupado', !bt.fim && cd <= 0 && s !== 'defesa' && !!l.acao); // pronto, mas ainda carregando outro ataque
+      b.classList.toggle('ativo', ativo);
+    }
+  }
+  document.addEventListener('keydown', (e) => {
+    const n = '1234'.indexOf(e.key);
+    if (n >= 0 && !e.repeat) apertar(ORDEM_BOTOES[n]);
+  });
+
+  function iniciar(meuTime, bioma) {
+    S.tocar('toque'); // o primeiro toque também libera o áudio do navegador
+    S.musica(true);
+    ultimoTime = meuTime.slice();
+    const biomas = Object.keys(B.BIOMA_ELEMENTO);
+    bioma = bioma || biomas[Math.floor(Math.random() * biomas.length)]; // o cenário vale na lógica (favorece um elemento), então é sorteado aqui
+    let adv = [], talAdv, cfg = null;
+    if (emTorneio()) { cfg = TORN.adv[torneio.fase - 1]; adv = B.adversariosTorneio(Math.random, meuTime.map((i) => B.MONSTROS[i]), torneio.fase); talAdv = B.talentosAdversario(Math.random, torneio.fase, torneio.dif, adv.length); iaAdv = B.iaAdversario(torneio.fase, torneio.dif); polAdv = cfg.pol; torneio.hpIni = torneio.hp.slice(); salvarT(); }
+    else if (emTreinador()) { const tr = B.treinadorPorId(treinadorSel); adv = B.timeDoTreinador(tr); talAdv = B.talentosTreinador(tr); iaAdv = B.iaTreinador(tr); polAdv = tr.pol; }
+    else { const resto = B.MONSTROS.filter((_, i) => !meuTime.includes(i)); while (adv.length < meuTime.length) adv.push(resto.splice(Math.floor(Math.random() * resto.length), 1)[0]); talAdv = B.sortearTalentos(Math.random, adv.length); iaAdv = B.IA_FACIL; polAdv = null; }
+    rng = B.criarRng(Date.now() >>> 0);
+    const meus = talEfetivo(meuTime);
+    bt = B.novaBatalha(meuTime.map((i) => B.MONSTROS[i]), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : null);
+    mostrarIntro(emTorneio() ? { f: (cfg.chefe ? 'CHEFE · ' : '') + 'FASE ' + torneio.fase + '/' + TORN.fases, n: cfg.nome + ', ' + cfg.titulo, q: cfg.frase, chefe: !!cfg.chefe } : emTreinador() ? (() => { const tr = B.treinadorPorId(treinadorSel); return { f: 'NÍVEL ' + tr.nivel, n: tr.nome, q: tr.frase, chefe: tr.id === 'aurora' }; })() : null);
+    const nomes = (t) => [...t.time.map((id) => B.TAL_TIME[id].nome), ...t.mon.filter(Boolean).map((id) => B.TAL_MON[id].nome)];
+    document.getElementById('talInfo').textContent = (emTreinador() ? B.treinadorPorId(treinadorSel).nome + ' · ' : '') + (emTorneio() ? 'Torneio: fase ' + torneio.fase + '/' + TORN.fases + ' · ' + cfg.nome + ' ' + cfg.titulo + ' · vidas ' + torneio.vidas + '   |   ' : '') + 'Seus talentos: ' + (nomes(bt.talentos[0]).join(' · ') || 'nenhum') + '   |   Adversário: ' + (nomes(bt.talentos[1]).join(' · ') || 'nenhum') + (auto ? '   |   Regras: ' + B.ESTILOS[pol.estilo].nome + ' · ' + B.OPCOES_POLITICA.ultimate[pol.ultimate].split(':')[0] + (pol.trocaDesv ? ' · troca em desvantagem' : '') : '');
+    pend = null; ultimoT = performance.now();
+    document.getElementById('escolha').hidden = true;
+    document.getElementById('luta').hidden = false;
+    document.getElementById('resultado').hidden = true; stats.crit = stats.st = 0; ultimoBioma = bioma; ultPronto = false;
+    montarBotoes(bt.lados[0].m); habs.classList.toggle('auto', auto);
+    montarTime(); timeEl.classList.toggle('auto', auto);
+    A.iniciar(cv, bt, bioma);
+  }
+
+  // linha do time na luta: os 3 monstros (foto, nome, vida); tocar em um troca (6 s de espera; depois de um nocaute, escolhe o próximo)
+  const timeEl = document.getElementById('time');
+  // aviso de abertura da luta do torneio: fase, nome do adversário e a frase dele
+  function mostrarIntro(info) {
+    const el = document.getElementById('intro');
+    if (!info) { el.hidden = true; return; }
+    el.className = info.chefe ? 'chefe' : ''; el.hidden = false; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+    el.innerHTML = '<div class="f"></div><div class="n"></div><div class="q"></div>';
+    el.querySelector('.f').textContent = info.f;
+    el.querySelector('.n').textContent = info.n; el.querySelector('.q').textContent = '“' + info.q + '”';
+    setTimeout(() => { el.hidden = true; }, 3300);
+  }
+  function montarTime() {
+    timeEl.innerHTML = '';
+    bt.times[0].forEach((l, k) => {
+      const b = document.createElement('button');
+      b.className = 'reserva'; b.setAttribute('aria-label', 'Trocar para ' + l.m.nome);
+      b.innerHTML = '<canvas width="40" height="40"></canvas><div class="inf"><b></b><div class="vida"><i></i></div></div>';
+      b.querySelector('b').textContent = l.m.nome;
+      b.onpointerdown = (ev) => { ev.preventDefault(); if (!auto && B.trocar(bt, 0, k)) S.tocar('toque'); };
+      timeEl.appendChild(b);
+    });
+  }
+  function atualizarTime() {
+    if (!bt) return;
+    const t = performance.now();
+    [...timeEl.children].forEach((b, k) => {
+      const l = bt.times[0][k], ativo = bt.ativo[0] === k;
+      b.classList.toggle('ativo', ativo); b.classList.toggle('caido', l.hp <= 0);
+      b.classList.toggle('espera', bt.trocaCd[0] > 0); b.classList.toggle('escolher', !!bt.pendente[0] && l.hp > 0 && !ativo);
+      b.querySelector('i').style.width = Math.max(0, (l.hp / l.m.hp) * 100) + '%';
+      if (!b._u || t - b._u > 200) { b._u = t; const x = b.querySelector('canvas').getContext('2d'); x.clearRect(0, 0, 40, 40); x.imageSmoothingEnabled = false; A.monstro(x, l.m, 20, 36, t, false, false, 1, null); }
+    });
+  }
+
+  // ---------- escolha: grade de ícones, ficha do monstro selecionado, cenário e botão ----------
+  const grade = document.getElementById('grade');
+  B.MONSTROS.forEach((m, i) => {
+    const b = document.createElement('button');
+    b.className = 'celula'; b.setAttribute('aria-label', m.nome);
+    const c = document.createElement('canvas'); c.width = 48; c.height = 48;
+    b.appendChild(c);
+    b.onclick = () => { sel = i; alternar(i); mostrar(); S.tocar('toque'); };
+    grade.appendChild(b);
+  });
+  // time: tocar num monstro entra ou sai do time (até 3, sem repetir); a faixa embaixo mostra a ordem de entrada
+  const meuTimeEl = document.getElementById('meuTime'), vagaCv = [];
+  for (let k = 0; k < 3; k++) { const v = document.createElement('button'); v.className = 'vaga'; v.onclick = () => { if (!timeTravado() && time[k] != null) { time.splice(k, 1); marcarTime(); S.tocar('toque'); } }; meuTimeEl.appendChild(v); }
+  function alternar(i) { if (timeTravado()) return; const k = time.indexOf(i); if (k >= 0) time.splice(k, 1); else if (time.length < 3) time.push(i); marcarTime(); }
+  function marcarTime() {
+    [...grade.children].forEach((b, i) => { const k = time.indexOf(i); if (k >= 0) b.dataset.ordem = k + 1; else delete b.dataset.ordem; });
+    [...meuTimeEl.children].forEach((v, k) => {
+      const i = time[k]; v.classList.toggle('cheia', i != null); v.innerHTML = '';
+      if (i == null) { v.textContent = (k + 1) + 'º vazio'; return; }
+      const c = document.createElement('canvas'); c.width = c.height = 44; v.appendChild(c);
+      const sp = document.createElement('span'); sp.textContent = B.MONSTROS[i].nome; v.appendChild(sp); vagaCv[k] = c;
+    });
+    renderTal();
+    document.getElementById('tituloTime').textContent = 'Seu time (' + time.length + '/3): ' + (time.length < 3 ? 'toque nos monstros para escolher' : 'toque numa vaga para tirar');
+    rotuloLutar(); renderResumo();
+  }
+  const salvarPol = () => { try { localStorage.setItem('pixmon-pol', JSON.stringify(pol)); } catch (e) { /* ok */ } };
+  const ROT_REGRA = { estilo: 'Estilo de luta', defesa: 'Defesa', ultimate: 'Ultimate', trocaDesv: 'Trocar quando o adversário tem vantagem', trocaVida: 'Trocar por vida baixa', proximo: 'Quem entra depois de um nocaute' };
+  function montarRegras() {
+    const el = document.getElementById('regras'); el.innerHTML = '';
+    const opcoes = Object.assign({}, B.OPCOES_POLITICA, { trocaDesv: { true: 'Sim: trocar se houver um monstro com vantagem', false: 'Não trocar por isso' } });
+    Object.keys(ROT_REGRA).forEach((campo) => {
+      const d = document.createElement('div'), l = document.createElement('span'), sel = document.createElement('select');
+      d.className = 'regra'; l.textContent = ROT_REGRA[campo];
+      Object.entries(opcoes[campo]).forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); });
+      sel.value = String(pol[campo]);
+      sel.onchange = () => { pol[campo] = campo === 'trocaDesv' ? sel.value === 'true' : campo === 'trocaVida' ? Number(sel.value) : sel.value; salvarPol(); S.tocar('toque'); };
+      d.appendChild(l); d.appendChild(sel); el.appendChild(d);
+    });
+  }
+  montarRegras();
+  const salvarTal = () => { try { localStorage.setItem('pixmon-tal', JSON.stringify(tal)); } catch (e) { /* ok */ } };
+  function renderTal() {
+    const orc = orcAtual(), usados = B.custoTalentos(tal.time.filter(liberadoTime)), tt = document.getElementById('talTime'), tm = document.getElementById('talMon');
+    document.getElementById('tituloTal').textContent = 'Talentos do time (' + usados + '/' + orc + ' pontos)' + (emTorneio() ? ' · travados ganham-se vencendo' : '');
+    tt.innerHTML = ''; tt.className = 'talgrid';
+    const GRUPO = { cura_cadeia: 'cura', reserva: 'cura', sorte: 'sorte', demolidor: 'sorte', ultimate: 'ritmo', troca: 'ritmo', sede: 'ritmo', abertura: 'ataque', dupla: 'ataque', arco: 'defesa', pe: 'defesa' };
+    Object.entries(B.TAL_TIME).forEach(([id, t]) => {
+      const lib = liberadoTime(id), b = document.createElement('button'), sel = lib && tal.time.includes(id);
+      b.className = 'tcard' + (sel ? ' sel' : '') + (lib ? '' : ' trava'); b.dataset.g = GRUPO[id] || 'defesa'; b.disabled = !lib || (!sel && usados + t.custo > orc);
+      b.innerHTML = '<div class="timg"><img alt=""></div><b class="tnome"></b><span class="tdesc"></span><span class="tcusto"></span>';
+      b.querySelector('img').src = window.PixmonIcones.talento(id); b.querySelector('.tnome').textContent = t.nome; b.querySelector('.tdesc').textContent = t.desc; b.querySelector('.tcusto').textContent = t.custo + ' pt' + (t.custo > 1 ? 's' : '');
+      b.onclick = () => { tal.time = sel ? tal.time.filter((x) => x !== id) : [...tal.time, id]; salvarTal(); S.tocar('toque'); renderTal(); };
+      tt.appendChild(b);
+    });
+    tm.innerHTML = '';
+    time.forEach((i) => {
+      const m = B.MONSTROS[i], r = document.createElement('div'), atual = liberadoMon(tal.mon[m.id]) ? tal.mon[m.id] : null;
+      r.className = 'talm'; r.innerHTML = '<div class="th"><span></span><small></small></div><div class="mgrid"></div><div class="desc"></div>';
+      r.querySelector('.th span').textContent = m.nome; r.querySelector('.th small').textContent = atual ? B.TAL_MON[atual].nome : 'nenhum';
+      r.querySelector('.desc').textContent = atual ? B.TAL_MON[atual].desc : 'Toque num talento para escolher (toque de novo para tirar).';
+      const grid = r.querySelector('.mgrid');
+      Object.entries(B.TAL_MON).forEach(([id, t]) => {
+        const lib = liberadoMon(id), c = document.createElement('button');
+        c.className = 'mchip' + (atual === id ? ' sel' : '') + (lib ? '' : ' trava'); c.disabled = !lib; c.title = t.desc;
+        c.innerHTML = '<img alt=""><span></span>'; c.querySelector('img').src = window.PixmonIcones.talento(id); c.querySelector('span').textContent = (lib ? '' : '🔒 ') + t.nome;
+        c.onclick = () => { tal.mon[m.id] = atual === id ? null : id; salvarTal(); S.tocar('toque'); renderTal(); };
+        grid.appendChild(c);
+      });
+      tm.appendChild(r);
+    });
+  }
+  document.getElementById('sortear').onclick = () => { if (timeTravado()) return; const ids = B.MONSTROS.map((_, i) => i); time = []; while (time.length < 3) time.push(ids.splice(Math.floor(Math.random() * ids.length), 1)[0]); sel = time[0]; marcarTime(); mostrar(); S.tocar('toque'); };
+  document.getElementById('contagem').textContent = B.MONSTROS.length + ' monstros';
+
+  // ícones animados (respiram e batem as asas); o PixelLab entra quando as sprites carregam
+  function desenharIcones() {
+    const t = performance.now();
+    time.forEach((i, k) => { const c = vagaCv[k], x = c && c.isConnected && c.getContext('2d'); if (x) { x.clearRect(0, 0, 44, 44); x.imageSmoothingEnabled = false; A.monstro(x, B.MONSTROS[i], 22, 40, t, false, false, 1, null); } });
+    [...grade.children].forEach((b, i) => {
+      const x = b.firstChild.getContext('2d');
+      x.clearRect(0, 0, 48, 48); x.imageSmoothingEnabled = false;
+      A.monstro(x, B.MONSTROS[i], 24, 42, t, false, false, 1, null);
+    });
+  }
+  setInterval(desenharIcones, 250);
+
+  const abas = document.getElementById('abas');
+  CENAS.forEach(([id, nome]) => {
+    const b = document.createElement('button');
+    b.className = 'aba'; b.dataset.id = id; b.textContent = nome;
+    b.onclick = () => { cena = id; S.tocar('toque'); marcarAbas(); };
+    abas.appendChild(b);
+  });
+  function marcarAbas() { [...abas.children].forEach((b) => b.classList.toggle('sel', b.dataset.id === cena)); }
+
+  function mostrar() {
+    const m = B.MONSTROS[sel], cor = A.CORES[m.tipo];
+    [...grade.children].forEach((b, i) => b.classList.toggle('sel', i === sel));
+    document.getElementById('fNome').textContent = m.nome;
+    document.getElementById('fNum').textContent = 'Nv ' + m.nivel + '  ·  Nº ' + String(sel + 1).padStart(4, '0');
+    const tipo = document.getElementById('fTipo');
+    tipo.textContent = NOMES[m.tipo]; tipo.style.background = cor.c;
+    document.getElementById('bPs').style.width = Math.round((m.hp / MAX_HP) * 100) + '%';
+    document.getElementById('vPs').textContent = m.hp;
+    document.getElementById('bAtq').style.width = Math.round((m.atk / MAX_ATK) * 100) + '%';
+    document.getElementById('vAtq').textContent = m.atk;
+    document.getElementById('bVel').style.width = Math.round(((1 / m.rc) / MAX_VEL) * 100) + '%';
+    document.getElementById('vVel').textContent = (1 / m.rc).toFixed(2);
+    const fraco = Object.keys(B.VENCE).find((e) => B.VENCE[e] === m.tipo);
+    const casa = Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === m.tipo);
+    document.getElementById('fTexto').textContent = 'Vantagem contra ' + NOMES[B.VENCE[m.tipo]] + '. Fraco contra ' + NOMES[fraco] + '. Dano x' + B.EL[m.tipo].dano + ', vida x' + B.EL[m.tipo].hp + (casa.length ? '. Mais forte em: ' + casa.join(', ') + '.' : '.');
+    const golpes = document.getElementById('golpes');
+    golpes.innerHTML = '';
+    ['rapido', 'forte', 'defesa', 'ultimate'].forEach((slot) => {
+      const g = m.golpes[slot], d = document.createElement('div');
+      d.className = 'golpe';
+      const recarga = (B.cdDe(m, slot) / 1000).toFixed(1) + ' s';
+      const info = slot === 'defesa' ? 'evita 1 ataque · recarga ' + recarga
+        : '≈' + B.danoBase(m, slot).toFixed(1) + ' de dano · carga ' + (B.cargaDe(m, slot) / 1000).toFixed(2) + ' s · recarga ' + recarga;
+      d.innerHTML = '<span class="rot"></span><span class="nm"></span><span class="info"></span><div class="mini"></div>';
+      d.querySelector('.rot').textContent = ROTULO[slot] + ' · ' + NOMES[g.tipo];
+      d.querySelector('.nm').textContent = g.nome;
+      d.querySelector('.info').textContent = info;
+      pintaIcone(d.querySelector('.mini'), g, slot);
+      golpes.appendChild(d);
+    });
+  }
+
+  document.getElementById('lutar').onclick = () => { // se faltam monstros no time, completa sorteando
+    if (modo === 'treinador' && !treinadorSel) { irPagina('trein'); return; }
+    const ids = B.MONSTROS.map((_, i) => i).filter((i) => !time.includes(i));
+    while (time.length < 3) time.push(ids.splice(Math.floor(Math.random() * ids.length), 1)[0]);
+    marcarTime();
+    if (emTorneio() && !torneio.time) { torneio.time = time.slice(); salvarT(); }
+    iniciar(time, cena === 'sorteio' ? null : cena);
+  };
+  // ---------- botões do cartão de resultado (mudam de função conforme o modo) ----------
+  const btnRev = document.getElementById('revanche'), btnOutro = document.getElementById('outro');
+  let acaoRev = () => iniciar(ultimoTime, ultimoBioma), acaoOutro = () => voltarEscolha();
+  btnRev.onclick = () => acaoRev(); btnOutro.onclick = () => acaoOutro();
+  function voltarEscolha() {
+    document.getElementById('resultado').hidden = true;
+    bt = null; pend = null; habs.innerHTML = '';
+    document.getElementById('escolha').hidden = false;
+    document.getElementById('luta').hidden = true;
+    atualizarModo(); S.tema(true);
+  }
+  function botoes(txtRev, fnRev, txtOutro, fnOutro, revOk = true) { btnRev.textContent = txtRev; acaoRev = fnRev; btnRev.disabled = !revOk; btnOutro.textContent = txtOutro; acaoOutro = fnOutro; }
+  // 3 prêmios sorteados entre o que ainda está travado (talentos do time, talentos de monstro) e +1 ponto de orçamento
+  function sortearPremios() {
+    const pool = [...Object.keys(B.TAL_TIME).filter((id) => !torneio.dt.includes(id)).map((id) => ({ t: 'time', id })), ...Object.keys(B.TAL_MON).filter((id) => !torneio.dm.includes(id)).map((id) => ({ t: 'mon', id }))];
+    if (torneio.bonus < TORN.bonusMax) pool.push({ t: 'pt' }, { t: 'pt' });
+    if (torneio.hp.some((f) => f < 1)) pool.push({ t: 'cura' }, { t: 'cura' });
+    const out = []; while (out.length < 3 && pool.length) { const p = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; if (!((p.t === 'pt' || p.t === 'cura') && out.some((o) => o.t === p.t))) out.push(p); }
+    return out;
+  }
+  function resultadoModo(v) {
+    const prem = document.getElementById('premios'), sub = document.getElementById('resSub'), tit = document.getElementById('resTitulo'), fase = torneio ? torneio.fase : 0;
+    prem.innerHTML = '';
+    if (emTreinador()) { // desafio a um treinador: pontos na primeira vitória (e poucos nas revanches)
+      const tr = B.treinadorPorId(treinadorSel);
+      if (v === 0) {
+        const n = trein.venceu[tr.id] || 0, ganho = n ? B.PONTOS_TREINADOR.revanche : B.PONTOS_TREINADOR.primeira(tr.nivel);
+        trein.venceu[tr.id] = n + 1; trein.pontos += ganho; salvarTrein(); renderTrein();
+        sub.textContent = 'Você venceu ' + tr.nome + '! +' + ganho + ' pontos' + (n ? '' : ' (primeira vitória)') + ' · total ' + trein.pontos;
+      } else sub.textContent = tr.nome + ' venceu: "' + tr.frase + '"';
+      botoes(v === 0 ? 'Revanche' : 'Tentar de novo', () => iniciar(ultimoTime, ultimoBioma), 'Voltar', voltarEscolha); return;
+    }
+    if (!emTorneio()) { botoes('Revanche', () => iniciar(ultimoTime, ultimoBioma), 'Trocar time', voltarEscolha); return; }
+    const fracs = bt.times[0].map((l) => Math.max(0, l.hp) / l.m.hp);
+    if (v === 0 && fase >= TORN.fases) { // campeão
+      stat.torneios++; stat.melhor = TORN.fases; torneio = null; salvarT();
+      tit.textContent = 'CAMPEÃO!'; sub.textContent = 'Você derrotou ' + TORN.adv[TORN.fases - 1].nome + ' e venceu as ' + TORN.fases + ' lutas. Torneios vencidos: ' + stat.torneios;
+      botoes('Novo torneio', () => voltarEscolha(), 'Voltar', voltarEscolha); return;
+    }
+    if (v === 0) { // vitória: a vida do time é levada para a próxima luta (com cura entre as lutas); escolhe um prêmio
+      torneio.hp = fracs.map((f) => (f > 0 ? Math.min(1, f + TORN.curaEntre) : TORN.revive)); salvarT();
+      sub.textContent = 'Fase ' + fase + '/' + TORN.fases + ' vencida! Cura entre as lutas: +' + Math.round(TORN.curaEntre * 100) + '% (caídos voltam com ' + Math.round(TORN.revive * 100) + '%). Escolha 1 prêmio';
+      botoes('Escolha um prêmio', () => iniciar(ultimoTime, null), 'Sair do torneio', voltarEscolha, false);
+      sortearPremios().forEach((p) => {
+        const b = document.createElement('button'); b.className = 'tal'; b.innerHTML = '<b></b><span class="custo"></span><small></small>';
+        const nome = p.t === 'pt' ? '+1 ponto de talento' : p.t === 'cura' ? 'Descanso completo' : (p.t === 'time' ? B.TAL_TIME[p.id].nome : B.TAL_MON[p.id].nome);
+        b.querySelector('b').textContent = nome;
+        b.querySelector('.custo').textContent = p.t === 'cura' ? 'toda a vida volta' : p.t === 'pt' ? 'orçamento ' + (TORN.orcBase + torneio.bonus) + ' → ' + (TORN.orcBase + torneio.bonus + 1) : p.t === 'time' ? 'talento do time · ' + B.TAL_TIME[p.id].custo + ' pts' : 'talento de monstro';
+        b.querySelector('small').textContent = p.t === 'cura' ? 'o time inteiro recupera 100% da vida antes da próxima luta' : p.t === 'pt' ? 'dá mais espaço para talentos do time' : (p.t === 'time' ? B.TAL_TIME[p.id].desc : B.TAL_MON[p.id].desc);
+        b.onclick = () => {
+          if (p.t === 'cura') torneio.hp = torneio.hp.map(() => 1); else if (p.t === 'pt') torneio.bonus++; else if (p.t === 'time') torneio.dt.push(p.id); else torneio.dm.push(p.id);
+          torneio.fase++; salvarT(); S.tocar('janela');
+          prem.innerHTML = ''; sub.textContent = 'Prêmio: ' + nome + '. Próxima: fase ' + torneio.fase + '/' + TORN.fases;
+          botoes('Próxima luta (fase ' + torneio.fase + '/' + TORN.fases + ')', () => iniciar(ultimoTime, null), 'Mexer nos talentos', voltarEscolha);
+        };
+        prem.appendChild(b);
+      });
+      return;
+    }
+    torneio.vidas--; stat.melhor = Math.max(stat.melhor, fase - 1); torneio.hp = (torneio.hpIni || [1, 1, 1]).slice(); // tentar de novo: volta à vida de antes da luta
+    if (torneio.vidas <= 0) {
+      const f = fase; torneio = null; salvarT();
+      tit.textContent = 'FIM DO TORNEIO'; sub.textContent = 'Você caiu na fase ' + f + '/' + TORN.fases + '. Melhor fase concluída: ' + stat.melhor;
+      botoes('Novo torneio', () => voltarEscolha(), 'Voltar', voltarEscolha); return;
+    }
+    salvarT();
+    sub.textContent = TORN.adv[fase - 1].nome + ' venceu: "' + TORN.adv[fase - 1].frase + '". Você perdeu uma vida, restam ' + torneio.vidas;
+    botoes('Tentar de novo', () => iniciar(ultimoTime, null), 'Mexer nos talentos', voltarEscolha);
+  }
+
+  // abas Luta rápida / Torneio e a faixa de status do torneio
+  const mR = document.getElementById('mRapido'), mT = document.getElementById('mTorneio'), tInfo = document.getElementById('torneioInfo');
+  function atualizarModo() {
+    if (modo === 'torneio' && !torneio) { torneio = novoTorneio(); salvarT(); } // depois de um torneio acabar, "Novo torneio" já começa o próximo
+    mR.classList.toggle('sel', modo === 'rapido'); mT.classList.toggle('sel', modo === 'torneio'); mTr.classList.toggle('sel', modo === 'treinador');
+    document.getElementById('mTorneioTxt').textContent = torneio ? 'fase ' + torneio.fase + '/' + TORN.fases + ' · ' + torneio.vidas + (torneio.vidas > 1 ? ' vidas' : ' vida') : '5 lutas contra campeões';
+    document.getElementById('mTreinTxt').textContent = treinadorSel ? B.treinadorPorId(treinadorSel).nome.replace('Treinadora ', '').replace('Treinador ', '') : 'desafie um treinador';
+    tInfo.innerHTML = '';
+    const txt = document.createElement('span');
+    if (modo === 'torneio' && torneio) {
+      const op = TORN.adv[torneio.fase - 1];
+      txt.textContent = 'Fase ' + torneio.fase + '/' + TORN.fases + ' (' + op.nome + (op.chefe ? ', chefe' : '') + ') · vidas ' + torneio.vidas + ' · orçamento ' + (TORN.orcBase + torneio.bonus) + ' pts' + (torneio.time ? ' · time travado · vida do time ' + Math.round(torneio.hp.reduce((a, b) => a + b, 0) / torneio.hp.length * 100) + '%' : '');
+      const ab = document.createElement('button'); ab.textContent = 'Abandonar';
+      ab.onclick = () => { if (confirm('Abandonar o torneio e perder o progresso?')) { torneio = null; modo = 'rapido'; salvarT(); atualizarModo(); } };
+      if (!torneio.time) { // antes da primeira luta dá para escolher a dificuldade
+        const sel = document.createElement('select');
+        Object.entries(TORN.dificuldades).forEach(([id, d]) => { const o = document.createElement('option'); o.value = id; o.textContent = d.nome + ' (' + d.vidas + (d.vidas > 1 ? ' vidas' : ' vida') + ')'; sel.appendChild(o); });
+        sel.value = torneio.dif; sel.onchange = () => { torneio.dif = sel.value; torneio.vidas = TORN.dificuldades[sel.value].vidas; salvarT(); atualizarModo(); };
+        tInfo.appendChild(sel);
+      }
+      tInfo.appendChild(txt); tInfo.appendChild(ab);
+    } else if (modo === 'treinador') {
+      const tr = treinadorSel && B.treinadorPorId(treinadorSel);
+      txt.textContent = tr ? 'Desafio: ' + tr.nome + ' (nível ' + tr.nivel + '). Vencer dá pontos para comprar insígnias.' : 'Escolha um treinador na aba Treinadores.'; tInfo.appendChild(txt);
+    } else { txt.textContent = 'Luta rápida: todos os talentos liberados · torneios vencidos: ' + stat.torneios + ' · melhor fase: ' + stat.melhor; tInfo.appendChild(txt); }
+    if (timeTravado()) { time = torneio.time.slice(); sel = time[0]; }
+    marcarTime(); mostrar(); renderTrein();
+  }
+  function rotuloLutar() {
+    const lutar = document.getElementById('lutar'), falta = 3 - time.length, sorteia = falta > 0 ? ' (sorteia ' + falta + ' que ' + (falta === 1 ? 'falta' : 'faltam') + ')' : '';
+    if (modo === 'treinador') { lutar.textContent = treinadorSel ? 'Desafiar ' + B.treinadorPorId(treinadorSel).nome + sorteia : 'Escolher treinador'; return; }
+    lutar.textContent = emTorneio() ? (torneio.time ? 'Próxima luta (fase ' + torneio.fase + '/' + TORN.fases + ')' : 'Começar torneio' + sorteia) : 'Lutar!' + sorteia;
+  }
+  if (location.search.includes('dbg')) window.__pixmon = { resultadoModo, iniciar, get torneio() { return torneio; } }; // conferência: ?dbg
+  const mTr = document.getElementById('mTrein');
+  mTr.onclick = () => { modo = 'treinador'; salvarT(); salvarTrein(); S.tocar('toque'); atualizarModo(); if (!treinadorSel) irPagina('trein'); };
+  mR.onclick = () => { modo = 'rapido'; salvarT(); S.tocar('toque'); atualizarModo(); };
+  mT.onclick = () => { modo = 'torneio'; if (!torneio) torneio = novoTorneio(); salvarT(); S.tocar('toque'); atualizarModo(); };
+
+  // ícones animados de monstros fora da grade (resumo do time, barra de baixo, cards dos treinadores)
+  const animCv = [];
+  function iconeMonstro(pai, idx, tam) { const c = document.createElement('canvas'); c.width = c.height = 44; c.style.width = c.style.height = tam + 'px'; pai.appendChild(c); animCv.push({ c, idx }); return c; }
+  setInterval(() => { const t = performance.now(); for (let k = animCv.length - 1; k >= 0; k--) { const { c, idx } = animCv[k]; if (!c.isConnected) { animCv.splice(k, 1); continue; } const x = c.getContext('2d'); x.clearRect(0, 0, 44, 44); x.imageSmoothingEnabled = false; A.monstro(x, B.MONSTROS[idx], 22, 40, t, false, false, 1, null); } }, 250);
+  function renderResumo() {
+    const r = document.getElementById('resumoTime'), mb = document.getElementById('miniTime'); r.innerHTML = ''; mb.innerHTML = '';
+    for (let k = 0; k < 3; k++) {
+      const d = document.createElement('div'), i = time[k]; d.className = 'rmon' + (i == null ? ' vazio' : '');
+      if (i == null) d.textContent = (k + 1) + 'º vazio'; else { iconeMonstro(d, i, 44); const n = document.createElement('span'); n.textContent = B.MONSTROS[i].nome; d.appendChild(n); iconeMonstro(mb, i, 34); }
+      r.appendChild(d);
+    }
+    const p = document.createElement('p'); p.className = 'nota';
+    const ntal = tal.time.filter(liberadoTime).length, nmon = time.filter((i) => tal.mon[B.MONSTROS[i].id] && liberadoMon(tal.mon[B.MONSTROS[i].id])).length;
+    p.textContent = ntal + ' talento(s) do time · ' + nmon + ' de monstro · regras: ' + B.ESTILOS[pol.estilo].nome;
+    r.appendChild(p); p.style.gridColumn = '1 / -1';
+  }
+  // navegação entre as páginas
+  function irPagina(p) {
+    document.querySelectorAll('.pagina').forEach((el) => { el.hidden = el.id !== 'p-' + p; });
+    document.querySelectorAll('.tabsnav button').forEach((b) => b.classList.toggle('sel', b.dataset.p === p));
+    if (p === 'trein') renderTrein(); if (p === 'opcoes') renderOpcoes(); window.scrollTo({ top: 0 });
+  }
+  document.querySelectorAll('.tabsnav button').forEach((b) => { b.onclick = () => { S.tocar('toque'); irPagina(b.dataset.p); }; });
+  document.querySelectorAll('[data-ir]').forEach((b) => { b.onclick = () => { S.tocar('toque'); irPagina(b.dataset.ir); }; });
+  // página dos treinadores: pontos, insígnias e a lista de desafios por nível
+  function renderTrein() {
+    const cp = document.getElementById('cartaoPontos'), lista = document.getElementById('listaTrein'); if (!cp) return;
+    cp.innerHTML = '<div class="pontos"><h3 style="margin:0;color:#ffd35a;font-size:16px">Pontos e insígnias</h3><b></b></div><p class="nota">Vencer um treinador dá pontos (10 x o nível na primeira vitória, 3 nas revanches). Troque os pontos por insígnias para desafiar treinadores mais fortes.</p>';
+    cp.querySelector('b').textContent = trein.pontos + ' pts';
+    B.INSIGNIAS.forEach((ins, k) => {
+      const tem = trein.insignias.includes(ins.id), anterior = k === 0 || trein.insignias.includes(B.INSIGNIAS[k - 1].id), d = document.createElement('div');
+      d.className = 'insignia' + (tem ? ' tem' : ''); d.innerHTML = '<b></b><span></span><small></small>';
+      d.querySelector('b').textContent = ins.nome; d.querySelector('small').textContent = 'Libera os treinadores do nível ' + ins.libera;
+      if (tem) d.querySelector('span').textContent = 'conquistada';
+      else { const b = document.createElement('button'); b.textContent = 'Trocar por ' + ins.custo + ' pts'; b.disabled = !anterior || trein.pontos < ins.custo; b.onclick = () => { trein.pontos -= ins.custo; trein.insignias.push(ins.id); salvarTrein(); S.tocar('janela'); renderTrein(); }; d.querySelector('span').appendChild(b); }
+      cp.appendChild(d);
+    });
+    lista.innerHTML = '';
+    for (let n = 1; n <= 5; n++) {
+      const lib = nivelLiberado(n), ins = B.INSIGNIAS.find((x) => x.libera === n), tit = document.createElement('div'); tit.className = 'nivelTit';
+      const venc = B.TREINADORES.filter((t) => t.nivel === n && trein.venceu[t.id]).length;
+      tit.innerHTML = '<span></span><span></span>'; tit.firstChild.textContent = 'Nível ' + n + (lib ? '' : ' 🔒 ' + ins.nome); tit.lastChild.textContent = venc + '/3 vencidos'; lista.appendChild(tit);
+      B.TREINADORES.filter((t) => t.nivel === n).forEach((t) => {
+        const d = document.createElement('div'); d.className = 'trein' + (lib ? '' : ' trava') + (treinadorSel === t.id ? ' sel' : '');
+        const mons = document.createElement('div'); mons.className = 'tmons'; B.timeDoTreinador(t).forEach((m) => iconeMonstro(mons, B.MONSTROS.indexOf(m), 36));
+        const inf = document.createElement('div'); inf.className = 'inf'; inf.innerHTML = '<b></b><small></small><small></small>';
+        inf.querySelector('b').textContent = t.nome; const sm = inf.querySelectorAll('small');
+        sm[0].textContent = '“' + t.frase + '”'; sm[1].textContent = (trein.venceu[t.id] ? 'Vencido ' + trein.venceu[t.id] + 'x' : 'Ainda não vencido') + ' · ' + B.timeDoTreinador(t).map((m) => NOMES[m.tipo]).join(' · ');
+        const b = document.createElement('button'); b.textContent = treinadorSel === t.id ? 'Escolhido' : 'Desafiar'; b.disabled = !lib; if (lib && treinadorSel !== t.id) b.className = 'principal';
+        b.onclick = () => { treinadorSel = t.id; modo = 'treinador'; salvarT(); salvarTrein(); S.tocar('toque'); atualizarModo(); irPagina('jogar'); };
+        d.appendChild(mons); d.appendChild(inf); d.appendChild(b); lista.appendChild(d);
+      });
+    }
+  }
+  function renderOpcoes() {
+    document.getElementById('progresso').textContent = 'Torneios vencidos: ' + stat.torneios + ' · melhor fase do torneio: ' + stat.melhor + ' · pontos de treinador: ' + trein.pontos + ' · insígnias: ' + trein.insignias.length + '/' + B.INSIGNIAS.length + ' · treinadores vencidos: ' + Object.keys(trein.venceu).length + '/' + B.TREINADORES.length;
+  }
+  document.getElementById('somOpcao').onclick = () => document.getElementById('mudo').click();
+  document.getElementById('apagar').onclick = () => { if (confirm('Apagar o torneio, os pontos, as insígnias e as vitórias contra treinadores?')) { torneio = null; stat = { torneios: 0, melhor: 0 }; trein = { pontos: 0, insignias: [], venceu: {}, sel: null }; treinadorSel = null; modo = 'rapido'; salvarT(); salvarTrein(); atualizarModo(); renderOpcoes(); } };
+
+  const btnAuto = document.getElementById('auto');
+  const rotuloAuto = () => { btnAuto.textContent = 'Luta automática: ' + (auto ? 'sim' : 'não'); btnAuto.classList.toggle('sel', auto); btnAuto.setAttribute('aria-pressed', auto); };
+  btnAuto.onclick = () => { auto = !auto; try { localStorage.setItem('pixmon-auto', auto ? '1' : '0'); } catch (e) { /* ok */ } S.tocar('toque'); rotuloAuto(); };
+  rotuloAuto();
+  marcarAbas(); atualizarModo(); renderTrein(); S.tema(true);
+
+  // ?folha mostra os 10 monstros lado a lado (conferência de arte)
+  if (location.search.includes('folha')) {
+    document.getElementById('escolha').hidden = true;
+    const c = document.createElement('canvas'); c.width = 360; c.height = 200; c.style.cssText = 'width:100%;image-rendering:pixelated;background:#7fa84a';
+    document.querySelector('main').appendChild(c);
+    const g = c.getContext('2d');
+    const pos = [[36, 80], [108, 80], [180, 80], [252, 80], [324, 80], [36, 180], [108, 180], [180, 180], [252, 180], [324, 180]];
+    (function folha(t) { g.clearRect(0, 0, 360, 200); B.MONSTROS.forEach((m, i) => A.monstro(g, m, pos[i][0], pos[i][1], t, i % 2 === 1, false, 1)); requestAnimationFrame(folha); })(0);
+  }
+
+  let errosLoop = 0;
+  function loop(t) { // um erro em uma etapa não pode parar o jogo: registra, segue e avisa na tela se repetir
+    for (const etapa of [logica, atualizarBotoes, atualizarTime, A.quadro]) {
+      try { etapa(t); } catch (e) {
+        console.error(e); errosLoop++;
+        if (errosLoop === 5) { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:9;background:#3a1c1c;color:#ffd0c8;border:2px solid #b85a4a;border-radius:8px;padding:6px 10px;font-size:12px'; d.textContent = 'Algo deu errado nesta luta. Recarregue a página (Ctrl+F5).'; document.body.appendChild(d); }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  Promise.all([document.fonts.load('700 11px "Pixelify Sans"'), document.fonts.load('28px "Press Start 2P"')])
+    .catch(() => {}).then(() => requestAnimationFrame(loop));
+})();
+</script>
+</body>
+</html>

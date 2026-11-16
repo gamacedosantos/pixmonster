@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "terra-rachadura 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 1.png",
+   "frame": {
+    "x": 91,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 2.png",
+   "frame": {
+    "x": 182,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 3.png",
+   "frame": {
+    "x": 273,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 4.png",
+   "frame": {
+    "x": 0,
+    "y": 46,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 5.png",
+   "frame": {
+    "x": 91,
+    "y": 46,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 6.png",
+   "frame": {
+    "x": 182,
+    "y": 46,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 7.png",
+   "frame": {
+    "x": 273,
+    "y": 46,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 8.png",
+   "frame": {
+    "x": 0,
+    "y": 92,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  },
+  {
+   "filename": "terra-rachadura 9.png",
+   "frame": {
+    "x": 91,
+    "y": 92,
+    "w": 91,
+    "h": 46
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 91,
+    "h": 46
+   },
+   "sourceSize": {
+    "w": 91,
+    "h": 46
+   },
+   "pivot": {
+    "x": 0.4945054945054945,
+    "y": 0.5869565217391305
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "terra-rachadura.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 364,
+   "h": 138
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 45,
+   "y": 27
+  },
+  "frameTags": [
+   {
+    "name": "terra-rachadura",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

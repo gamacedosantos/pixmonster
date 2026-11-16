@@ -1,0 +1,567 @@
+{
+ "frames": [
+  {
+   "filename": "fogo-impacto 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 1",
+   "frame": {
+    "x": 272,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 2",
+   "frame": {
+    "x": 544,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 3",
+   "frame": {
+    "x": 816,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 4",
+   "frame": {
+    "x": 1088,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 5",
+   "frame": {
+    "x": 0,
+    "y": 232,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 6",
+   "frame": {
+    "x": 272,
+    "y": 232,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 7",
+   "frame": {
+    "x": 544,
+    "y": 232,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 8",
+   "frame": {
+    "x": 816,
+    "y": 232,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 9",
+   "frame": {
+    "x": 1088,
+    "y": 232,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 10",
+   "frame": {
+    "x": 0,
+    "y": 464,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 11",
+   "frame": {
+    "x": 272,
+    "y": 464,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 12",
+   "frame": {
+    "x": 544,
+    "y": 464,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 13",
+   "frame": {
+    "x": 816,
+    "y": 464,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 14",
+   "frame": {
+    "x": 1088,
+    "y": 464,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 15",
+   "frame": {
+    "x": 0,
+    "y": 696,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 16",
+   "frame": {
+    "x": 272,
+    "y": 696,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 17",
+   "frame": {
+    "x": 544,
+    "y": 696,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 18",
+   "frame": {
+    "x": 816,
+    "y": 696,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 19",
+   "frame": {
+    "x": 1088,
+    "y": 696,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 20",
+   "frame": {
+    "x": 0,
+    "y": 928,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 21",
+   "frame": {
+    "x": 272,
+    "y": 928,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 22",
+   "frame": {
+    "x": 544,
+    "y": 928,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  },
+  {
+   "filename": "fogo-impacto 23",
+   "frame": {
+    "x": 816,
+    "y": 928,
+    "w": 272,
+    "h": 232
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 272,
+    "h": 232
+   },
+   "sourceSize": {
+    "w": 272,
+    "h": 232
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "fogo-impacto.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1360,
+   "h": 1160
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "fogo-impacto",
+    "from": 0,
+    "to": 23,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "fire/meteor",
+   "name": "Meteor",
+   "fps": 30,
+   "loop": false,
+   "frames": 24,
+   "frameSize": [
+    272,
+    232
+   ],
+   "pivot": [
+    150,
+    208
+   ],
+   "columns": 5
+  }
+ }
+}

@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "pixmon-escudo-terra 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 1.png",
+   "frame": {
+    "x": 61,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 2.png",
+   "frame": {
+    "x": 122,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 3.png",
+   "frame": {
+    "x": 183,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 4.png",
+   "frame": {
+    "x": 0,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 5.png",
+   "frame": {
+    "x": 61,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 6.png",
+   "frame": {
+    "x": 122,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 7.png",
+   "frame": {
+    "x": 183,
+    "y": 61,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 8.png",
+   "frame": {
+    "x": 0,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 9.png",
+   "frame": {
+    "x": 61,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 10.png",
+   "frame": {
+    "x": 122,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  },
+  {
+   "filename": "pixmon-escudo-terra 11.png",
+   "frame": {
+    "x": 183,
+    "y": 122,
+    "w": 61,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 61,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 61,
+    "h": 61
+   },
+   "pivot": {
+    "x": 0.4918032786885246,
+    "y": 0.4918032786885246
+   },
+   "duration": 100
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "pixmon-escudo-terra.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 244,
+   "h": 183
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 30,
+   "y": 30
+  },
+  "frameTags": [
+   {
+    "name": "pixmon-escudo-terra",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}
