@@ -7,9 +7,24 @@
 
   function ac() {
     if (!ctx) { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); }
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state !== 'running') ctx.resume().catch(() => { /* precisa de um toque */ });
     return ctx;
   }
+  // qualquer toque reativa o áudio (o resume() só vale dentro de um gesto) e, na primeira vez, toca um trecho mudo para o iPhone tratar a página como "reprodução"
+  // (assim os efeitos do WebAudio não ficam presos ao botão de silencioso). shortcut: o <audio> mudo fica em loop; se aparecer controle de mídia na tela de bloqueio, remover.
+  let mudoAudio = null;
+  function wavMudo() { // 0,5 s de silêncio (WAV 8 bits, 8 kHz)
+    const n = 4000, v = new DataView(new ArrayBuffer(44 + n)), t = (o, x) => [...x].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    t(0, 'RIFF'); v.setUint32(4, 36 + n, true); t(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, 8000, true); v.setUint32(28, 8000, true); v.setUint16(32, 1, true); v.setUint16(34, 8, true); t(36, 'data'); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+    return URL.createObjectURL(new Blob([v], { type: 'audio/wav' }));
+  }
+  const reativar = () => {
+    if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+    if (!mudoAudio) { mudoAudio = new Audio(wavMudo()); mudoAudio.loop = true; mudoAudio.play().catch(() => { mudoAudio = null; }); }
+  };
+  ['pointerdown', 'touchend', 'click'].forEach((n) => document.addEventListener(n, reativar, true));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) reativar(); });
 
   // ---------- cadeia mestre (uma por contexto): compressor + reverb sintética ----------
   const mestres = new WeakMap(), ruidos = new WeakMap();

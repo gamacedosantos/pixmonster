@@ -18,6 +18,8 @@
   @media (max-width: 340px) { :root { --s: 48px; } }
   body { margin: 0; background: #14110f; color: #efe0b8; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700; }
   html { -webkit-text-size-adjust: 100%; }
+  html, body { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  img, canvas, svg { -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
   body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; touch-action: manipulation; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
   main { max-width: 420px; margin: 0 auto; padding: 8px; }
   @media (pointer: coarse) { button:not(.reserva) { min-height: 44px; } } /* alvo de toque mínimo de 44 px */
@@ -25,15 +27,17 @@
   #girar { display: none; }
   @media (orientation: landscape) and (max-height: 500px) { #girar { position: fixed; inset: 0; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: #1b1020; color: #ffd35a; text-align: center; font-size: 18px; } #girar small { color: #8fb0ff; font-size: 13px; } }
   button { font: inherit; width: 100%; padding: 12px; margin: 4px 0; border: 2px solid #e0b040; border-radius: 4px; background: #2a1c12; color: #efe0b8; font-size: 16px; }
-  #mudo { position: fixed; top: 6px; right: 6px; z-index: 5; width: 40px; height: 40px; min-height: 40px; padding: 4px; margin: 0; border-radius: 10px; background: rgba(27,16,32,.75); border-color: #ffd35a; display: flex; align-items: center; justify-content: center; }
-  #mudo svg, .item svg { width: 100%; height: 100%; display: block; }
+  #mudo, #tela { position: fixed; top: 6px; right: 6px; z-index: 5; width: 40px; height: 40px; min-height: 40px; padding: 4px; margin: 0; border-radius: 10px; background: rgba(27,16,32,.75); border-color: #ffd35a; display: flex; align-items: center; justify-content: center; }
+  #tela { right: 52px; }
+  #mudo svg, #tela svg, .item svg { width: 100%; height: 100%; display: block; }
   canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
   /* ---------- luta: o campo em cima e os 4 botões de habilidade embaixo, na mesma largura ---------- */
   /* a arena ocupa a altura que sobra depois do time e dos textos; na luta do mundo há mais uma barra (esfera e poção) */
   .coluna { --resto: 150px; width: min(100%, calc((100dvh - var(--resto)) * 360 / 640)); margin: 0 auto; }
   .coluna:has(#itensLuta:not([hidden])) { --resto: 206px; }
-  body:has(#luta:not([hidden]), #mundo:not([hidden])) #mudo { top: auto; bottom: calc(env(safe-area-inset-bottom) + 8px); } /* o botão de som não cobre o HUD */
+  body:has(#luta:not([hidden]), #mundo:not([hidden])) #mudo { top: auto; bottom: calc(env(safe-area-inset-bottom) + 8px); }
+  body:has(#luta:not([hidden]), #mundo:not([hidden])) #tela { top: auto; right: 6px; bottom: calc(env(safe-area-inset-bottom) + 56px); } /* tela cheia fica acima do som */ /* o botão de som não cobre o HUD */
   @media (pointer: coarse) { #mundoDica { display: none; } } /* a dica é de teclado */
   .palco { position: relative; width: 100%; aspect-ratio: 360 / 640; }
   /* cartão de resultado: mesmo estilo azul e dourado da escolha, entra com um pulo */
@@ -233,7 +237,8 @@
     #luta .coluna, #mundo .coluna { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
     #mundoCv { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
     #hudBaixo { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 36px 8px calc(env(safe-area-inset-bottom) + 8px); background: linear-gradient(to bottom, transparent, rgba(20,17,15,.9) 50%); }
-    body:has(#luta:not([hidden])) #mudo { bottom: calc(env(safe-area-inset-bottom) + 84px); } /* acima da HUD de baixo */
+    body:has(#luta:not([hidden])) #mudo { bottom: calc(env(safe-area-inset-bottom) + 84px); }
+    body:has(#luta:not([hidden])) #tela { bottom: calc(env(safe-area-inset-bottom) + 132px); } /* acima da HUD de baixo */
     /* HUD mínima: itens em cima à esquerda, time (retratos) à esquerda e golpes redondos à direita */
     #hudBaixo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; padding: 40px 12px calc(env(safe-area-inset-bottom) + 12px); background: linear-gradient(to bottom, transparent, rgba(20,17,15,.72) 60%); }
     #itensLuta { margin: 0; gap: 10px; }
@@ -248,6 +253,7 @@
 </head>
 <body>
 <button id="mudo" aria-label="Ligar ou desligar o som"></button>
+<button id="tela" aria-label="Tela cheia" hidden></button>
 <div id="girar">Gire o celular<small>PixMonster é jogado em pé</small></div>
 <main>
   <div id="escolha">
@@ -377,6 +383,7 @@
   </div>
 </main>
 <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { /* sem offline */ }));</script>
+<script>document.addEventListener('contextmenu', (e) => e.preventDefault());</script>
 <script src="pixel.js"></script>
 <script src="icones.js"></script>
 <script src="som.js"></script>
@@ -471,6 +478,7 @@
     esfera: bola('#dd3140', '#f0e9ca'), esferaF: bola('#ffc80e', '#e1894c'),
     pocao: SVG('<rect x="6" y="1" width="4" height="3" fill="#b17349" stroke="#000" stroke-width="1"/><path d="M6 4h4v2l3 6a2 2 0 0 1-2 3H5a2 2 0 0 1-2-3l3-6z" fill="#de595a" stroke="#000" stroke-width="1.2"/><path d="M5 11h6l1.4 2.4A1 1 0 0 1 11.5 14.5h-7A1 1 0 0 1 3.6 13.4z" fill="#ff9aa0"/>'),
     somSim: SVG('<path d="M2 6h3l4-3v10l-4-3H2z" fill="#ffd35a" stroke="#000" stroke-width="1"/><path d="M11 5.5q2 2.5 0 5M13 3.5q4 4.5 0 9" fill="none" stroke="#ffd35a" stroke-width="1.5"/>'),
+    telaIn: SVG('<path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="#ffd35a" stroke-width="2"/>'), telaOut: SVG('<path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4" fill="none" stroke="#ffd35a" stroke-width="2"/>'),
     somNao: SVG('<path d="M2 6h3l4-3v10l-4-3H2z" fill="#8fb0ff" stroke="#000" stroke-width="1"/><path d="M11 5l4 6M15 5l-4 6" stroke="#ff7a6a" stroke-width="1.8"/>'),
   };
   const btnMudo = document.getElementById('mudo');
@@ -480,6 +488,18 @@
     if (S.mudo()) S.musica(false); else if (bt && !bt.fim) S.musica(true);
   };
   rotuloMudo();
+  // tela cheia: só aparece onde o navegador permite (Android, computador). No iPhone o Safari/Chrome não têm a API: lá, "Adicionar à Tela de Início" abre o jogo em tela cheia.
+  const btnTela = document.getElementById('tela'), raiz = document.documentElement, pedeTela = raiz.requestFullscreen || raiz.webkitRequestFullscreen, saiTela = document.exitFullscreen || document.webkitExitFullscreen;
+  const emTela = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  const rotuloTela = () => { btnTela.innerHTML = emTela() ? ICONES.telaOut : ICONES.telaIn; btnTela.setAttribute('aria-label', emTela() ? 'Sair da tela cheia' : 'Tela cheia'); };
+  if (pedeTela) {
+    btnTela.hidden = false; rotuloTela();
+    btnTela.onclick = () => {
+      if (emTela()) { saiTela.call(document); return; }
+      Promise.resolve(pedeTela.call(raiz)).then(() => { try { screen.orientation.lock('portrait').catch(() => {}); } catch (e) { /* sem trava de orientação */ } }).catch(() => { /* recusado */ });
+    };
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach((n) => document.addEventListener(n, rotuloTela));
+  }
 
   // ---------- luta em tempo real ----------
   // O jogador aperta um botão: o comando fica pendente por 350 ms (para não perder o toque feito um instante antes de a
