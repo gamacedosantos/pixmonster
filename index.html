@@ -33,7 +33,7 @@
   /* a arena ocupa a altura que sobra depois do time e dos textos; na luta do mundo há mais uma barra (esfera e poção) */
   .coluna { --resto: 150px; width: min(100%, calc((100dvh - var(--resto)) * 360 / 640)); margin: 0 auto; }
   .coluna:has(#itensLuta:not([hidden])) { --resto: 206px; }
-  body:has(#luta:not([hidden]), #mundo:not([hidden])) #mudo { top: auto; bottom: 6px; } /* o botão de som não cobre o HUD */
+  body:has(#luta:not([hidden]), #mundo:not([hidden])) #mudo { top: auto; bottom: calc(env(safe-area-inset-bottom) + 8px); } /* o botão de som não cobre o HUD */
   @media (pointer: coarse) { #mundoDica { display: none; } } /* a dica é de teclado */
   .palco { position: relative; width: 100%; aspect-ratio: 360 / 640; }
   /* cartão de resultado: mesmo estilo azul e dourado da escolha, entra com um pulo */
@@ -218,9 +218,6 @@
   #lutar { margin-top: 0; padding: 14px; font-size: 18px; background: #ffd35a; color: #1b1020; border: 2px solid #ffffff; border-radius: 8px; }
   #mundo .coluna { position: relative; --resto: 172px; } /* sobra espaço para o D-pad embaixo do mapa */
   #mundoCv { display: block; width: 100%; aspect-ratio: 360 / 640; image-rendering: pixelated; background: #1b1020; border-radius: 10px; }
-  #dpad { position: relative; margin: 8px auto 0; width: 132px; height: 132px; touch-action: none; } /* embaixo do mapa, para o polegar não cobrir a vista */
-  #dpad button { position: absolute; width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; border-radius: 12px; background: rgba(27,16,32,.65); border: 2px solid #ffd35a; color: #ffd35a; font-size: 20px; touch-action: none; user-select: none; }
-  #dpad [data-d=cima] { left: 44px; top: 0; } #dpad [data-d=baixo] { left: 44px; bottom: 0; } #dpad [data-d=esq] { left: 0; top: 44px; } #dpad [data-d=dir] { right: 0; top: 44px; }
   #mundoSair { position: absolute; right: 10px; top: 10px; width: auto; margin: 0; padding: 6px 12px; font-size: 13px; background: rgba(27,16,32,.7); border: 2px solid #ffd35a; color: #ffd35a; border-radius: 10px; }
   .sobre { position: absolute; inset: 0; z-index: 5; background: rgba(10,8,30,.94); padding: 14px; overflow: auto; color: #e8f1ff; border-radius: 10px; }
   .sobre h3 { margin: 0 0 8px; color: #ffd35a; }
@@ -235,7 +232,17 @@
   .item:disabled { opacity: .4; }
   .loja .it { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
   .loja .it button { width: auto; margin: 0; padding: 8px 10px; }
-  #mundoDica { position: absolute; right: 10px; bottom: 14px; font-size: 11px; color: #fff; opacity: .7; text-align: right; }
+  #mundoDica { white-space: pre-line; position: absolute; right: 10px; bottom: 14px; font-size: 11px; color: #fff; opacity: .7; text-align: right; }
+  /* celular em pé: o jogo ocupa a tela inteira e a HUD de baixo fica por cima */
+  @media (max-aspect-ratio: 3/4) {
+    main:has(#luta:not([hidden])), main:has(#mundo:not([hidden])) { max-width: none; padding: 0; }
+    #luta, #mundo { position: fixed; inset: 0; overflow: hidden; background: #14110f; }
+    #luta .coluna, #mundo .coluna { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
+    #mundoCv { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+    #hudBaixo { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 36px 8px calc(env(safe-area-inset-bottom) + 8px); background: linear-gradient(to bottom, transparent, rgba(20,17,15,.9) 50%); }
+    #resultado { bottom: 210px; }
+    #mundoSair, #mundoEq { top: calc(env(safe-area-inset-top) + 10px); }
+  }
 </style>
 </head>
 <body>
@@ -341,12 +348,11 @@
   <div id="mundo" hidden>
     <div class="coluna">
       <canvas id="mundoCv" width="360" height="640"></canvas>
-      <div id="dpad"><button data-d="cima">▲</button><button data-d="esq">◀</button><button data-d="dir">▶</button><button data-d="baixo">▼</button></div>
       <button id="mundoSair">Menu</button><button id="mundoEq">Equipe</button>
       <div id="inicial" class="sobre" hidden><h3>Escolha seu primeiro monstro</h3><div class="lista" id="inicialLista"></div></div>
       <div id="loja" class="sobre loja" hidden><h3>Mercado do Vovô</h3><p id="lojaFala" style="font-size:13px;margin:0 0 4px"></p><p id="lojaMoedas" style="font-size:14px;color:#ffd35a;margin:0 0 8px"></p><div id="lojaLista"></div><button id="lojaFechar" style="margin-top:6px">Fechar</button></div>
       <div id="caixa" class="sobre" hidden><h3>Equipe e caixa</h3><p style="font-size:12px;margin:0 0 8px">Toque para pôr ou tirar da equipe (de 1 a 3).</p><div class="lista" id="caixaLista"></div><button id="caixaFechar" style="margin-top:10px">Fechar</button></div>
-      <div id="mundoDica">Setas ou WASD<br>seta amarela = saída<br>mato alto = monstros</div>
+      <div id="mundoDica"></div>
     </div>
   </div>
   <div id="luta" hidden>
@@ -362,9 +368,11 @@
           <div class="acoes"><button id="revanche" class="principal">Revanche</button><button id="outro">Trocar time</button></div>
         </div>
       </div>
+      <div id="hudBaixo">
       <div id="time"></div>
       <div id="habs"></div>
       <div id="itensLuta" hidden><button id="esfera" class="item"></button><button id="esferaF" class="item"></button><button id="pocao" class="item"></button></div>
+      </div>
     </div>
   </div>
 </main>
@@ -870,7 +878,8 @@
   }
   document.getElementById('mMundo').onclick = () => abrirMundo(false);
   document.getElementById('mundoSair').onclick = sairMundo;
-  window.PixmonMundo.ligarDpad(document.getElementById('dpad'));
+  window.PixmonMundo.ligarToque(document.getElementById('mundoCv'));
+  document.getElementById('mundoDica').textContent = matchMedia('(pointer: coarse)').matches ? 'Segure o dedo na tela\npara andar' : 'Setas ou WASD\nseta amarela = saída\nmato alto = monstros';
   function voltarEscolha() {
     document.getElementById('resultado').hidden = true;
     bt = null;

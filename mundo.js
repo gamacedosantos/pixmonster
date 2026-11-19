@@ -394,7 +394,9 @@
 
   // ajusta tile, resolução do canvas e escala da sprite à área atual
   function usarArea() {
-    const A = AREAS[area]; T = A.T || 32; const r = A.res || [360, 640]; W = r[0]; H = r[1]; ESC_TREI = A.v2 ? 0.42 : 0.6;
+    const A = AREAS[area]; T = A.T || 32; const r = A.res || [360, 640]; A.res0 = A.res0 || r.slice(); W = A.res0[0]; H = A.res0[1]; ESC_TREI = A.v2 ? 0.42 : 0.6;
+    const asp = innerHeight / innerWidth; if (A.v2 && asp > 4 / 3) H = Math.min(Math.round(W * asp), 640); // celular em pé: mostra mais linhas do mapa
+    r[1] = H; // as áreas leem RES[1] para preencher e cortar o que não aparece
     if (cv && (cv.width !== W || cv.height !== H)) { cv.width = W; cv.height = H; }
   }
   function iniciar(canvas, callbacks, novo) {
@@ -589,13 +591,23 @@
   document.addEventListener('keydown', (e) => { const d = MAPA_TECLAS[e.key]; if (d && rodando) { teclas.add(d); e.preventDefault(); } });
   document.addEventListener('keyup', (e) => { const d = MAPA_TECLAS[e.key]; if (d) teclas.delete(d); });
   window.addEventListener('blur', () => { teclas.clear(); pressionados.clear(); });
-  function ligarDpad(el) {
-    el.querySelectorAll('[data-d]').forEach((b) => {
-      const d = b.dataset.d;
-      b.addEventListener('pointerdown', (e) => { pressionados.add(d); b.setPointerCapture(e.pointerId); e.preventDefault(); });
-      ['pointerup', 'pointercancel', 'pointerleave'].forEach((n) => b.addEventListener(n, () => pressionados.delete(d)));
-    });
+  // toque na tela: segurar o dedo faz o personagem andar em direção ao dedo (eixo dominante); soltar para
+  function dirDoToque(e) {
+    const r = cv.getBoundingClientRect(), A = AREAS[area], mw = A.largura * T, mh = A.mapa.length * T;
+    const cx = Math.max(0, Math.min(mw - W, px - W / 2)), cy = Math.max(0, Math.min(mh - H, py - T / 2 - H / 2));
+    const dx = (e.clientX - r.left) * W / r.width - (px - cx), dy = (e.clientY - r.top) * H / r.height - (py - T / 2 - cy);
+    pressionados.clear();
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 10) return; // perto do personagem: fica parado
+    pressionados.add(Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'esq' : 'dir') : (dy < 0 ? 'cima' : 'baixo'));
   }
+  function ligarToque(el) {
+    el.style.touchAction = 'none';
+    let preso = false;
+    el.addEventListener('pointerdown', (e) => { if (!rodando || pausado) return; preso = true; try { el.setPointerCapture(e.pointerId); } catch (x) { /* ponteiro sintético */ } dirDoToque(e); e.preventDefault(); });
+    el.addEventListener('pointermove', (e) => { if (preso) dirDoToque(e); });
+    ['pointerup', 'pointercancel'].forEach((n) => el.addEventListener(n, () => { preso = false; pressionados.clear(); }));
+  }
+  addEventListener('resize', () => { if (cv) usarArea(); }); // girar o celular ou mostrar/esconder a barra do navegador
 
-  window.PixmonMundo = { BLOQUEIA, BLOQ_OBJ, iniciar, parar, pausar, retomar, ligarDpad, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
+  window.PixmonMundo = { BLOQUEIA, BLOQ_OBJ, iniciar, parar, pausar, retomar, ligarToque, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
 })();
