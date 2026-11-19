@@ -37,7 +37,7 @@
   @media (pointer: coarse) { #mundoDica { display: none; } } /* a dica é de teclado */
   .palco { position: relative; width: 100%; aspect-ratio: 360 / 640; }
   /* cartão de resultado: mesmo estilo azul e dourado da escolha, entra com um pulo */
-  #resultado { position: absolute; left: 10px; right: 10px; bottom: 12px; padding: 14px 12px 12px; text-align: center; color: #e8f1ff; background: #1b3366; border: 3px solid #ffd35a; border-radius: 12px; box-shadow: inset 0 0 0 4px #14285a, 0 6px 0 #0b1633, 0 0 0 3px #0b1633; animation: entra .45s cubic-bezier(.2, 1.4, .4, 1) both; }
+  #resultado { position: absolute; left: 10px; right: 10px; top: 0; bottom: 0; height: fit-content; margin: auto 0; padding: 14px 12px 12px; text-align: center; color: #e8f1ff; background: #1b3366; border: 3px solid #ffd35a; border-radius: 12px; box-shadow: inset 0 0 0 4px #14285a, 0 6px 0 #0b1633, 0 0 0 3px #0b1633; animation: entra .45s cubic-bezier(.2, 1.4, .4, 1) both; }
   #resultado[hidden] { display: none; }
   @keyframes entra { from { transform: translateY(40px) scale(.7); opacity: 0; } to { transform: none; opacity: 1; } }
   #resTitulo { margin: 0; font-size: 34px; letter-spacing: 2px; color: #ffd35a; text-shadow: 0 3px 0 #14285a, 0 0 12px #ffd35a66; }
@@ -91,15 +91,6 @@
   .celula { position: relative; }
   #lutar:disabled { opacity: .55; background: #8a7a4a; }
   .sortear { margin-top: 6px; padding: 7px; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 8px; color: #dfe9ff; }
-  /* golpes do monstro em campo: só o ícone, escurecido enquanto recarrega, com os segundos que faltam */
-  #habs { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
-  .hab { --s: 44px; position: relative; border: 2px solid #4a6fb8; border-radius: 8px; background: #14285a; padding: 2px; }
-  .hab .ico { width: var(--s); height: var(--s); }
-  .hab .cd { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(8, 14, 40, .72); }
-  .hab .seg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; text-shadow: 0 0 3px #000, 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000; }
-  .hab.pronto { border-color: #ffd35a; box-shadow: 0 0 6px #ffd35a88; }
-  .hab[data-slot="ultimate"].pronto { border-color: #ff7af0; box-shadow: 0 0 8px #ff7af0aa; }
-  .hab.ativo { border-color: #9fd0ff; box-shadow: 0 0 8px #9fd0ffaa; }
   #time { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
   .reserva { position: relative; width: auto; margin: 0; padding: 3px 2px; display: flex; align-items: center; gap: 4px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 8px; color: #e8f1ff; touch-action: manipulation; user-select: none; text-align: left; }
   .reserva canvas { width: 34px; height: 34px; flex: none; image-rendering: pixelated; background: #0f2147; border-radius: 4px; }
@@ -242,19 +233,15 @@
     #luta .coluna, #mundo .coluna { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; }
     #mundoCv { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
     #hudBaixo { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 36px 8px calc(env(safe-area-inset-bottom) + 8px); background: linear-gradient(to bottom, transparent, rgba(20,17,15,.9) 50%); }
-    #resultado { bottom: 150px; }
-    body:has(#luta:not([hidden])) #mudo { bottom: calc(env(safe-area-inset-bottom) + 136px); } /* acima dos golpes, não por cima deles */
+    body:has(#luta:not([hidden])) #mudo { bottom: calc(env(safe-area-inset-bottom) + 84px); } /* acima da HUD de baixo */
     /* HUD mínima: itens em cima à esquerda, time (retratos) à esquerda e golpes redondos à direita */
     #hudBaixo { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; padding: 40px 12px calc(env(safe-area-inset-bottom) + 12px); background: linear-gradient(to bottom, transparent, rgba(20,17,15,.72) 60%); }
-    #itensLuta { order: -1; width: 100%; margin: 0 0 8px; justify-content: flex-start; gap: 10px; }
-    .item { width: 40px; height: 40px; min-height: 40px; border-radius: 50%; padding: 5px; background: rgba(20,40,90,.8); }
+    #itensLuta { margin: 0; gap: 10px; }
+    .item { width: 46px; height: 46px; min-height: 46px; border-radius: 50%; padding: 5px; background: rgba(20,40,90,.8); }
     #time { display: flex; gap: 8px; margin: 0; }
     .reserva { width: 52px; flex-direction: column; padding: 3px; gap: 3px; border-radius: 14px; background: rgba(20,40,90,.8); }
     .reserva canvas { width: 40px; height: 40px; border-radius: 10px; }
     .reserva .inf { width: 100%; flex: none; } .reserva .inf b { display: none; } .reserva .vida { margin-top: 0; }
-    #habs { display: grid; grid-template-columns: repeat(2, 52px); gap: 8px; margin: 0; }
-    .hab { --s: 44px; border-radius: 50%; padding: 2px; background: rgba(20,40,90,.8); }
-    .hab .ico { border-radius: 50%; overflow: hidden; }
     #mundoSair, #mundoEq { top: calc(env(safe-area-inset-top) + 10px); }
   }
 </style>
@@ -384,7 +371,6 @@
       </div>
       <div id="hudBaixo">
       <div id="time"></div>
-      <div id="habs"></div>
       <div id="itensLuta" hidden><button id="esfera" class="item"></button><button id="esferaF" class="item"></button><button id="pocao" class="item"></button></div>
       </div>
     </div>
@@ -476,28 +462,6 @@
     if (slot === 'defesa') el.style.backgroundImage = 'url(ui/defesas.png)';
     if (p) { el.style.setProperty('--c', p[0]); el.style.setProperty('--r', p[1]); }
     else { el.classList.add('escudo'); el.style.backgroundImage = 'url(' + escudoUrl(g.tipo) + ')'; }
-  }
-
-  // golpes do monstro em campo (forte, rápido, defesa, ultimate): ícone + segundos de recarga. Refaz quando outro monstro entra.
-  const habs = document.getElementById('habs'); let habsMon = null;
-  function atualizarHabs() {
-    if (!bt) return;
-    const l = bt.lados[0];
-    if (habsMon !== l.m) {
-      habsMon = l.m; habs.innerHTML = '';
-      ['forte', 'rapido', 'defesa', 'ultimate'].forEach((slot) => {
-        const b = document.createElement('div'); b.className = 'hab'; b.dataset.slot = slot; b.setAttribute('aria-label', ROTULO[slot] + ': ' + l.m.golpes[slot].nome);
-        b.innerHTML = '<div class="ico"><div class="cd"></div><span class="seg"></span></div>';
-        pintaIcone(b.querySelector('.ico'), l.m.golpes[slot], slot); habs.appendChild(b);
-      });
-    }
-    for (const b of habs.children) {
-      const s = b.dataset.slot, cd = l.cd[s], tot = l.cdTotal[s], ativo = s === 'defesa' && l.defesaAte > bt.t;
-      b.querySelector('.cd').style.height = (tot ? Math.min(100, (cd / tot) * 100) : 0).toFixed(1) + '%';
-      b.querySelector('.seg').textContent = cd > 0 ? (cd < 10000 ? (cd / 1000).toFixed(1) : Math.ceil(cd / 1000)) : '';
-      b.classList.toggle('pronto', !bt.fim && cd <= 0 && !ativo);
-      b.classList.toggle('ativo', ativo);
-    }
   }
 
   // ícones do HUD em SVG 16x16 (bordas retas, contorno preto)
@@ -1101,7 +1065,7 @@
 
   let errosLoop = 0;
   function loop(t) { // um erro em uma etapa não pode parar o jogo: registra, segue e avisa na tela se repetir
-    for (const etapa of [logica, atualizarTime, atualizarHabs, A.quadro]) {
+    for (const etapa of [logica, atualizarTime, A.quadro]) {
       try { etapa(t); } catch (e) {
         console.error(e); errosLoop++;
         if (errosLoop === 5) { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:9;background:#3a1c1c;color:#ffd0c8;border:2px solid #b85a4a;border-radius:8px;padding:6px 10px;font-size:12px'; d.textContent = 'Algo deu errado nesta luta. Recarregue a página (Ctrl+F5).'; document.body.appendChild(d); }

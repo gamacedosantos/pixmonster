@@ -1105,15 +1105,9 @@
     desenharTimes(g, agoraReal);
     painel(g, 6, 8, 172, 0, bt.lados[0].m, hpVis[0], hpLag[0], agoraReal, dn(0));   // você, à esquerda
     painel(g, 182, 8, 172, 1, bt.lados[1].m, hpVis[1], hpLag[1], agoraReal, dn(1)); // adversário, à direita
-    if (ko) { // escurece o campo, faixa escura e "K.O.!" que entra grande e quica (por cima do campo e do HUD)
-      const q = Math.min(1, (agora - ko.t0) / 400), t = agora - ko.t0;
+    if (ko) { // escurece o campo no fim da luta (o cartão de resultado entra no centro, sem banner de K.O.)
+      const q = Math.min(1, (agora - ko.t0) / 400);
       g.globalAlpha = 0.4 * q; g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.globalAlpha = 1;
-      g.globalAlpha = 0.8 * q; px(g, 0, 290, W, 56, '#10101a'); px(g, 0, 290, W, 2, '#ffd35a'); px(g, 0, 344, W, 2, '#ffd35a'); g.globalAlpha = 1;
-      const u = Math.min(1, t / 320), esc = u < 1 ? 3 - 2.4 * (1 - Math.pow(1 - u, 3)) + 0.4 * Math.sin(u * Math.PI) : 1 + 0.04 * Math.sin(t / 120);
-      g.save(); g.translate(180, 318); g.rotate(-0.06); g.scale(esc, esc);
-      g.font = '30px "Press Start 2P", monospace'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineWidth = 7; g.lineJoin = 'round';
-      g.strokeStyle = OUT; g.strokeText('K.O.!', 0, 0); g.fillStyle = '#ffd35a'; g.fillText('K.O.!', 0, -3); g.fillStyle = '#e03030'; g.fillText('K.O.!', 0, 0);
-      g.restore();
     }
     g.restore();
   }
