@@ -591,21 +591,30 @@
   document.addEventListener('keydown', (e) => { const d = MAPA_TECLAS[e.key]; if (d && rodando) { teclas.add(d); e.preventDefault(); } });
   document.addEventListener('keyup', (e) => { const d = MAPA_TECLAS[e.key]; if (d) teclas.delete(d); });
   window.addEventListener('blur', () => { teclas.clear(); pressionados.clear(); });
-  // toque na tela: segurar o dedo faz o personagem andar em direção ao dedo (eixo dominante); soltar para
-  function dirDoToque(e) {
-    const r = cv.getBoundingClientRect(), A = AREAS[area], mw = A.largura * T, mh = A.mapa.length * T;
-    const cx = Math.max(0, Math.min(mw - W, px - W / 2)), cy = Math.max(0, Math.min(mh - H, py - T / 2 - H / 2));
-    const dx = (e.clientX - r.left) * W / r.width - (px - cx), dy = (e.clientY - r.top) * H / r.height - (py - T / 2 - cy);
-    pressionados.clear();
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 10) return; // perto do personagem: fica parado
-    pressionados.add(Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'esq' : 'dir') : (dy < 0 ? 'cima' : 'baixo'));
-  }
+  // Joystick flutuante: aparece onde o dedo toca e o personagem anda na direção em que o botão é puxado (4 direções; zona morta de 14 px).
   function ligarToque(el) {
     el.style.touchAction = 'none';
-    let preso = false;
-    el.addEventListener('pointerdown', (e) => { if (!rodando || pausado) return; preso = true; try { el.setPointerCapture(e.pointerId); } catch (x) { /* ponteiro sintético */ } dirDoToque(e); e.preventDefault(); });
-    el.addEventListener('pointermove', (e) => { if (preso) dirDoToque(e); });
-    ['pointerup', 'pointercancel'].forEach((n) => el.addEventListener(n, () => { preso = false; pressionados.clear(); }));
+    const base = document.createElement('div'), botao = document.createElement('div'); base.id = 'joy'; base.hidden = true; base.appendChild(botao); document.body.appendChild(base);
+    const R = 44; let ox = 0, oy = 0, preso = false, ult = null;
+    function mover(e) {
+      let dx = e.clientX - ox, dy = e.clientY - oy; const m = Math.hypot(dx, dy);
+      if (m > R) { dx *= R / m; dy *= R / m; }
+      botao.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      pressionados.clear();
+      if (m < 14) { ult = null; return; }
+      let d = Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'esq' : 'dir') : (dy < 0 ? 'cima' : 'baixo');
+      if (ult && ult !== d) { const h = ult === 'esq' || ult === 'dir', p = Math.abs(h ? dx : dy), o = Math.abs(h ? dy : dx); if (p >= o * 0.75) d = ult; } // histerese: não pisca na diagonal
+      ult = d; pressionados.add(d);
+    }
+    function soltar() { preso = false; ult = null; base.hidden = true; pressionados.clear(); }
+    el.addEventListener('pointerdown', (e) => {
+      if (!rodando || pausado) return; preso = true; ox = e.clientX; oy = e.clientY;
+      base.style.left = ox + 'px'; base.style.top = oy + 'px'; base.hidden = false;
+      try { el.setPointerCapture(e.pointerId); } catch (x) { /* ponteiro sintético */ }
+      mover(e); e.preventDefault();
+    });
+    el.addEventListener('pointermove', (e) => { if (preso) mover(e); });
+    ['pointerup', 'pointercancel'].forEach((n) => el.addEventListener(n, soltar));
   }
   addEventListener('resize', () => { if (cv) usarArea(); }); // girar o celular ou mostrar/esconder a barra do navegador
 

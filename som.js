@@ -210,16 +210,22 @@
   const MENU = ['tema', 'menu2', 'menu3', 'menu4'], BATALHA = ['batalha', 'batalha2', 'batalha3', 'batalha4'], CAVERNA = ['caverna1', 'caverna2', 'caverna3', 'caverna4'];
   const pistas = {};
   let querida = null; // trilha que deveria estar tocando (o navegador só deixa tocar depois do primeiro toque)
+  // No iOS o volume de <audio> é fixo em 1: o fade nunca chegava ao alvo e a faixa antiga nunca pausava (várias músicas juntas).
+  // Aqui o fade termina por tempo (1,2 s) e, sem controle de volume, a troca é seca.
+  const volumeOk = (() => { const a = new Audio(); a.volume = 0.5; return a.volume === 0.5; })();
   function fade(el, alvo, fim) {
     clearInterval(el._f);
+    if (!volumeOk) { clearInterval(el._f); if (fim) fim(); return; }
+    const t0 = Date.now();
     el._f = setInterval(() => {
       el.volume = Math.max(0, Math.min(1, el.volume + (alvo > el.volume ? 0.05 : -0.05)));
-      if (Math.abs(el.volume - alvo) < 0.05) { el.volume = alvo; clearInterval(el._f); if (fim) fim(); }
+      if (Math.abs(el.volume - alvo) < 0.05 || Date.now() - t0 > 1200) { el.volume = alvo; clearInterval(el._f); if (fim) fim(); }
     }, 50);
   }
   function trilha(nome) { // nome: 'batalha' | 'tema' | null (silêncio)
     querida = nome;
     for (const k in pistas) if (k !== nome && !pistas[k].paused) fade(pistas[k], 0, () => { if (querida !== k) pistas[k].pause(); });
+    clearTimeout(trilha._t); trilha._t = setTimeout(() => { for (const k in pistas) if (k !== querida && !pistas[k].paused) pistas[k].pause(); }, 1500); // garantia: só a faixa atual toca
     if (!nome) { pararAmbiente(); return; }
     if (mudo) return;
     let el = pistas[nome];
