@@ -1,0 +1,67 @@
+{
+  "group_id": "753607a4-d42f-4719-a69e-ce16ecf495f4",
+  "states": [
+    {
+      "character": {
+        "id": "5bdb8ad7-6b11-4a32-b2e7-2bdaca09b407",
+        "name": "Idle",
+        "prompt": "young boy with messy spiky brown hair, simple black dot eyes, bare chest with no shirt, dark brown shorts, light cream shoes, dark brown outline, flat pixel art, same exact design as the reference",
+        "size": {
+          "width": 32,
+          "height": 32
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "low top-down",
+        "created_at": "2026-11-19T12:06:02.719128+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "west": "Idle/rotations/west.png",
+          "east": "Idle/rotations/east.png",
+          "north": "Idle/rotations/north.png"
+        },
+        "animations": {
+          "andar": {
+            "south": [
+              "Idle/animations/andar/south/frame_000.png",
+              "Idle/animations/andar/south/frame_001.png",
+              "Idle/animations/andar/south/frame_002.png",
+              "Idle/animations/andar/south/frame_003.png",
+              "Idle/animations/andar/south/frame_004.png",
+              "Idle/animations/andar/south/frame_005.png"
+            ],
+            "west": [
+              "Idle/animations/andar/west/frame_000.png",
+              "Idle/animations/andar/west/frame_001.png",
+              "Idle/animations/andar/west/frame_002.png",
+              "Idle/animations/andar/west/frame_003.png",
+              "Idle/animations/andar/west/frame_004.png",
+              "Idle/animations/andar/west/frame_005.png"
+            ],
+            "north": [
+              "Idle/animations/andar/north/frame_000.png",
+              "Idle/animations/andar/north/frame_001.png",
+              "Idle/animations/andar/north/frame_002.png",
+              "Idle/animations/andar/north/frame_003.png",
+              "Idle/animations/andar/north/frame_004.png",
+              "Idle/animations/andar/north/frame_005.png"
+            ],
+            "east": [
+              "Idle/animations/andar/east/frame_000.png",
+              "Idle/animations/andar/east/frame_001.png",
+              "Idle/animations/andar/east/frame_002.png",
+              "Idle/animations/andar/east/frame_003.png",
+              "Idle/animations/andar/east/frame_004.png",
+              "Idle/animations/andar/east/frame_005.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-19T12:49:13.660772"
+}

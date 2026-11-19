@@ -39,13 +39,15 @@
     veneno_pot: ['............', '.....kk.....', '....kggk....', '....kgGk....', '...kgGGgk...', '..kggwGGgk..', '..kgwgGGgk..', '..kggGGGgk..', '..kgGGGGGk..', '...kggGGk...', '....kkkk....', '............'],
     sem_lento: ['............', '..kkkk......', '.kNNNNk.....', '.kNnnNk.....', '.kNnnNkkkk..', '.kNnnnnnNnk.', '.kNnnnnnnNk.', '.kNnnnnnnNk.', 'kkNNNNNNNNk.', 'kEEEEEEEEEk.', '.kkkkkkkkkk.', '............'],
   };
+  // Ícones dos talentos: desenhos de 12x12 feitos em código (os PNG do CraftPix foram removidos em 2026-11-19).
+  const IDS = ['cura_cadeia', 'sorte', 'ultimate', 'troca', 'abertura', 'dupla', 'arco', 'reserva', 'sede', 'demolidor', 'pe', 'folego', 'ultimo', 'res_fogo', 'res_agua', 'res_terra', 'res_ar', 'res_eletrico', 'espinhos', 'casca', 'corpo', 'veneno_pot', 'sem_lento'];
   const cache = {};
   function desenhar(mapa, subst) {
     const c = document.createElement('canvas'); c.width = c.height = 12; const x = c.getContext('2d');
     mapa.forEach((lin, j) => { for (let i = 0; i < 12; i++) { const ch = lin[i]; if (ch === '.' || ch === ' ') continue; x.fillStyle = (subst && subst[ch]) || PAL[ch] || '#ff00ff'; x.fillRect(i, j, 1, 1); } });
     return c.toDataURL();
   }
-  // id do talento -> imagem (data URL de 12x12, para mostrar ampliada com image-rendering: pixelated)
+  // id do talento -> caminho do ícone (ou desenho de código, se faltar o arquivo)
   function talento(id) {
     if (cache[id]) return cache[id];
     if (id.startsWith('res_')) cache[id] = desenhar(ESCUDO, { X: ELEM[id.slice(4)] || '#ffffff' });

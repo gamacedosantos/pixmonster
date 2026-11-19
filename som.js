@@ -201,7 +201,13 @@
   SONS.musica = (c) => notas(c, busMusica(c), 0, 36, 0); // só para medir offline
 
   // Trilhas de arquivo (audio/): "batalha" durante a luta, "tema" na tela de escolha. Uma toca por vez, em loop, com fade.
-  const ARQ = { batalha: ['audio/battle-theme.mp3', 0.45], tema: ['audio/pixelandia-tema.mp3', 0.4] };
+  const ARQ = {
+    batalha: ['audio/battle-theme.mp3', 0.45], batalha2: ['audio/gym-leader-showdown.mp3', 0.45], batalha3: ['audio/fixed-transition-battle.mp3', 0.45], batalha4: ['audio/gym-leader-showdown-2.mp3', 0.45],
+    tema: ['audio/pixelandia-tema.mp3', 0.4], menu2: ['audio/menu/pixelandia-trap-pop.mp3', 0.4], menu3: ['audio/menu/pixmonster-funk-jpop.mp3', 0.4], menu4: ['audio/menu/instrumental-backing-track.m4a', 0.4],
+    vila: ['audio/bosque/pokemart-memories.mp3', 0.4], rota: ['audio/bosque/hidden-trail-whispers.mp3', 0.4], loja: ['audio/loja/item-shop-oasis.mp3', 0.4],
+    caverna1: ['audio/caverna/crystal-cavern-echoes.mp3', 0.4], caverna2: ['audio/caverna/echoes-of-prontera-depth.mp3', 0.4], caverna3: ['audio/caverna/subterranean-sanctuary.mp3', 0.4], caverna4: ['audio/caverna/subterranean-waypoint.mp3', 0.4],
+  };
+  const MENU = ['tema', 'menu2', 'menu3', 'menu4'], BATALHA = ['batalha', 'batalha2', 'batalha3', 'batalha4'], CAVERNA = ['caverna1', 'caverna2', 'caverna3', 'caverna4'];
   const pistas = {};
   let querida = null; // trilha que deveria estar tocando (o navegador só deixa tocar depois do primeiro toque)
   function fade(el, alvo, fim) {
@@ -220,11 +226,23 @@
     if (!el) { el = pistas[nome] = new Audio(ARQ[nome][0]); el.loop = true; el.volume = 0; }
     if (el.paused) el.play().catch(() => { /* sem toque ainda: o próximo toque tenta de novo */ });
     fade(el, ARQ[nome][1]);
-    if (nome === 'batalha' && ultimoAmb) ambiente(ultimoAmb); else pararAmbiente();
+    if (nome.startsWith('batalha') && ultimoAmb) ambiente(ultimoAmb); else pararAmbiente();
   }
   document.addEventListener('pointerdown', () => { if (querida && !mudo && (!pistas[querida] || pistas[querida].paused)) trilha(querida); }, true);
-  function musica(ligar) { trilha(ligar ? 'batalha' : null); nivel = 0; }
-  function tema(ligar) { trilha(ligar ? 'tema' : null); }
+  let ultimaBatalha = null;
+  function musica(ligar) { // a cada luta toca uma das músicas de batalha, trocando em relação à anterior
+    if (ligar) { const lista = BATALHA.filter((k) => k !== ultimaBatalha); ultimaBatalha = lista[Math.floor(Math.random() * lista.length)]; }
+    trilha(ligar ? ultimaBatalha : null); nivel = 0;
+  }
+  let ultimoMenu = null, ultimaCaverna = null;
+  function tema(ligar) { // menu: uma das músicas da tela principal (mantém a que já toca)
+    if (!ligar) { trilha(null); return; }
+    if (!MENU.includes(querida)) { const lista = MENU.filter((k) => k !== ultimoMenu); ultimoMenu = lista[Math.floor(Math.random() * lista.length)]; }
+    trilha(ultimoMenu);
+  }
+  function mundo(area) { trilha(area === 'vila' ? 'vila' : 'rota'); } // exploração: Vila = PokéMart Memories, Rota = Hidden Trail Whispers
+  function loja(ligar) { if (ligar) trilha('loja'); }
+  function caverna() { const lista = CAVERNA.filter((k) => k !== ultimaCaverna); ultimaCaverna = lista[Math.floor(Math.random() * lista.length)]; trilha(ultimaCaverna); } // ainda sem área de caverna no mundo
   function intensidade(n) { nivel = Math.max(0, Math.min(3, n)); }
 
   // ---------- ambiência por bioma: vento filtrado em loop + sons esporádicos (pássaros, gotas, águia) ----------
@@ -258,6 +276,7 @@
       floresta: { v: () => { vento(350, 0.7, 0.07, 0.1); vento(2500, 1.5, 0.012, 0.3); }, ev: [[pio, 1500, 3000], [coruja, 7000, 6000]] },
       lago: { v: () => { vento(900, 0.5, 0.06, 0.25); vento(250, 0.8, 0.04, 0.08); }, ev: [[gota, 1200, 2500], [pio, 4000, 6000]] },
       montanha: { v: () => { vento(260, 1.2, 0.11, 0.07); vento(900, 2.5, 0.04, 0.17); }, ev: [[aguia, 6000, 6000]] },
+      ginasio: { v: () => vento(180, 0.6, 0.02, 0.05), ev: [] },
     }[bioma] || { v: () => vento(500, 0.7, 0.05, 0.12), ev: [] };
     receita.v();
     amb = { g, nos, ts: [] };
@@ -292,5 +311,5 @@
     return mudo;
   }
 
-  window.PixmonSom = { tocar, musica, tema, ambiente, intensidade, medir, alternar, mudo: () => mudo };
+  window.PixmonSom = { tocar, musica, tema, mundo, loja, caverna, ambiente, intensidade, medir, alternar, mudo: () => mudo };
 })();

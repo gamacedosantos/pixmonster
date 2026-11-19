@@ -29,9 +29,15 @@
   // ?codigo volta ao desenho feito em código (conferência e plano B se os PNGs não carregarem).
   const USA_PL = !location.search.includes('codigo');
   const PL = {};
-  const PL_ARQ = { fagulhao: 'fagulhao-teste.png', mareal: 'mareal-teste.png', musgarra: 'musgarra-teste.png', chamuscao: 'chamuscao-teste.png', pingolino: 'pingolino-teste.png', brotinho: 'brotinho-teste.png', ventinho: 'ventinho-teste.png', nuvelino: 'nuvelino-teste.png', faiscao: 'faiscao-teste.png', trovinho: 'trovinho-teste.png', carvalho: 'arvore-carvalho-teste.png', pinheiro: 'arvore-pinheiro-teste.png', grama: 'grama-tufo-teste.png', pedra: 'pedra-pequena-teste.png', pedramusgo: 'pedra-musgo-teste.png', pedras: 'pedras-grupo-teste.png', arbusto: 'arbusto-teste.png', flores: 'flores-teste.png', toco: 'toco-teste.png', junco: 'junco-teste.png', nenufar: 'nenufar-teste.png', rochedo: 'rochedo-teste.png', betula: 'arvore-betula-teste.png', frutinhas: 'arbusto-frutinhas-teste.png', floresazuis: 'flores-azuis-teste.png', barril: 'barril-teste.png', caixote: 'caixote-teste.png', jarro: 'jarro-teste.png' };
+  const PL_ARQ = { casa: 'ui/mundo/v2/casa_1_f.png', fagulhao: 'fagulhao-teste.png', mareal: 'mareal-teste.png', musgarra: 'musgarra-teste.png', chamuscao: 'chamuscao-teste.png', pingolino: 'pingolino-teste.png', brotinho: 'brotinho-teste.png', ventinho: 'ventinho-teste.png', nuvelino: 'nuvelino-teste.png', faiscao: 'faiscao-teste.png', trovinho: 'trovinho-teste.png', carvalho: 'arvore-carvalho-teste.png', pinheiro: 'arvore-pinheiro-teste.png', grama: 'grama-tufo-teste.png', pedra: 'pedra-pequena-teste.png', pedramusgo: 'pedra-musgo-teste.png', pedras: 'pedras-grupo-teste.png', arbusto: 'arbusto-teste.png', flores: 'flores-teste.png', toco: 'toco-teste.png', junco: 'junco-teste.png', nenufar: 'nenufar-teste.png', rochedo: 'rochedo-teste.png', betula: 'arvore-betula-teste.png', frutinhas: 'arbusto-frutinhas-teste.png', floresazuis: 'flores-azuis-teste.png', barril: 'barril-teste.png', caixote: 'caixote-teste.png', jarro: 'jarro-teste.png' };
   const ALT_MON = 32; // monstros 25% menores (eram 50 px) e mais 15% (era 38)
-  const ALT_PL = { fagulhao: ALT_MON, mareal: ALT_MON, musgarra: ALT_MON, chamuscao: ALT_MON, pingolino: ALT_MON, brotinho: ALT_MON, ventinho: ALT_MON, nuvelino: ALT_MON, faiscao: ALT_MON, trovinho: ALT_MON, carvalho: 84, pinheiro: 84, grama: 16, pedra: 16, pedramusgo: 26, pedras: 14, arbusto: 22, flores: 14, toco: 18, junco: 22, nenufar: 14, rochedo: 46, betula: 84, outono: 84, rosa: 84, frutinhas: 22, floresazuis: 15, barril: 22, caixote: 22, jarro: 20 }; // altura alvo na tela, em px
+  const ALT_PL = { fagulhao: ALT_MON, mareal: ALT_MON, musgarra: ALT_MON, chamuscao: ALT_MON, pingolino: ALT_MON, brotinho: ALT_MON, ventinho: ALT_MON, nuvelino: ALT_MON, faiscao: ALT_MON, trovinho: ALT_MON, carvalho: 84, pinheiro: 84, grama: 16, pedra: 16, pedramusgo: 26, pedras: 14, arbusto: 22, flores: 14, toco: 18, junco: 22, nenufar: 14, rochedo: 46, casa: 1.4, betula: 84, outono: 84, rosa: 84, frutinhas: 22, floresazuis: 15, barril: 22, caixote: 22, jarro: 20 }; // altura alvo na tela, em px
+  // Formas evoluídas (Fase D): um pouco maiores que a forma base
+  Object.assign(PL_ARQ, { brasalisco: 'brasalisco-teste.png', magmadilo: 'magmadilo-teste.png', algamar: 'algamar-teste.png', recifante: 'recifante-teste.png', rochedao: 'rochedao-teste.png', esporao: 'esporao-teste.png', plumareu: 'plumareu-teste.png', ciclonara: 'ciclonara-teste.png', zapotrao: 'zapotrao-teste.png', tempestauro: 'tempestauro-teste.png', carvaoreal: 'carvaoreal-teste.png', pingueiroimperial: 'pingueiroimperial-teste.png', musgarrao: 'musgarrao-teste.png', vendaval: 'vendaval-teste.png', cumulonio: 'cumulonio-teste.png', trovaodourado: 'trovaodourado-teste.png', brasinha: 'brasinha-teste.png', vulcanejo: 'vulcanejo-teste.png', algazinho: 'algazinho-teste.png', coraline: 'coraline-teste.png', pedrinho: 'pedrinho-teste.png', tatufungo: 'tatufungo-teste.png', plumelho: 'plumelho-teste.png', redemoinha: 'redemoinha-teste.png', zapinho: 'zapinho-teste.png', raiomante: 'raiomante-teste.png', labaredo: 'labaredo-teste.png', oceanico: 'oceanico-teste.png', carvalhinho: 'carvalhinho-teste.png', faiscante: 'faiscante-teste.png' });
+  Object.assign(ALT_PL, { brasalisco: 38, magmadilo: 38, algamar: 38, recifante: 38, rochedao: 38, esporao: 38, plumareu: 38, ciclonara: 38, zapotrao: 38, tempestauro: 38, carvaoreal: 38, pingueiroimperial: 38, musgarrao: 38, vendaval: 38, cumulonio: 38, trovaodourado: 38, brasinha: ALT_MON, vulcanejo: ALT_MON, algazinho: ALT_MON, coraline: ALT_MON, pedrinho: ALT_MON, tatufungo: ALT_MON, plumelho: ALT_MON, redemoinha: ALT_MON, zapinho: ALT_MON, raiomante: ALT_MON, labaredo: 38, oceanico: 38, carvalhinho: 38, faiscante: 38 });
+  // Mais 5 espécies (2026-11-19): uma de cada elemento
+  Object.assign(PL_ARQ, { pavio: 'pavio-teste.png', bolhudo: 'bolhudo-teste.png', taupino: 'taupino-teste.png', pipinha: 'pipinha-teste.png', lampiro: 'lampiro-teste.png' });
+  Object.assign(ALT_PL, { pavio: ALT_MON, bolhudo: ALT_MON, taupino: ALT_MON, pipinha: ALT_MON, lampiro: ALT_MON });
   // Recorta a silhueta (pixels com alfa) para a sprite ser centralizada pela base
   function plCaixa(im) {
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
@@ -50,7 +56,7 @@
         const x = c.getContext('2d'); x.filter = filtro; x.drawImage(im, 0, 0); PL[nome] = plCaixa(c);
       });
     };
-    im.src = 'sprites-pixellab/' + PL_ARQ[k];
+    im.src = (PL_ARQ[k].includes('/') ? '' : 'sprites-pixellab/') + PL_ARQ[k]; // os dos pacotes ficam em ui/mundo/
   });
   // Chão do PixelLab. As folhas Wang 4x4 (32 px) do PixelLab não trazem os 16 tiles de transição distintos (têm repetidos e faltam
   // combinações), então só usamos os tiles PUROS delas (um terreno inteiro) e desenhamos as bordas por ruído, no nível do pixel,
@@ -66,6 +72,7 @@
     floresta: { g: ['floresta', 'l'], f: ['floresta', 'u'] },
     lago: { g: ['areiagrama', 'l'], a: ['areiagrama', 'u'], w: ['aguaareia', 'u'] },
     montanha: { g: ['pedragrama', 'l'], r: ['pedragrama', 'u'] },
+    vila: { g: ['terra', 'l'], d: ['terra', 'u'] },
   };
   const BORDA = { d: '#74502c', f: '#2f5a2e', a: '#d8b878', w: '#8ccdf0', r: '#5e5648' }; // contorno de 1 px na beira de cada terreno
   const PL_PURO = {}; // por folha: { l: [ImageData 32x32...], u: [...] }, os tiles mais puros de cada terreno
@@ -92,6 +99,29 @@
     im.onload = () => { PL_PURO[k] = purosDaFolha(im); fundo = null; };
     im.src = 'sprites-pixellab/chao/' + FOLHAS[k];
   });
+  // A folha tem dezenas de detalhes pequenos (tufos de grama e manchas de terra). Em vez de recortar à mão, acho os blocos conectados
+  // (com 2 px de folga) quando a imagem carrega; o que está na metade de cima é terra, o de baixo é grama.
+  let DET = null, detIm = null;
+  if (USA_PL) {
+    detIm = new Image();
+    detIm.onload = () => {
+      const w = detIm.width, h = detIm.height, c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.drawImage(detIm, 0, 0);
+      const d = x.getImageData(0, 0, w, h).data, R = 2, op = new Uint8Array(w * h), dil = new Uint8Array(w * h), lab = new Int32Array(w * h), comps = [];
+      for (let i = 0; i < w * h; i++) op[i] = d[i * 4 + 3] > 20 ? 1 : 0;
+      for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) if (op[y * w + xx]) for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) { const ny = y + dy, nx = xx + dx; if (ny >= 0 && ny < h && nx >= 0 && nx < w) dil[ny * w + nx] = 1; }
+      let n = 0;
+      for (let y = 0; y < h; y++) for (let xx = 0; xx < w; xx++) {
+        if (!dil[y * w + xx] || lab[y * w + xx]) continue;
+        n++; const st = [[xx, y]]; lab[y * w + xx] = n; let x0 = xx, x1 = xx, y0 = y, y1 = y;
+        while (st.length) { const [cx, cy] = st.pop(); for (const [ax, ay] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = cx + ax, ny = cy + ay; if (nx < 0 || ny < 0 || nx >= w || ny >= h || !dil[ny * w + nx] || lab[ny * w + nx]) continue; lab[ny * w + nx] = n; st.push([nx, ny]); x0 = Math.min(x0, nx); x1 = Math.max(x1, nx); y0 = Math.min(y0, ny); y1 = Math.max(y1, ny); } }
+        comps.push({ x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 });
+      }
+      DET = { verde: comps.filter((k) => k.y >= 140 && k.w >= 7 && k.w <= 40 && k.h <= 40), marrom: comps.filter((k) => k.y < 140 && k.w >= 5 && k.w <= 40 && k.h <= 40) };
+      fundo = null;
+    };
+    // (sem detalhes de chão: o arquivo era do CraftPix, removido)
+  }
   // o hash do pixel.js mistura pouco os bits e deixa listras em diagonal no ruído; este mistura mais (0..1)
   function hashPL(a, b, c) {
     let h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263) ^ Math.imul(c | 0, 1274126177);
@@ -115,7 +145,7 @@
       const dc = Math.hypot(x - 180, y - 338), miolo = Math.max(0, (150 - dc) / 40);
       const n = ruidoPL(x / 90, y / 90, semente) * 0.7 + ruidoPL(x / 28, y / 28, semente + 1) * 0.3;
       let t = 'g';
-      if (bioma === 'campo' || bioma === 'floresta') { if (n + miolo < 0.38) t = bioma === 'campo' ? 'd' : 'f'; }
+      if (bioma === 'campo' || bioma === 'floresta' || bioma === 'vila') { if (n + miolo < 0.38) t = bioma === 'floresta' ? 'f' : 'd'; }
       else {
         const f = Math.hypot(x - lado[0], y - lado[1]) - (bioma === 'lago' ? 210 : 230) + (n - 0.5) * 140 + miolo * 120;
         if (f < 0) t = bioma === 'lago' ? 'w' : 'r';
@@ -152,7 +182,7 @@
   });
   // Desenha a sprite com a base em (x, y), centralizada; espelha se flip. p é o quadro (padrão: a sprite parada)
   function desenharPL(gg, k, x, y, flip, alfa, p = PL[k], branco = false) {
-    const s = ALT_PL[k] / PL[k].h, w = p.w * s, h = p.h * s;
+    const s = ALT_PL[k] < 10 ? ALT_PL[k] : ALT_PL[k] / PL[k].h, w = p.w * s, h = p.h * s;
     gg.save(); gg.imageSmoothingEnabled = false; gg.globalAlpha = alfa;
     gg.translate(Math.round(x), Math.round(y)); if (flip) gg.scale(-1, 1);
     let im = p.im, sx = p.x0, sy = p.y0, sw = p.w, sh = p.h;
@@ -273,26 +303,68 @@
       }
       return out;
     };
-    const itens = [];
+    let itens = [];
     const mais = (n, rmin, cod, ok, k, exige) => espalhar(n, rmin, cod, ok, exige).forEach(([x, y], i) => itens.push([x, y, typeof k === 'function' ? k(i) : k]));
+    const K = (...ks) => ks.filter((k) => PL[k]), pick = (lista, cod = 640) => (i) => lista[Math.floor(al(i, cod) * lista.length) % lista.length];
     const arbustoK = (i) => (PL.frutinhas && al(i, 610) < 0.45 ? 'frutinhas' : 'arbusto'), florK = (i) => (PL.floresazuis && al(i, 620) < 0.5 ? 'floresazuis' : 'flores');
     const pedras = (i) => ['pedra', 'pedramusgo', 'pedras'][Math.floor(al(i, 600) * 3)];
+    fumacaCasa = null; casaCaixa = null;
+    if (DET) { // detalhes rentes ao chão: tufos de grama sobre a grama e manchas de terra onde há terra, areia ou pedra
+      const solta = (n, cod, ok, lista) => espalhar(n, 0, cod, ok).forEach(([x, y], i) => { const r = lista[Math.floor(al(i, cod + 7) * lista.length) % lista.length]; gg.drawImage(detIm, r.x, r.y, r.w, r.h, Math.round(x - r.w / 2), Math.round(y - r.h), r.w, r.h); });
+      solta(bioma === 'montanha' ? 50 : 90, 950, 'g', DET.verde);
+      solta(bioma === 'floresta' ? 30 : 22, 960, bioma === 'floresta' ? 'f' : 'd', DET.marrom);
+      if (bioma === 'lago') solta(18, 970, 'a', DET.marrom); else if (bioma === 'montanha') solta(26, 970, 'r', DET.marrom);
+    }
     espalhar(bioma === 'lago' ? 24 : bioma === 'montanha' ? 12 : 30, 150, 100, 'g').forEach(([x, y]) => desenharPL(gg, 'grama', x, y, false, 1));
     if (bioma === 'lago') {
       mais(10, 140, 200, 'w', 'nenufar'); mais(16, 140, 210, 'a', 'junco', 'w'); mais(5, 150, 220, 'ag', pedras);
       mais(11, 152, 230, 'g', florK); mais(8, 160, 240, 'g', arbustoK);
+      if (K('salgueiro1', 'salgueiro3').length) mais(5, 150, 250, 'g', pick(K('salgueiro1', 'salgueiro3')), 'a'); // salgueiros perto da água
     } else if (bioma === 'montanha') {
       mais(7, 150, 200, 'r', 'rochedo'); mais(12, 150, 210, 'rg', pedras);
       mais(4, 152, 220, 'g', florK); mais(4, 160, 230, 'g', arbustoK);
+      if (K('rocha_a').length) mais(7, 150, 260, 'rg', pick(K('rocha_a', 'rocha_b', 'rocha_p1', 'rocha_p2', 'pedra_azul')));
+    } else if (bioma === 'vila') {
+      mais(12, 152, 200, 'gd', florK); mais(8, 160, 210, 'gd', arbustoK); mais(5, 158, 230, 'gd', pedras);
+      if (K('caixas', 'poco', 'espantalho').length) { mais(3, 165, 270, 'gd', pick(K('caixas', 'toco_a', 'toco_b'), 641)); mais(1, 170, 275, 'gd', 'poco'); mais(1, 170, 280, 'gd', 'espantalho'); mais(3, 160, 285, 'gd', pick(K('cogumelos_verm', 'cerca_longa'), 642)); }
+      if (PL.casa) { // a casa num canto de cima, com a fumaça da chaminé e algumas pedras do caminho até a porta
+        const esq = al(1, 900) < 0.5, cx = esq ? 100 : 260, base = 236, porta = cx + 31, sinal = esq ? 1 : -1;
+        itens = itens.filter(([x, y]) => !(x > cx - 74 && x < cx + 74 && y > base - 140 && y < base + 70)); // nada em cima da casa
+        itens.push([cx, base, 'casa']);
+        if (PL.pedrisco) [[0, 42], [sinal * 12, 62], [sinal * 26, 82], [sinal * 44, 100]].forEach(([dx, dy]) => itens.push([porta + dx, base + dy, 'pedrisco'])); // a pedra tem ~31 px de altura e é desenhada de baixo para cima: começa 42 px abaixo da base para não subir sobre a parede
+        casaCaixa = { x0: cx - 66, x1: cx + 66, y0: base - 136, y1: base + 14 }; // área da casa (os objetos quebráveis e o resto não entram aqui)
+        fumacaCasa = { x: cx - 58 + 2, y: base - 128 - 16 }; // canto do quadro de 48x48 da fumaça
+      }
     } else {
       mais(14, 152, 200, 'gdf', florK); mais(10, 160, 210, 'gdf', arbustoK);
       mais(2, 165, 220, 'gdf', 'toco'); mais(8, 158, 230, 'gdf', pedras);
+      if (bioma === 'floresta' && K('cogumelo_br').length) { mais(9, 155, 270, 'gdf', pick(K('cogumelo_br', 'cogumelo_br2', 'laranja', 'cogumelos_verm', 'cogumelo_bege'))); mais(5, 158, 275, 'gdf', pick(K('samambaia', 'toco_raiz'), 643)); }
+      if (bioma === 'campo' && K('toco_a').length) mais(4, 160, 265, 'gdf', pick(K('toco_a', 'toco_b', 'cogumelos_verm'), 644));
     }
     const arvOk = bioma === 'lago' ? 'g' : 'gdfr';
-    const arvore = (x, y, u) => { if (!arvOk.includes(terrenoEm(x, y))) return; const kinds = (bioma === 'montanha' ? ['pinheiro', 'pinheiro', 'pinheiro', 'carvalho'] : bioma === 'lago' ? ['carvalho', 'betula', 'rosa', 'carvalho'] : ['pinheiro', 'carvalho', 'betula', 'outono', 'rosa', 'carvalho']).filter((k) => PL[k]); itens.push([x, y, kinds[Math.floor(u * kinds.length) % kinds.length]]); };
+    const LISTAS = {
+      montanha: ['pinheiro', 'pinheiro', 'pinheiro', 'branca2', 'branca1', 'carvalho'],
+      lago: ['carvalho', 'betula', 'rosa', 'macieira', 'salgueiro3'],
+      floresta: ['pinheiro', 'carvalho', 'betula', 'arvore_escura', 'arvore_escura2', 'luminosa3', 'bolas_azuis', 'espiral', 'curva'],
+      vila: ['macieira', 'macieira2', 'carvalho_grande', 'carvalho3', 'betula', 'carvalho'],
+      campo: ['pinheiro', 'carvalho', 'betula', 'outono', 'rosa', 'macieira', 'carvalho_grande'],
+    };
+    const arvore = (x, y, u) => { if (!arvOk.includes(terrenoEm(x, y))) return; const kinds = K(...(LISTAS[bioma] || LISTAS.campo)); itens.push([x, y, kinds[Math.floor(u * kinds.length) % kinds.length]]); };
     for (let i = 0; i < 6; i++) for (const y of [44, 74, 598, 632]) arvore(Math.round(20 + i * 62 + al(i + y, 700) * 14), y + Math.round(al(i + y, 701) * 8 - 4), al(i + y, 702)); // mata em cima e embaixo
     [[12, 150], [348, 190], [8, 270], [352, 330], [12, 420], [348, 470], [10, 540], [350, 90]].forEach(([x, y], i) => arvore(x, y + Math.round(al(i, 800) * 20 - 10), al(i, 801))); // laterais
+    if (bioma === 'vila' && fumacaCasa) { const hx = fumacaCasa.x + 56, hy = fumacaCasa.y + 144; itens = itens.filter(([x, y, k]) => k === 'casa' || k === 'pedrisco' || !(x > hx - 74 && x < hx + 74 && y > hy - 140 && y < hy + 20)); } // árvores das bordas também não cobrem a casa
     itens.sort((a, b) => a[1] - b[1]).forEach(([x, y, k]) => desenharPL(gg, k, x, y + 2, false, 1));
+  }
+
+  // Fumaça da chaminé da casa da vila (Smoke_animation.png: 6 quadros de 48x48), desenhada por cima do fundo estático
+  let fumacaCasa = null, fumacaIm = null, casaCaixa = null;
+  function desenharFumaca(agora) {
+    if (!fumacaCasa) return;
+    if (!fumacaIm) { fumacaIm = new Image(); /* sem fumaça: o arquivo era do CraftPix, removido */ }
+    if (!fumacaIm.complete || !fumacaIm.naturalWidth) return;
+    const q = Math.floor(agora / 130) % 6;
+    g.imageSmoothingEnabled = false;
+    g.drawImage(fumacaIm, q * 48, 0, 48, 48, Math.round(fumacaCasa.x), Math.round(fumacaCasa.y), 48, 48);
   }
 
   function montarFundo() {
@@ -300,6 +372,11 @@
     c.width = W; c.height = H;
     const g = c.getContext('2d');
     g.imageSmoothingEnabled = false;
+    if (biomaPedido === 'ginasio' && GINASIO) { // quadra pronta + anel branco do círculo central em volta do emblema
+      bioma = 'ginasio'; mapa = null; g.drawImage(GINASIO, 0, 0, W, H);
+      g.strokeStyle = '#e8e0d0'; g.lineWidth = 3; g.beginPath(); g.arc(180, 368, 33, 0, Math.PI * 2); g.stroke();
+      return c;
+    }
     const disponiveis = USA_PL ? Object.keys(RECEITA).filter((b) => Object.values(RECEITA[b]).every(([k]) => PL_PURO[k])) : [];
     if (disponiveis.length && PROPS_PL.every((k) => PL[k])) { // um bioma sorteado por luta: campo, floresta, lago ou montanha
       semente = Math.floor(Math.random() * 1e4);
@@ -338,6 +415,7 @@
       ellipse(g, x + (flip ? -r(dx) : r(dx)), y + r(dy), r(rx) + 1, r(ry) + 1, OUT);
       ellipse(g, x + (flip ? -r(dx) : r(dx)), y + r(dy), r(rx), r(ry), col(c));
     };
+    if (!f) { g.globalAlpha = 1; return; } // espécie só com PNG (PixelLab) e o PNG ainda não carregou: não há desenho em código
     const [cdx, cdy, crx, cry] = f.cauda;
     const [bx, by, brx, bry] = f.corpo;
     const [hx, hy, hrx, hry] = f.cabeca;
@@ -437,7 +515,7 @@
   }
 
   // Pips do time embaixo de cada painel (cor do elemento; caído = escuro com X; em campo = borda branca) e o aviso do cenário
-  const NOME_BIOMA = { campo: 'Campo', floresta: 'Floresta', lago: 'Lago', montanha: 'Montanha' }, NOME_EL = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
+  const NOME_BIOMA = { campo: 'Campo', floresta: 'Floresta', lago: 'Lago', montanha: 'Montanha', vila: 'Vila', ginasio: 'Ginásio' }, NOME_EL = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
   function desenharTimes(g, agora) {
     for (const i of [0, 1]) {
       const time = bt.times[i], x0 = i === 0 ? 8 : 352 - time.length * 12;
@@ -465,14 +543,16 @@
   // ---------- objetos demolíveis: barris, caixotes e jarros que quebram quando uma investida, um projétil ou um impacto passa perto ----------
   let objetos = [], restos = [];
   const OBJ_COR = { barril: ['#6b4a2a', '#a07c4f', '#3a3a44'], caixote: ['#7a5a34', '#b8945a', '#4a3320'], jarro: ['#b8542a', '#e08a4a', '#7a3418'] };
+  let GINASIO = null; { const im = new Image(); im.onload = () => { GINASIO = im; fundo = null; }; im.src = 'ui/mundo/novo/arena_ginasio.png'; }
   function criarObjetos() {
     objetos = []; restos = [];
-    if (!USA_PL) return;
+    if (!USA_PL || bioma === 'ginasio') return; // no ginásio não há barris nem caixotes
     const tipos = ['barril', 'caixote', 'jarro'];
     for (let t = 0; objetos.length < 8 && t < 400; t++) {
       const a = hash(t, semente + 5) * Math.PI * 2, r = 60 + hash(t, semente + 6) * 120;
       const x = Math.round(CENTRO.x + Math.cos(a) * r * 0.95), y = Math.round(CENTRO.y + Math.sin(a) * r * 1.25);
       if (x < 30 || x > W - 30 || y < 110 || y > H - 120 || !'gdfa'.includes(terrenoEm(x, y))) continue;
+      if (casaCaixa && x > casaCaixa.x0 - 16 && x < casaCaixa.x1 + 16 && y > casaCaixa.y0 && y < casaCaixa.y1 + 90) continue; // nem em cima da casa nem no caminho da porta
       if (objetos.some((o) => Math.hypot(o.x - x, o.y - y) < 40)) continue;
       objetos.push({ x, y, k: tipos[objetos.length % 3], vivo: true });
     }
@@ -955,10 +1035,11 @@
       const m = Math.round(tremor.mag * (1 - (agoraReal - tremor.t0) / tremor.dur));
       g.translate(Math.round((Math.random() - 0.5) * 2 * m), Math.round((Math.random() - 0.5) * 2 * m));
     }
+    if (!fundo) { fundo = montarFundo(); criarObjetos(); } // um sprite que terminou de carregar no meio da luta refaz o fundo e os objetos juntos
     g.drawImage(fundo, 0, 0);
 
     desenharChaoFx(agora);
-    colideObjetos(agora); desenharRestos();
+    colideObjetos(agora); desenharRestos(); desenharFumaca(agora);
     const ps = [0, 1].map((i) => ({ y: pos(i, agora).y, fn: () => desenharMonstro(i, pos(i, agora), agora) }))
       .concat(objetos.filter((o) => o.vivo && PL[o.k]).map((o) => ({ y: o.y, fn: () => { ellipse(g, o.x, o.y + 1, 9, 3, 'rgba(20,40,20,0.35)'); desenharPL(g, o.k, o.x, o.y + 2, false, 1); } })))
       .sort((a, b) => a.y - b.y);

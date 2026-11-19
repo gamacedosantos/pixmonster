@@ -2,7 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1020">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PixMonster">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icone-192.png">
+<link rel="apple-touch-icon" href="icone-192.png">
 <title>PixMonster: protótipo de batalha</title>
 <style>
   @font-face { font-family: 'Pixelify Sans'; src: url(fonts/pixelify-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
@@ -10,13 +17,24 @@
   :root { color-scheme: dark; --s: 64px; /* lado do ícone de habilidade na tela (a folha tem ícones de 32 px, em 2x) */ }
   @media (max-width: 340px) { :root { --s: 48px; } }
   body { margin: 0; background: #14110f; color: #efe0b8; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; touch-action: manipulation; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
   main { max-width: 420px; margin: 0 auto; padding: 8px; }
+  @media (pointer: coarse) { button:not(.reserva) { min-height: 44px; } } /* alvo de toque mínimo de 44 px */
+  /* só retrato: em paisagem baixa (celular deitado) pede para girar */
+  #girar { display: none; }
+  @media (orientation: landscape) and (max-height: 500px) { #girar { position: fixed; inset: 0; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: #1b1020; color: #ffd35a; text-align: center; font-size: 18px; } #girar small { color: #8fb0ff; font-size: 13px; } }
   button { font: inherit; width: 100%; padding: 12px; margin: 4px 0; border: 2px solid #e0b040; border-radius: 4px; background: #2a1c12; color: #efe0b8; font-size: 16px; }
-  #mudo { position: fixed; top: 6px; right: 6px; z-index: 5; width: auto; padding: 4px 8px; margin: 0; font-size: 12px; opacity: .85; }
+  #mudo { position: fixed; top: 6px; right: 6px; z-index: 5; width: 40px; height: 40px; min-height: 40px; padding: 4px; margin: 0; border-radius: 10px; background: rgba(27,16,32,.75); border-color: #ffd35a; display: flex; align-items: center; justify-content: center; }
+  #mudo svg, .item svg { width: 100%; height: 100%; display: block; }
   canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
 
   /* ---------- luta: o campo em cima e os 4 botões de habilidade embaixo, na mesma largura ---------- */
-  .coluna { width: min(100%, calc((100dvh - 206px) * 360 / 640)); margin: 0 auto; }
+  /* a arena ocupa a altura que sobra depois do time e dos textos; na luta do mundo há mais uma barra (esfera e poção) */
+  .coluna { --resto: 150px; width: min(100%, calc((100dvh - var(--resto)) * 360 / 640)); margin: 0 auto; }
+  .coluna:has(#itensLuta:not([hidden])) { --resto: 206px; }
+  body:has(#luta:not([hidden]), #mundo:not([hidden])) #mudo { top: auto; bottom: 6px; } /* o botão de som não cobre o HUD */
+  @media (pointer: coarse) { #mundoDica { display: none; } } /* a dica é de teclado */
   .palco { position: relative; width: 100%; aspect-ratio: 360 / 640; }
   /* cartão de resultado: mesmo estilo azul e dourado da escolha, entra com um pulo */
   #resultado { position: absolute; left: 10px; right: 10px; bottom: 12px; padding: 14px 12px 12px; text-align: center; color: #e8f1ff; background: #1b3366; border: 3px solid #ffd35a; border-radius: 12px; box-shadow: inset 0 0 0 4px #14285a, 0 6px 0 #0b1633, 0 0 0 3px #0b1633; animation: entra .45s cubic-bezier(.2, 1.4, .4, 1) both; }
@@ -32,18 +50,8 @@
   #resultado .acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   #resultado button { margin: 0; padding: 11px 6px; font-size: 15px; border-radius: 8px; background: #24417f; border: 2px solid #4a6fb8; color: #dfe9ff; }
   #resultado button.principal { background: #ffd35a; color: #1b1020; border-color: #ffffff; box-shadow: 0 0 10px #ffd35a88; }
-  #habs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
-  .hab { position: relative; width: auto; margin: 0; padding: 4px 2px 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #1b3366; border: 2px solid #4a6fb8; border-radius: 8px; color: #e8f1ff; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
   .ico { position: relative; width: var(--s); height: var(--s); image-rendering: pixelated; background-image: url(ui/habilidades.png); background-size: calc(var(--s) * 4) calc(var(--s) * 4); background-position: calc(var(--s) * var(--c) * -1) calc(var(--s) * var(--r) * -1); border-radius: 4px; overflow: hidden; }
   .ico.escudo { background-size: 100% 100%; background-position: 0 0; }
-  .hab .cd { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(8, 12, 30, .72); }
-  .hab .seg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; text-shadow: 0 0 3px #000, 0 0 3px #000; }
-  .hab .nome { font-size: 11px; line-height: 1.1; text-align: center; min-height: 24px; display: flex; align-items: center; }
-  .hab small { font-size: 10px; color: #8fb0ff; }
-  .hab.pronto { border-color: #ffd35a; box-shadow: 0 0 6px #ffd35a88; }
-  .hab[data-slot="ultimate"].pronto { border-color: #ff7af0; box-shadow: 0 0 8px #ff7af0aa; }
-  .hab.ocupado { opacity: .6; }
-  .hab.ativo { border-color: #9fd0ff; box-shadow: 0 0 8px #9fd0ffaa; }
 
   /* ---------- escolha: grade de monstros e ficha, em coluna para celular ---------- */
   #escolha { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px; color: #e8f1ff; box-shadow: inset 0 0 0 4px #14285a; }
@@ -73,11 +81,6 @@
   .golpe .info { color: #e3c35c; font-size: 11px; }
   .golpe .mini { grid-column: 2; grid-row: 1 / span 3; width: 32px; height: 32px; image-rendering: pixelated; background-image: url(ui/habilidades.png); background-position: calc(var(--c) * -32px) calc(var(--r) * -32px); border-radius: 3px; }
   .golpe .mini.escudo { background-size: 100% 100%; background-position: 0 0; }
-  .autoluta { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 8px 10px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; font-size: 13px; color: #8fb0ff; }
-  .autoluta button { width: auto; margin: 0; padding: 6px 12px; font-size: 14px; flex: none; background: #24417f; border: 2px solid #4a6fb8; border-radius: 14px; color: #dfe9ff; }
-  .autoluta button.sel { background: #ffd35a; color: #1b1020; border-color: #fff; }
-  #habs.auto .hab { opacity: .75; pointer-events: none; }
-  #habs.auto::before { content: 'AUTO'; grid-column: 1 / -1; text-align: center; font-size: 12px; letter-spacing: 3px; color: #ffd35a; }
   /* time de 3: faixa de escolha e linha de troca na luta */
   .wiki { position: fixed; top: 6px; right: 90px; z-index: 5; padding: 4px 8px; font-size: 12px; color: #efe0b8; background: #2a1c12; border: 2px solid #e0b040; border-radius: 4px; text-decoration: none; opacity: .85; }
   #meuTime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
@@ -88,6 +91,15 @@
   .celula { position: relative; }
   #lutar:disabled { opacity: .55; background: #8a7a4a; }
   .sortear { margin-top: 6px; padding: 7px; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 8px; color: #dfe9ff; }
+  /* golpes do monstro em campo: só o ícone, escurecido enquanto recarrega, com os segundos que faltam */
+  #habs { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+  .hab { --s: 44px; position: relative; border: 2px solid #4a6fb8; border-radius: 8px; background: #14285a; padding: 2px; }
+  .hab .ico { width: var(--s); height: var(--s); }
+  .hab .cd { position: absolute; left: 0; right: 0; top: 0; height: 0; background: rgba(8, 14, 40, .72); }
+  .hab .seg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; text-shadow: 0 0 3px #000, 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000; }
+  .hab.pronto { border-color: #ffd35a; box-shadow: 0 0 6px #ffd35a88; }
+  .hab[data-slot="ultimate"].pronto { border-color: #ff7af0; box-shadow: 0 0 8px #ff7af0aa; }
+  .hab.ativo { border-color: #9fd0ff; box-shadow: 0 0 8px #9fd0ffaa; }
   #time { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 6px; }
   .reserva { position: relative; width: auto; margin: 0; padding: 3px 2px; display: flex; align-items: center; gap: 4px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 8px; color: #e8f1ff; touch-action: manipulation; user-select: none; text-align: left; }
   .reserva canvas { width: 34px; height: 34px; flex: none; image-rendering: pixelated; background: #0f2147; border-radius: 4px; }
@@ -100,7 +112,6 @@
   .reserva.espera:not(.ativo) { opacity: .6; }
   .reserva.escolher { border-color: #ff7af0; animation: pisca .5s infinite alternate; }
   @keyframes pisca { to { box-shadow: 0 0 10px #ff7af0cc; } }
-  #time.auto .reserva { pointer-events: none; }
   /* talentos: cartões do time (orçamento de pontos) e um seletor por monstro */
   #talTime { display: grid; gap: 6px; margin-top: 4px; }
   .tal { width: auto; margin: 0; padding: 6px 10px; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 0 8px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; color: #e8f1ff; font-size: 14px; }
@@ -112,7 +123,6 @@
   .talm { display: grid; grid-template-columns: 90px 1fr; gap: 6px; align-items: center; font-size: 13px; color: #cfe0ff; }
   .talm select { font: inherit; width: 100%; padding: 6px; background: #0f2147; color: #e8f1ff; border: 2px solid #4a6fb8; border-radius: 8px; }
   .talm small { grid-column: 1 / -1; font-size: 12px; color: #8fb0ff; font-weight: 400; margin-top: -3px; }
-  #talInfo { margin-top: 4px; font-size: 11px; color: #8fb0ff; text-align: center; }
   .regras { margin-top: 8px; background: #0f2147; border: 2px solid #4a6fb8; border-radius: 8px; padding: 6px 10px; font-size: 13px; color: #8fb0ff; }
   .regras summary { cursor: pointer; color: #ffd35a; font-size: 14px; }
   .regra { display: grid; gap: 2px; margin-top: 8px; }
@@ -178,7 +188,7 @@
   .talgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .tcard { position: relative; width: auto; margin: 0; padding: 0 0 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; overflow: hidden; background: #14285a; border: 2px solid #3a5ea6; border-radius: 12px; color: #e8f1ff; }
   .tcard .timg { width: 100%; height: 72px; display: flex; align-items: center; justify-content: center; background: linear-gradient(#2c4f96, #1d3a78); }
-  .tcard .timg img { width: 48px; height: 48px; image-rendering: pixelated; filter: drop-shadow(0 2px 0 #0b1633); }
+  .tcard .timg img { width: 56px; height: 56px; image-rendering: auto; filter: drop-shadow(0 2px 3px #0b1633); }
   .tcard[data-g="cura"] .timg { background: linear-gradient(#2f8a4a, #1d5a30); }
   .tcard[data-g="sorte"] .timg { background: linear-gradient(#b8941a, #7a5e10); }
   .tcard[data-g="ritmo"] .timg { background: linear-gradient(#7a4ac0, #4a2a80); }
@@ -197,7 +207,7 @@
   .talm .th small { color: #8fb0ff; font-weight: 400; font-size: 12px; }
   .mgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
   .mchip { position: relative; width: auto; margin: 0; padding: 4px 1px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; color: #cfe0ff; font-size: 10px; line-height: 1.1; text-align: center; }
-  .mchip img { width: 36px; height: 36px; image-rendering: pixelated; }
+  .mchip img { width: 34px; height: 34px; image-rendering: auto; }
   .mchip.sel { border-color: #ffd35a; background: #24417f; box-shadow: 0 0 6px #ffd35a88; }
   .mchip.trava { opacity: .4; filter: grayscale(1); }
   .talm .desc { font-size: 12px; color: #8fb0ff; font-weight: 400; margin-top: 4px; min-height: 14px; }
@@ -206,10 +216,31 @@
   .aba { flex: 1 1 auto; width: auto; padding: 8px 6px; margin: 0; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 14px; color: #dfe9ff; }
   .aba.sel { border-color: #ffd35a; color: #ffd35a; background: #2f5aa8; }
   #lutar { margin-top: 0; padding: 14px; font-size: 18px; background: #ffd35a; color: #1b1020; border: 2px solid #ffffff; border-radius: 8px; }
+  #mundo .coluna { position: relative; --resto: 172px; } /* sobra espaço para o D-pad embaixo do mapa */
+  #mundoCv { display: block; width: 100%; aspect-ratio: 360 / 640; image-rendering: pixelated; background: #1b1020; border-radius: 10px; }
+  #dpad { position: relative; margin: 8px auto 0; width: 132px; height: 132px; touch-action: none; } /* embaixo do mapa, para o polegar não cobrir a vista */
+  #dpad button { position: absolute; width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0; border-radius: 12px; background: rgba(27,16,32,.65); border: 2px solid #ffd35a; color: #ffd35a; font-size: 20px; touch-action: none; user-select: none; }
+  #dpad [data-d=cima] { left: 44px; top: 0; } #dpad [data-d=baixo] { left: 44px; bottom: 0; } #dpad [data-d=esq] { left: 0; top: 44px; } #dpad [data-d=dir] { right: 0; top: 44px; }
+  #mundoSair { position: absolute; right: 10px; top: 10px; width: auto; margin: 0; padding: 6px 12px; font-size: 13px; background: rgba(27,16,32,.7); border: 2px solid #ffd35a; color: #ffd35a; border-radius: 10px; }
+  .sobre { position: absolute; inset: 0; z-index: 5; background: rgba(10,8,30,.94); padding: 14px; overflow: auto; color: #e8f1ff; border-radius: 10px; }
+  .sobre h3 { margin: 0 0 8px; color: #ffd35a; }
+  .sobre .lista { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sobre .mc { width: auto; margin: 0; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; color: #e8f1ff; font-size: 13px; }
+  .sobre .mc.eq { border-color: #ffd35a; background: #2f5aa8; }
+  #mundoEq { position: absolute; left: 10px; top: 10px; width: auto; margin: 0; padding: 6px 12px; font-size: 13px; background: rgba(27,16,32,.7); border: 2px solid #ffd35a; color: #ffd35a; border-radius: 10px; }
+  /* itens da luta do mundo: só ícone, com o que resta no canto */
+  #itensLuta { display: flex; justify-content: center; gap: 12px; margin-top: 8px; } #itensLuta[hidden] { display: none; }
+  .item { position: relative; width: 48px; height: 48px; min-height: 48px; margin: 0; padding: 4px; background: #14285a; border: 2px solid #4a6fb8; border-radius: 10px; }
+  .item .n { position: absolute; right: -4px; bottom: -4px; min-width: 18px; padding: 0 3px; font-size: 12px; line-height: 16px; text-align: center; color: #1b1020; background: #ffd35a; border: 2px solid #1b1020; border-radius: 9px; }
+  .item:disabled { opacity: .4; }
+  .loja .it { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #14285a; border: 2px solid #3a5ea6; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 13px; }
+  .loja .it button { width: auto; margin: 0; padding: 8px 10px; }
+  #mundoDica { position: absolute; right: 10px; bottom: 14px; font-size: 11px; color: #fff; opacity: .7; text-align: right; }
 </style>
 </head>
 <body>
 <button id="mudo" aria-label="Ligar ou desligar o som"></button>
+<div id="girar">Gire o celular<small>PixMonster é jogado em pé</small></div>
 <main>
   <div id="escolha">
     <div class="topo">
@@ -224,6 +255,7 @@
     <section class="pagina" id="p-jogar">
       <div class="cartao">
         <h3>Modo de jogo</h3>
+        <button class="modo" id="mMundo" style="width:100%;margin-bottom:8px"><b>Explorar o mundo (beta)</b><small>ande pela Vila e pela Rota 1 e encontre monstros</small></button>
         <div class="modos3">
           <button class="modo sel" id="mRapido"><b>Luta rápida</b><small>todos os talentos liberados</small></button>
           <button class="modo" id="mTorneio"><b>Torneio</b><small id="mTorneioTxt">5 lutas contra campeões</small></button>
@@ -241,9 +273,9 @@
         <div id="abas" class="abas"></div>
       </div>
       <div class="cartao">
-        <h3>Luta automática</h3>
-        <div class="autoluta"><button id="auto" aria-pressed="false">Luta automática: não</button><span>O seu time luta sozinho, pelas regras que você escolher. Vale a partir da próxima luta.</span></div>
-        <button class="linkbtn" data-ir="time">Mudar as regras do automático</button>
+        <h3>Regras da luta</h3>
+        <p class="nota">Seu time luta sozinho, pelas regras que você escolher.</p>
+        <button class="linkbtn" data-ir="time">Mudar as regras da luta</button>
       </div>
     </section>
 
@@ -277,7 +309,7 @@
         <div id="talMon"></div>
       </div>
       <div class="cartao">
-        <h3>Regras do modo automático</h3>
+        <h3>Regras da luta</h3>
         <div id="regras"></div>
       </div>
     </section>
@@ -306,6 +338,17 @@
 
     <div id="barraLutar"><div id="miniTime"></div><button id="lutar">Lutar!</button></div>
   </div>
+  <div id="mundo" hidden>
+    <div class="coluna">
+      <canvas id="mundoCv" width="360" height="640"></canvas>
+      <div id="dpad"><button data-d="cima">▲</button><button data-d="esq">◀</button><button data-d="dir">▶</button><button data-d="baixo">▼</button></div>
+      <button id="mundoSair">Menu</button><button id="mundoEq">Equipe</button>
+      <div id="inicial" class="sobre" hidden><h3>Escolha seu primeiro monstro</h3><div class="lista" id="inicialLista"></div></div>
+      <div id="loja" class="sobre loja" hidden><h3>Mercado do Vovô</h3><p id="lojaFala" style="font-size:13px;margin:0 0 4px"></p><p id="lojaMoedas" style="font-size:14px;color:#ffd35a;margin:0 0 8px"></p><div id="lojaLista"></div><button id="lojaFechar" style="margin-top:6px">Fechar</button></div>
+      <div id="caixa" class="sobre" hidden><h3>Equipe e caixa</h3><p style="font-size:12px;margin:0 0 8px">Toque para pôr ou tirar da equipe (de 1 a 3).</p><div class="lista" id="caixaLista"></div><button id="caixaFechar" style="margin-top:10px">Fechar</button></div>
+      <div id="mundoDica">Setas ou WASD<br>seta amarela = saída<br>mato alto = monstros</div>
+    </div>
+  </div>
   <div id="luta" hidden>
     <div class="coluna">
       <div class="palco">
@@ -320,33 +363,38 @@
         </div>
       </div>
       <div id="time"></div>
-      <div id="talInfo"></div>
       <div id="habs"></div>
+      <div id="itensLuta" hidden><button id="esfera" class="item"></button><button id="esferaF" class="item"></button><button id="pocao" class="item"></button></div>
     </div>
   </div>
 </main>
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { /* sem offline */ }));</script>
 <script src="pixel.js"></script>
 <script src="icones.js"></script>
 <script src="som.js"></script>
 <script src="battle.js"></script>
 <script src="arena.js"></script>
+<script src="mundo2.js"></script>
+<script src="mundo3.js"></script>
+<script src="mundo4.js"></script>
+<script src="mundo5.js"></script>
+<script src="mundo6.js"></script>
+<script src="mundo.js"></script>
 <script>
 (function () {
   const B = window.PixmonBatalha, A = window.PixmonArena, S = window.PixmonSom;
   const NOMES = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
   const ROTULO = { rapido: 'Rápido', forte: 'Forte', defesa: 'Defesa', ultimate: 'Ultimate' };
-  const ORDEM_BOTOES = ['forte', 'rapido', 'defesa', 'ultimate']; // teclas 1, 2, 3, 4
-  const CENAS = [['sorteio', 'Sorteio'], ...['campo', 'floresta', 'lago', 'montanha'].map((b) => [b, b[0].toUpperCase() + b.slice(1) + ' · ' + NOMES[B.BIOMA_ELEMENTO[b]] + ' +' + Math.round((B.BONUS_BIOMA - 1) * 100) + '%'])];
+  const CENAS = [['sorteio', 'Sorteio'], ...Object.keys(B.BIOMA_ELEMENTO).map((b) => [b, b[0].toUpperCase() + b.slice(1) + ' · ' + NOMES[B.BIOMA_ELEMENTO[b]] + ' +' + Math.round((B.BONUS_BIOMA - 1) * 100) + '%']), ['ginasio', 'Ginásio · neutro']];
   const MAX_HP = Math.max(...B.MONSTROS.map((m) => m.hp)), MAX_ATK = Math.max(...B.MONSTROS.map((m) => m.atk));
   const MAX_VEL = Math.max(...B.MONSTROS.map((m) => 1 / m.rc));
-  const cv = document.getElementById('arena'), habs = document.getElementById('habs');
-  let bt = null, rng = null, pend = null, ultimoT = 0;
+  const cv = document.getElementById('arena');
+  let bt = null, rng = null, ultimoT = 0, noMundo = false, selvagem = 0;
   let sel = 0, cena = 'sorteio', ultimoBioma = null, time = [], ultimoTime = null; // time: índices dos monstros escolhidos (até 3)
-  let auto = false; try { auto = localStorage.getItem('pixmon-auto') === '1'; } catch (e) { /* ok */ } // luta automática: escolhida antes de lutar
   // Talentos escolhidos (lembrados no navegador): time = ids dos talentos do time; mon = talento por id de monstro
   let tal = { time: [], mon: {} }; try { tal = Object.assign(tal, JSON.parse(localStorage.getItem('pixmon-tal'))); } catch (e) { /* ok */ }
   tal.time = B.normalizarTalentos({ time: tal.time }).time;
-  // Regras do modo automático (valem só na luta automática); lembradas no navegador
+  // Regras da luta (o jogo é só automático); lembradas no navegador
   let pol = Object.assign({}, B.POLITICA_PADRAO); try { pol = Object.assign(pol, JSON.parse(localStorage.getItem('pixmon-pol'))); } catch (e) { /* ok */ }
   // Torneio: 5 lutas, 2 vidas, talentos travados que se destravam com prêmios (regras em B.TORNEIO). Persistido no navegador.
   const TORN = B.TORNEIO;
@@ -371,7 +419,6 @@
   const emTreinador = () => modo === 'treinador' && !!treinadorSel;
   const nivelLiberado = (n) => n <= 1 || trein.insignias.some((id) => B.INSIGNIAS.find((x) => x.id === id).libera === n);
   try { if (localStorage.getItem('pixmon-modo') === 'treinador' && treinadorSel) modo = 'treinador'; } catch (e) { /* ok */ }
-  let ultPronto = null; // para o bipe só na hora em que o ultimate fica pronto
   const stats = { crit: 0, st: 0 }; // contados na luta para o cartão final
 
   // Ícones das habilidades: recortes da folha ui/habilidades.png (grade 4x4 de 32 px): [coluna, linha].
@@ -409,8 +456,39 @@
     else { el.classList.add('escudo'); el.style.backgroundImage = 'url(' + escudoUrl(g.tipo) + ')'; }
   }
 
+  // golpes do monstro em campo (forte, rápido, defesa, ultimate): ícone + segundos de recarga. Refaz quando outro monstro entra.
+  const habs = document.getElementById('habs'); let habsMon = null;
+  function atualizarHabs() {
+    if (!bt) return;
+    const l = bt.lados[0];
+    if (habsMon !== l.m) {
+      habsMon = l.m; habs.innerHTML = '';
+      ['forte', 'rapido', 'defesa', 'ultimate'].forEach((slot) => {
+        const b = document.createElement('div'); b.className = 'hab'; b.dataset.slot = slot; b.setAttribute('aria-label', ROTULO[slot] + ': ' + l.m.golpes[slot].nome);
+        b.innerHTML = '<div class="ico"><div class="cd"></div><span class="seg"></span></div>';
+        pintaIcone(b.querySelector('.ico'), l.m.golpes[slot], slot); habs.appendChild(b);
+      });
+    }
+    for (const b of habs.children) {
+      const s = b.dataset.slot, cd = l.cd[s], tot = l.cdTotal[s], ativo = s === 'defesa' && l.defesaAte > bt.t;
+      b.querySelector('.cd').style.height = (tot ? Math.min(100, (cd / tot) * 100) : 0).toFixed(1) + '%';
+      b.querySelector('.seg').textContent = cd > 0 ? (cd < 10000 ? (cd / 1000).toFixed(1) : Math.ceil(cd / 1000)) : '';
+      b.classList.toggle('pronto', !bt.fim && cd <= 0 && !ativo);
+      b.classList.toggle('ativo', ativo);
+    }
+  }
+
+  // ícones do HUD em SVG 16x16 (bordas retas, contorno preto)
+  const SVG = (d) => '<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">' + d + '</svg>';
+  const bola = (cima, baixo) => SVG('<circle cx="8" cy="8" r="7" fill="' + baixo + '" stroke="#000" stroke-width="1.6"/><path d="M1 8a7 7 0 0 1 14 0z" fill="' + cima + '"/><rect x="1" y="7.2" width="14" height="1.6" fill="#000"/><circle cx="8" cy="8" r="2.2" fill="#f0e9ca" stroke="#000" stroke-width="1.4"/>');
+  const ICONES = {
+    esfera: bola('#dd3140', '#f0e9ca'), esferaF: bola('#ffc80e', '#e1894c'),
+    pocao: SVG('<rect x="6" y="1" width="4" height="3" fill="#b17349" stroke="#000" stroke-width="1"/><path d="M6 4h4v2l3 6a2 2 0 0 1-2 3H5a2 2 0 0 1-2-3l3-6z" fill="#de595a" stroke="#000" stroke-width="1.2"/><path d="M5 11h6l1.4 2.4A1 1 0 0 1 11.5 14.5h-7A1 1 0 0 1 3.6 13.4z" fill="#ff9aa0"/>'),
+    somSim: SVG('<path d="M2 6h3l4-3v10l-4-3H2z" fill="#ffd35a" stroke="#000" stroke-width="1"/><path d="M11 5.5q2 2.5 0 5M13 3.5q4 4.5 0 9" fill="none" stroke="#ffd35a" stroke-width="1.5"/>'),
+    somNao: SVG('<path d="M2 6h3l4-3v10l-4-3H2z" fill="#8fb0ff" stroke="#000" stroke-width="1"/><path d="M11 5l4 6M15 5l-4 6" stroke="#ff7a6a" stroke-width="1.8"/>'),
+  };
   const btnMudo = document.getElementById('mudo');
-  const rotuloMudo = () => { btnMudo.textContent = S.mudo() ? 'Som: não' : 'Som: sim'; };
+  const rotuloMudo = () => { btnMudo.innerHTML = S.mudo() ? ICONES.somNao : ICONES.somSim; btnMudo.setAttribute('aria-label', S.mudo() ? 'Ligar o som' : 'Desligar o som'); };
   btnMudo.onclick = () => {
     S.alternar(); rotuloMudo(); S.tocar('toque');
     if (S.mudo()) S.musica(false); else if (bt && !bt.fim) S.musica(true);
@@ -420,29 +498,21 @@
   // ---------- luta em tempo real ----------
   // O jogador aperta um botão: o comando fica pendente por 350 ms (para não perder o toque feito um instante antes de a
   // habilidade ficar pronta) e vale assim que a lógica aceitar. O adversário decide pela IA da lógica.
-  function apertar(slot) {
-    if (!bt || bt.fim || auto) return;
-    pend = { slot, resta: 350 };
-  }
   function logica(t) {
     if (!bt || bt.fim) return;
     const dt = Math.min(50, t - ultimoT);
     ultimoT = t;
     if (dt <= 0) return;
-    let cmd = null;
-    if (auto) cmd = B.iaPolitica(bt, 0, rng, dt, pol); // o monstro do jogador joga sozinho, pelas regras escolhidas
-    else if (pend && B.podeUsar(bt, 0, pend.slot)) { cmd = pend.slot; pend = null; }
-    else if (pend && (pend.resta -= dt) <= 0) pend = null; // o toque vale por 350 ms de luta
-    if (auto) { const tr = B.iaTroca(bt, 0, rng, dt, pol); if (tr != null) B.trocar(bt, 0, tr); }
+    const cmd = B.iaPolitica(bt, 0, rng, dt, pol); // o jogo é só automático: o monstro do jogador luta sozinho, pelas regras escolhidas
+    { const tr = B.iaTroca(bt, 0, rng, dt, pol); if (tr != null) B.trocar(bt, 0, tr); }
     { const tr = B.iaTroca(bt, 1, rng, dt, polAdv); if (tr != null) B.trocar(bt, 1, tr); }
     B.passo(bt, rng, dt, [cmd, polAdv ? B.iaPolitica(bt, 1, rng, dt, polAdv, iaAdv) : B.ia(bt, 1, rng, dt, iaAdv.reacao, iaAdv.ritmo)]);
     A.eventos(bt.eventos);
-    if (bt.eventos.some((e) => e.ev === 'troca' && e.i === 0)) montarBotoes(bt.lados[0].m); // o novo monstro tem outros golpes e nomes
     for (const e of bt.eventos) { if (e.ev === 'golpe' && e.crit) stats.crit++; else if (e.ev === 'status') stats.st++; }
+    verEvolucaoLuta();
     if (bt.fim) terminar();
   }
   function terminar() {
-    pend = null;
     const fim = bt.fim, esta = bt; // o aviso final só vale se ainda for a mesma luta
     setTimeout(() => S.musica(false), 1600); // a música cai junto com o K.O.
     setTimeout(() => {
@@ -458,39 +528,6 @@
     }, 2600);
   }
 
-  // botões: forte, rápido, defesa e ultimate do monstro escolhido, cada um com o nome da habilidade e a recarga
-  function montarBotoes(m) {
-    habs.innerHTML = '';
-    ORDEM_BOTOES.forEach((slot, n) => {
-      const g = m.golpes[slot], b = document.createElement('button');
-      b.className = 'hab'; b.dataset.slot = slot;
-      b.innerHTML = '<div class="ico"><div class="cd"></div><span class="seg"></span></div><span class="nome"></span><small></small>';
-      pintaIcone(b.querySelector('.ico'), g, slot);
-      b.querySelector('.nome').textContent = g.nome;
-      b.querySelector('small').textContent = (n + 1) + ' · ' + ROTULO[slot];
-      b.onpointerdown = (ev) => { ev.preventDefault(); apertar(slot); };
-      habs.appendChild(b);
-    });
-  }
-  function atualizarBotoes() {
-    if (!bt) return;
-    const l = bt.lados[0];
-    for (const b of habs.children) {
-      const s = b.dataset.slot, cd = l.cd[s], tot = l.cdTotal[s];
-      const ativo = s === 'defesa' && l.defesaAte > bt.t;
-      b.querySelector('.cd').style.height = (tot ? (cd / tot) * 100 : 0).toFixed(1) + '%';
-      b.querySelector('.seg').textContent = cd > 0 ? (cd < 10000 ? (cd / 1000).toFixed(1) : Math.ceil(cd / 1000)) : '';
-      b.classList.toggle('pronto', !bt.fim && cd <= 0 && !ativo);
-      if (s === 'ultimate') { const pronto = !bt.fim && cd <= 0; if (pronto && ultPronto === false) S.tocar('pronto'); ultPronto = pronto; }
-      b.classList.toggle('ocupado', !bt.fim && cd <= 0 && s !== 'defesa' && !!l.acao); // pronto, mas ainda carregando outro ataque
-      b.classList.toggle('ativo', ativo);
-    }
-  }
-  document.addEventListener('keydown', (e) => {
-    const n = '1234'.indexOf(e.key);
-    if (n >= 0 && !e.repeat) apertar(ORDEM_BOTOES[n]);
-  });
-
   function iniciar(meuTime, bioma) {
     S.tocar('toque'); // o primeiro toque também libera o áudio do navegador
     S.musica(true);
@@ -500,19 +537,21 @@
     let adv = [], talAdv, cfg = null;
     if (emTorneio()) { cfg = TORN.adv[torneio.fase - 1]; adv = B.adversariosTorneio(Math.random, meuTime.map((i) => B.MONSTROS[i]), torneio.fase); talAdv = B.talentosAdversario(Math.random, torneio.fase, torneio.dif, adv.length); iaAdv = B.iaAdversario(torneio.fase, torneio.dif); polAdv = cfg.pol; torneio.hpIni = torneio.hp.slice(); salvarT(); }
     else if (emTreinador()) { const tr = B.treinadorPorId(treinadorSel); adv = B.timeDoTreinador(tr); talAdv = B.talentosTreinador(tr); iaAdv = B.iaTreinador(tr); polAdv = tr.pol; }
+    else if (noMundo && trMundo) { adv = B.timeDoTreinador(trMundo).slice(0, meuTime.length).map((m) => escalar(m, nvSel)); talAdv = B.talentosTreinador(trMundo); iaAdv = B.iaTreinador(trMundo); polAdv = trMundo.pol; }
+    else if (noMundo) { adv = [escalar(selvagemEvo ? B.evoluida(B.MONSTROS[selvagem]) : B.MONSTROS[selvagem], nvSel)]; talAdv = B.sortearTalentos(Math.random, 1); iaAdv = B.IA_FACIL; polAdv = null; }
     else { const resto = B.MONSTROS.filter((_, i) => !meuTime.includes(i)); while (adv.length < meuTime.length) adv.push(resto.splice(Math.floor(Math.random() * resto.length), 1)[0]); talAdv = B.sortearTalentos(Math.random, adv.length); iaAdv = B.IA_FACIL; polAdv = null; }
     rng = B.criarRng(Date.now() >>> 0);
     const meus = talEfetivo(meuTime);
-    bt = B.novaBatalha(meuTime.map((i) => B.MONSTROS[i]), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : null);
+    bt = B.novaBatalha(meuTime.map((i) => (noMundo ? monDoMundo(i) : B.MONSTROS[i])), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : null);
     mostrarIntro(emTorneio() ? { f: (cfg.chefe ? 'CHEFE · ' : '') + 'FASE ' + torneio.fase + '/' + TORN.fases, n: cfg.nome + ', ' + cfg.titulo, q: cfg.frase, chefe: !!cfg.chefe } : emTreinador() ? (() => { const tr = B.treinadorPorId(treinadorSel); return { f: 'NÍVEL ' + tr.nivel, n: tr.nome, q: tr.frase, chefe: tr.id === 'aurora' }; })() : null);
     const nomes = (t) => [...t.time.map((id) => B.TAL_TIME[id].nome), ...t.mon.filter(Boolean).map((id) => B.TAL_MON[id].nome)];
-    document.getElementById('talInfo').textContent = (emTreinador() ? B.treinadorPorId(treinadorSel).nome + ' · ' : '') + (emTorneio() ? 'Torneio: fase ' + torneio.fase + '/' + TORN.fases + ' · ' + cfg.nome + ' ' + cfg.titulo + ' · vidas ' + torneio.vidas + '   |   ' : '') + 'Seus talentos: ' + (nomes(bt.talentos[0]).join(' · ') || 'nenhum') + '   |   Adversário: ' + (nomes(bt.talentos[1]).join(' · ') || 'nenhum') + (auto ? '   |   Regras: ' + B.ESTILOS[pol.estilo].nome + ' · ' + B.OPCOES_POLITICA.ultimate[pol.ultimate].split(':')[0] + (pol.trocaDesv ? ' · troca em desvantagem' : '') : '');
-    pend = null; ultimoT = performance.now();
+    ultimoT = performance.now();
     document.getElementById('escolha').hidden = true;
     document.getElementById('luta').hidden = false;
-    document.getElementById('resultado').hidden = true; stats.crit = stats.st = 0; ultimoBioma = bioma; ultPronto = false;
-    montarBotoes(bt.lados[0].m); habs.classList.toggle('auto', auto);
-    montarTime(); timeEl.classList.toggle('auto', auto);
+    document.getElementById('resultado').hidden = true; stats.crit = stats.st = 0; ultimoBioma = bioma;
+    montarTime();
+    capt = false; evoTentou = new Set(); itensEl.hidden = !noMundo; esferaBtn.hidden = esferaFBtn.hidden = !!trMundo; pocaoT = -1e9; atualizarEsfera(); // treinador não se captura
+    if (noMundo && trMundo) mostrarIntro({ f: trMundo.nivel >= 2 ? 'LÍDER DO GINÁSIO' : 'TREINADOR', n: trMundo.nome, q: trMundo.frase, chefe: trMundo.nivel >= 2 });
     A.iniciar(cv, bt, bioma);
   }
 
@@ -535,8 +574,7 @@
       b.className = 'reserva'; b.setAttribute('aria-label', 'Trocar para ' + l.m.nome);
       b.innerHTML = '<canvas width="40" height="40"></canvas><div class="inf"><b></b><div class="vida"><i></i></div></div>';
       b.querySelector('b').textContent = l.m.nome;
-      b.onpointerdown = (ev) => { ev.preventDefault(); if (!auto && B.trocar(bt, 0, k)) S.tocar('toque'); };
-      timeEl.appendChild(b);
+            timeEl.appendChild(b);
     });
   }
   function atualizarTime() {
@@ -692,9 +730,150 @@
   const btnRev = document.getElementById('revanche'), btnOutro = document.getElementById('outro');
   let acaoRev = () => iniciar(ultimoTime, ultimoBioma), acaoOutro = () => voltarEscolha();
   btnRev.onclick = () => acaoRev(); btnOutro.onclick = () => acaoOutro();
+  // ---------- jogo do mundo (Fase B): coleção, níveis, captura ----------
+  const JOGO_K = 'pixmon-jogo', INICIAIS = ['fagulhao', 'mareal', 'brotinho'];
+  let jogo = { v: 1, col: {}, eq: [], esf: 5, venc: {}, din: 40, esfF: 0, poc: 2 }, capt = false, nvSel = 5, biomaMundo = null, trMundo = null, selvagemEvo = false, evoTentou = new Set(); // trMundo: treinador do mapa que está lutando
+  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
+  const salvarJogo = () => { try { localStorage.setItem(JOGO_K, JSON.stringify(jogo)); } catch (e) { /* sem save */ } };
+  const idxDe = (id) => B.MONSTROS.findIndex((m) => m.id === id);
+  const fator = (nv) => 1 + 0.05 * (nv - 10); // nível 10 = status base
+  const escalar = (m, nv) => ({ ...m, nivel: nv, hp: Math.round(m.hp * fator(nv)), atk: +(m.atk * fator(nv)).toFixed(2) });
+  const forma = (id) => { const i = idxDe(id), m = B.MONSTROS[i]; return jogo.col[id] && jogo.col[id].evo ? B.evoluida(m) : m; }; // forma atual (base ou evoluída)
+  const monDoMundo = (i) => escalar(forma(B.MONSTROS[i].id), jogo.col[B.MONSTROS[i].id].nv);
+  // texto de XP: devolve a frase de subida de nível ou de evolução (ou null)
+  function sortearSelvagem(elemento) { // sorteio ponderado pela raridade (comum 1, rara 0,4, lendária 0,1); o elemento da área aparece 3x mais
+    const pesos = B.MONSTROS.map((m) => B.PESO_RARIDADE[m.raridade] * (elemento && m.tipo === elemento ? 3 : 1)); let r = Math.random() * pesos.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < pesos.length; i++) { r -= pesos[i]; if (r <= 0) return i; }
+    return 0;
+  }
+  const CHANCE_SELVAGEM_EVO = 0.3; // chance de o selvagem (das 4 linhas que evoluem) já aparecer evoluído
+  const EVO_LUTA = { chance: 0.6, hpMax: 0.5, nvMin: 1 }; // evolução no meio da luta: ao cair abaixo de 50% da vida, 60% de chance (1 tentativa por monstro por luta)
+  function verEvolucaoLuta() {
+    if (!noMundo || !bt || bt.fim) return;
+    const l = bt.lados[0], m = l.m, E = B.EVOLUCOES[m.id], c = jogo.col[m.id];
+    if (!E || !c || c.evo || l.hp <= 0 || l.hp / m.hp >= EVO_LUTA.hpMax || c.nv < EVO_LUTA.nvMin || evoTentou.has(m.id)) return;
+    evoTentou.add(m.id);
+    if (Math.random() >= EVO_LUTA.chance) return;
+    c.evo = true; salvarJogo(); // fica evoluído depois da luta
+    const novo = escalar(forma(m.id), c.nv); l.m = novo; l.hp = Math.max(l.hp, novo.hp * 0.5); // a forma nova entra com pelo menos metade da vida
+    mostrarIntro({ f: 'EVOLUÇÃO!', n: E.nome, q: m.nome + ' evoluiu no meio da luta', chefe: true }); S.tocar('pronto');
+    montarTime();
+  }
+  function textoXp(id, xp) {
+    const c = jogo.col[id], nomeAntes = forma(id).nome, nvAntes = c.nv, subiu = ganhaXp(id, xp), E = B.EVOLUCOES[id];
+    if (!subiu) return null;
+    if (E && !c.evo && c.nv >= E.nv) { c.evo = true; return nomeAntes + ' evoluiu para ' + E.nome + '!'; }
+    return nomeAntes + ' subiu para Nv ' + c.nv + '!';
+  }
+  function ganhaXp(id, xp) { // devolve true se subiu de nível
+    const c = jogo.col[id]; let subiu = false; c.xp += xp;
+    while (c.nv < 30 && c.xp >= 15 * c.nv) { c.xp -= 15 * c.nv; c.nv++; subiu = true; }
+    return subiu;
+  }
+  const esferaBtn = document.getElementById('esfera');
+  const itensEl = document.getElementById('itensLuta'), esferaFBtn = document.getElementById('esferaF'), pocaoBtn = document.getElementById('pocao');
+  const pintaItem = (b, ic, nome, n) => { b.innerHTML = ICONES[ic] + '<span class="n">' + n + '</span>'; b.setAttribute('aria-label', nome + ' (' + n + ')'); b.title = nome; };
+  let bonusEsf = 0, pocaoT = -1e9;
+  function atualizarEsfera() {
+    const vivo = !!bt && !bt.fim, sem = !vivo || capt;
+    pintaItem(esferaBtn, 'esfera', 'Esfera', jogo.esf); esferaBtn.disabled = jogo.esf < 1 || sem;
+    pintaItem(esferaFBtn, 'esferaF', 'Esfera Forte', jogo.esfF); esferaFBtn.disabled = jogo.esfF < 1 || sem;
+    pintaItem(pocaoBtn, 'pocao', 'Poção', jogo.poc); pocaoBtn.disabled = jogo.poc < 1 || !vivo;
+    document.getElementById('mundoEq').textContent = 'Equipe · ' + jogo.din + ' moedas';
+  }
+  esferaFBtn.onclick = () => { if (jogo.esfF < 1 || !bt || bt.fim || capt) return; jogo.esfF--; jogo.esf++; bonusEsf = 0.2; esferaBtn.onclick(); bonusEsf = 0; atualizarEsfera(); }; // gasta uma forte (a normal sobe e desce)
+  pocaoBtn.onclick = () => {
+    if (jogo.poc < 1 || !bt || bt.fim) return;
+    if (bt.t - pocaoT < 8000) { mostrarIntro({ f: 'POÇÃO', n: 'Espere um pouco', q: 'Uma poção a cada 8 s.' }); return; }
+    const l = bt.lados[0]; if (l.hp <= 0) return;
+    jogo.poc--; pocaoT = bt.t; l.hp = Math.min(l.m.hp, l.hp + 0.35 * l.m.hp); salvarJogo();
+    mostrarIntro({ f: 'POÇÃO', n: '+35% de vida', q: l.m.nome + ' se recupera' }); atualizarEsfera();
+  };
+  // loja do vovô (tile da porta do Mercado, na Vila)
+  const LOJA = [['esf', 'Esfera', 15, 'captura um selvagem'], ['esfF', 'Esfera Forte', 40, '+20% de chance de captura'], ['poc', 'Poção', 20, 'cura 35% da vida em luta']];
+  function abrirLoja() {
+    window.PixmonMundo.pausar(); S.loja(true); const el = document.getElementById('loja'); el.hidden = false;
+    const h = new Date().getHours(); document.getElementById('lojaFala').textContent = (h < 12 ? 'Bom dia!' : h < 18 ? 'Boa tarde!' : 'Boa noite!') + ' O que vai ser hoje?';
+    const desenhar = () => {
+      document.getElementById('lojaMoedas').textContent = 'Você tem ' + jogo.din + ' moedas';
+      const lista = document.getElementById('lojaLista'); lista.innerHTML = '';
+      LOJA.forEach(([k, nome, preco, desc]) => {
+        const d = document.createElement('div'); d.className = 'it';
+        const t = document.createElement('span'); t.textContent = nome + ' (' + (jogo[k] || 0) + ') · ' + desc; d.appendChild(t);
+        const b = document.createElement('button'); b.textContent = preco + ' moedas'; b.disabled = jogo.din < preco;
+        b.onclick = () => { if (jogo.din < preco) return; jogo.din -= preco; jogo[k] = (jogo[k] || 0) + 1; salvarJogo(); atualizarEsfera(); S.tocar('toque'); desenhar(); };
+        d.appendChild(b); lista.appendChild(d);
+      });
+    };
+    desenhar();
+  }
+  document.getElementById('lojaFechar').onclick = () => { document.getElementById('loja').hidden = true; S.mundo(window.PixmonMundo.estado().area); window.PixmonMundo.retomar(); };
+  esferaBtn.onclick = () => {
+    if (!bt || bt.fim || jogo.esf < 1 || capt) return;
+    jogo.esf--; salvarJogo();
+    const l = bt.lados[1], falta = 1 - Math.max(0, l.hp) / l.m.hp, chance = Math.min(0.97, 0.12 + 0.78 * falta + bonusEsf);
+    if (Math.random() < chance) { capt = true; l.hp = 0; mostrarIntro({ f: 'ESFERA', n: 'Capturado!', q: l.m.nome + ' é seu', chefe: false }); }
+    else mostrarIntro({ f: 'ESFERA', n: 'Escapou!', q: 'Chance era ' + Math.round(chance * 100) + '%. Enfraqueça mais.', chefe: false });
+    atualizarEsfera();
+  };
+  function mostrarEscolha(lista, qual, ao) { // cartões de monstros; ao(id) quando toca
+    lista.innerHTML = '';
+    qual.forEach((id) => {
+      const i = idxDe(id), c = jogo.col[id], b = document.createElement('button'); b.className = 'mc' + (jogo.eq.includes(id) ? ' eq' : '');
+      iconeMonstro(b, i, 56, c ? forma(id) : null); const t = document.createElement('span'); t.textContent = (c ? forma(id) : B.MONSTROS[i]).nome + (c ? ' · Nv ' + c.nv : ''); b.appendChild(t);
+      if (c) { const x = document.createElement('small'); x.textContent = 'XP ' + c.xp + '/' + 15 * c.nv; b.appendChild(x); }
+      b.onclick = () => ao(id); lista.appendChild(b);
+    });
+  }
+  function abrirCaixa() {
+    window.PixmonMundo.pausar(); const el = document.getElementById('caixa'); el.hidden = false;
+    const desenhar = () => mostrarEscolha(document.getElementById('caixaLista'), Object.keys(jogo.col), (id) => {
+      const k = jogo.eq.indexOf(id);
+      if (k >= 0) { if (jogo.eq.length > 1) jogo.eq.splice(k, 1); } else if (jogo.eq.length < 3) jogo.eq.push(id);
+      salvarJogo(); desenhar();
+    });
+    desenhar();
+  }
+  document.getElementById('mundoEq').onclick = abrirCaixa;
+  document.getElementById('caixaFechar').onclick = () => { document.getElementById('caixa').hidden = true; window.PixmonMundo.retomar(); };
+
+  // ---------- mundo andável (Fase A) ----------
+  const mundoEl = document.getElementById('mundo');
+  function abrirMundo(novo) {
+    modo = 'rapido'; noMundo = true; // o mundo usa a luta simples, sem torneio nem treinador
+    document.getElementById('escolha').hidden = true; document.getElementById('luta').hidden = true; mundoEl.hidden = false;
+    S.tocar('toque'); atualizarEsfera();
+    const comecar = () => window.PixmonMundo.iniciar(document.getElementById('mundoCv'), { encontro: (a) => {
+      const AR = window.PixmonMundo.AREAS[a] || {}; biomaMundo = AR.bioma || null;
+      trMundo = null; selvagem = sortearSelvagem(AR.elemento); selvagemEvo = !!B.EVOLUCOES[B.MONSTROS[selvagem].id] && Math.random() < CHANCE_SELVAGEM_EVO;
+      const med = jogo.eq.reduce((a, id) => a + jogo.col[id].nv, 0) / jogo.eq.length; nvSel = Math.max(2, Math.min(30, Math.round(med) + Math.floor(Math.random() * 3) - 1));
+      mundoEl.hidden = true; iniciar(jogo.eq.map(idxDe), biomaMundo);
+    }, loja: abrirLoja, area: (a) => S.mundo(a), vencido: (id) => !!jogo.venc[id], desafio: (id) => {
+      trMundo = B.treinadorPorId(id); const med = jogo.eq.reduce((a, i) => a + jogo.col[i].nv, 0) / jogo.eq.length;
+      nvSel = Math.max(3, Math.min(30, Math.round(med) + trMundo.nivel - 1)); mundoEl.hidden = true;
+      const AR = window.PixmonMundo.AREAS[window.PixmonMundo.estado().area] || {}; // o líder luta no ginásio; os outros, no cenário da área
+      iniciar(jogo.eq.map(idxDe), id === 'tomas' ? 'ginasio' : (AR.bioma || null));
+    } }, novo);
+    if (jogo.eq.length) comecar(); else { // primeira vez: escolhe o inicial
+      const el = document.getElementById('inicial'); el.hidden = false;
+      mostrarEscolha(document.getElementById('inicialLista'), INICIAIS, (id) => { jogo.col[id] = { nv: 5, xp: 0 }; jogo.eq = [id]; salvarJogo(); el.hidden = true; comecar(); });
+    }
+  }
+  function voltarMundo(caiu) {
+    atualizarEsfera();
+    document.getElementById('resultado').hidden = true; bt = null;
+    document.getElementById('luta').hidden = true; mundoEl.hidden = false;
+    S.mundo(window.PixmonMundo.estado().area); window.PixmonMundo.retomar();
+  }
+  function sairMundo() {
+    noMundo = false; window.PixmonMundo.parar(); mundoEl.hidden = true; voltarEscolha();
+  }
+  document.getElementById('mMundo').onclick = () => abrirMundo(false);
+  document.getElementById('mundoSair').onclick = sairMundo;
+  window.PixmonMundo.ligarDpad(document.getElementById('dpad'));
   function voltarEscolha() {
     document.getElementById('resultado').hidden = true;
-    bt = null; pend = null; habs.innerHTML = '';
+    bt = null;
     document.getElementById('escolha').hidden = false;
     document.getElementById('luta').hidden = true;
     atualizarModo(); S.tema(true);
@@ -709,6 +888,34 @@
     return out;
   }
   function resultadoModo(v) {
+    if (noMundo && trMundo) {
+      const tr = trMundo, tx = [];
+      if (v === 0) {
+        const ganho = B.PONTOS_TREINADOR.primeira(tr.nivel), xp = 12 * nvSel;
+        jogo.venc[tr.id] = 1; jogo.esf += 2; jogo.din += 30 * tr.nivel; trein.venceu[tr.id] = (trein.venceu[tr.id] || 0) + 1; trein.pontos += ganho; salvarTrein(); try { renderTrein(); } catch (e) { /* aba fechada */ }
+        tx.push('Você venceu ' + tr.nome + '! +' + ganho + ' pontos de treinador, +2 esferas, +' + (30 * tr.nivel) + ' moedas, +' + xp + ' XP.');
+        if (tr.id === 'tomas' && !trein.insignias.includes('bronze')) { trein.insignias.push('bronze'); salvarTrein(); tx.push('Você ganhou a Insígnia de Bronze!'); try { renderTrein(); } catch (e) { /* ok */ } }
+        jogo.eq.forEach((id) => { const f = textoXp(id, xp); if (f) tx.push(f); });
+      } else tx.push(tr.nome + ': "' + tr.frase + '" (ele vai querer a revanche)');
+      salvarJogo(); document.getElementById('resSub').textContent = tx.join(' ');
+      botoes('Continuar explorando', () => voltarMundo(v !== 0), 'Menu', () => sairMundo()); document.getElementById('premios').innerHTML = ''; return;
+    }
+    if (noMundo) {
+      const w = B.MONSTROS[selvagem], tx = [], nomeSel = selvagemEvo ? B.EVOLUCOES[w.id].nome : w.nome;
+      if (v === 0) {
+        if (capt) {
+          if (jogo.col[w.id] && selvagemEvo && !jogo.col[w.id].evo) { jogo.col[w.id].evo = true; tx.push(w.nome + ' já era seu e agora está evoluído para ' + B.EVOLUCOES[w.id].nome + '!'); }
+          else if (jogo.col[w.id]) { ganhaXp(w.id, 15 * nvSel); tx.push(nomeSel + ' já era seu: virou XP extra.'); }
+          else { jogo.col[w.id] = { nv: nvSel, xp: 0 }; if (selvagemEvo) jogo.col[w.id].evo = true; if (jogo.eq.length < 3) jogo.eq.push(w.id); tx.push('Você capturou ' + nomeSel + ' (Nv ' + nvSel + ')!' + (jogo.eq.includes(w.id) ? '' : ' Foi para a caixa.')); }
+        }
+        const xp = Math.round(8 * nvSel * (capt ? 0.6 : 1)); const din = 6 + 2 * nvSel; jogo.din += din; tx.push('+' + xp + ' XP, +' + din + ' moedas');
+        jogo.eq.forEach((id) => { const f = textoXp(id, xp); if (f) tx.push(f); });
+        if (!capt && Math.random() < 0.4) { jogo.esf++; tx.push('Achou 1 esfera.'); }
+      } else tx.push('Você foi derrotado, mas segue explorando.');
+      salvarJogo(); if (capt) document.getElementById('resTitulo').textContent = 'CAPTURADO!';
+      document.getElementById('resSub').textContent = tx.join(' ');
+      botoes('Continuar explorando', () => voltarMundo(v !== 0), 'Menu', () => sairMundo()); document.getElementById('premios').innerHTML = ''; return;
+    }
     const prem = document.getElementById('premios'), sub = document.getElementById('resSub'), tit = document.getElementById('resTitulo'), fase = torneio ? torneio.fase : 0;
     prem.innerHTML = '';
     if (emTreinador()) { // desafio a um treinador: pontos na primeira vitória (e poucos nas revanches)
@@ -791,7 +998,7 @@
     if (modo === 'treinador') { lutar.textContent = treinadorSel ? 'Desafiar ' + B.treinadorPorId(treinadorSel).nome + sorteia : 'Escolher treinador'; return; }
     lutar.textContent = emTorneio() ? (torneio.time ? 'Próxima luta (fase ' + torneio.fase + '/' + TORN.fases + ')' : 'Começar torneio' + sorteia) : 'Lutar!' + sorteia;
   }
-  if (location.search.includes('dbg')) window.__pixmon = { resultadoModo, iniciar, get torneio() { return torneio; } }; // conferência: ?dbg
+  if (location.search.includes('dbg')) window.__pixmon = { resultadoModo, iniciar, get bt() { return bt; }, get torneio() { return torneio; } }; // conferência: ?dbg
   const mTr = document.getElementById('mTrein');
   mTr.onclick = () => { modo = 'treinador'; salvarT(); salvarTrein(); S.tocar('toque'); atualizarModo(); if (!treinadorSel) irPagina('trein'); };
   mR.onclick = () => { modo = 'rapido'; salvarT(); S.tocar('toque'); atualizarModo(); };
@@ -799,8 +1006,8 @@
 
   // ícones animados de monstros fora da grade (resumo do time, barra de baixo, cards dos treinadores)
   const animCv = [];
-  function iconeMonstro(pai, idx, tam) { const c = document.createElement('canvas'); c.width = c.height = 44; c.style.width = c.style.height = tam + 'px'; pai.appendChild(c); animCv.push({ c, idx }); return c; }
-  setInterval(() => { const t = performance.now(); for (let k = animCv.length - 1; k >= 0; k--) { const { c, idx } = animCv[k]; if (!c.isConnected) { animCv.splice(k, 1); continue; } const x = c.getContext('2d'); x.clearRect(0, 0, 44, 44); x.imageSmoothingEnabled = false; A.monstro(x, B.MONSTROS[idx], 22, 40, t, false, false, 1, null); } }, 250);
+  function iconeMonstro(pai, idx, tam, mon) { const c = document.createElement('canvas'); c.width = c.height = 44; c.style.width = c.style.height = tam + 'px'; pai.appendChild(c); animCv.push({ c, idx, mon }); return c; }
+  setInterval(() => { const t = performance.now(); for (let k = animCv.length - 1; k >= 0; k--) { const { c, idx, mon } = animCv[k]; if (!c.isConnected) { animCv.splice(k, 1); continue; } const x = c.getContext('2d'); x.clearRect(0, 0, 44, 44); x.imageSmoothingEnabled = false; A.monstro(x, mon || B.MONSTROS[idx], 22, 40, t, false, false, 1, null); } }, 250);
   function renderResumo() {
     const r = document.getElementById('resumoTime'), mb = document.getElementById('miniTime'); r.innerHTML = ''; mb.innerHTML = '';
     for (let k = 0; k < 3; k++) {
@@ -857,10 +1064,6 @@
   document.getElementById('somOpcao').onclick = () => document.getElementById('mudo').click();
   document.getElementById('apagar').onclick = () => { if (confirm('Apagar o torneio, os pontos, as insígnias e as vitórias contra treinadores?')) { torneio = null; stat = { torneios: 0, melhor: 0 }; trein = { pontos: 0, insignias: [], venceu: {}, sel: null }; treinadorSel = null; modo = 'rapido'; salvarT(); salvarTrein(); atualizarModo(); renderOpcoes(); } };
 
-  const btnAuto = document.getElementById('auto');
-  const rotuloAuto = () => { btnAuto.textContent = 'Luta automática: ' + (auto ? 'sim' : 'não'); btnAuto.classList.toggle('sel', auto); btnAuto.setAttribute('aria-pressed', auto); };
-  btnAuto.onclick = () => { auto = !auto; try { localStorage.setItem('pixmon-auto', auto ? '1' : '0'); } catch (e) { /* ok */ } S.tocar('toque'); rotuloAuto(); };
-  rotuloAuto();
   marcarAbas(); atualizarModo(); renderTrein(); S.tema(true);
 
   // ?folha mostra os 10 monstros lado a lado (conferência de arte)
@@ -875,7 +1078,7 @@
 
   let errosLoop = 0;
   function loop(t) { // um erro em uma etapa não pode parar o jogo: registra, segue e avisa na tela se repetir
-    for (const etapa of [logica, atualizarBotoes, atualizarTime, A.quadro]) {
+    for (const etapa of [logica, atualizarTime, atualizarHabs, A.quadro]) {
       try { etapa(t); } catch (e) {
         console.error(e); errosLoop++;
         if (errosLoop === 5) { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:9;background:#3a1c1c;color:#ffd0c8;border:2px solid #b85a4a;border-radius:8px;padding:6px 10px;font-size:12px'; d.textContent = 'Algo deu errado nesta luta. Recarregue a página (Ctrl+F5).'; document.body.appendChild(d); }

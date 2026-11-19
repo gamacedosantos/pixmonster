@@ -25,27 +25,43 @@
   .topo { display: flex; justify-content: space-between; align-items: center; }
   .roda { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0; font-size: 15px; }
   .bom { color: #6fd66f; } .ruim { color: #ff7a6a; }
+  #tabLoja td, #tabGanho td { white-space: normal; }
+  .nav { margin: 2px 0 6px; font-size: 14px; } .nav a { margin-right: 10px; }
+  .dex { display: grid; gap: 10px; margin-top: 8px; }
+  .dexc { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 3px #14285a; }
+  .dexc.evo { border-color: #ffd35a; }
+  .dexc .cab { display: flex; gap: 10px; align-items: center; }
+  .dexc .cab img { width: 96px; height: 96px; image-rendering: pixelated; background: #0f2147; border-radius: 10px; flex: none; }
+  .dexc .cab h3 { margin: 0 0 4px; font-size: 20px; color: #ffd35a; }
+  .dexc .cab p { margin: 4px 0 0; font-size: 13px; }
+  .dexc .num { font-size: 12px; color: #8fb0ff; }
+  .dexc .poderes { width: 100%; margin-top: 8px; }
+  .dexc .poderes td { white-space: normal; }
+  .dexc .linha { font-size: 13px; margin: 6px 0 0; }
+  .dexc .evol { display: flex; align-items: center; gap: 8px; margin-top: 8px; background: #14285a; border-radius: 10px; padding: 6px 8px; font-size: 13px; }
+  .dexc .evol img { width: 48px; height: 48px; image-rendering: pixelated; flex: none; }
 </style>
 </head>
 <body>
 <main>
   <div class="topo"><h1>PixMonster · Wiki</h1><a href="index.html">Voltar ao jogo</a></div>
+  <div class="nav"><a href="#pixdex">Pixdex</a><a href="#itens">Itens</a><a href="#capturar">Capturar e evoluir</a><a href="#elementos">Elementos</a><a href="#talentos">Talentos</a></div>
   <p class="nota">Esta página é montada a partir dos números do próprio jogo (<code>battle.js</code>): se um valor mudar lá, ela muda junto.</p>
 
   <h2>Como funciona a luta</h2>
   <div class="caixa">
     <ul>
       <li><b>Time de 3:</b> você escolhe 3 monstros (sem repetir) e o adversário sorteia outros 3. Um monstro de cada lado fica em campo; quando ele cai, o próximo do time entra.</li>
-      <li><b>Quatro botões:</b> forte, rápido, defesa e ultimate. Cada um tem a sua recarga, e os ataques passam por um tempo de carga (o anel que fecha) antes de acertar.</li>
-      <li><b>Defesa:</b> evita 1 ataque dentro da janela de <span id="defDur"></span> s. Quando o adversário carrega um ataque forte, aparece um "!": é a hora de defender.</li>
-      <li><b>Trocar de monstro:</b> toque num dos 3 retratos embaixo da arena. A troca cancela a carga e a defesa, o novo monstro fica <span id="entraMs"></span> s sem agir, e só dá para trocar de novo depois de <span id="trocaCd"></span> s. Depois de um nocaute, você escolhe quem entra (se não escolher, entra o melhor contra o adversário).</li>
+      <li><b>Quatro golpes:</b> forte, rápido, defesa e ultimate. Cada um tem a sua recarga, e os ataques passam por um tempo de carga (o anel que fecha) antes de acertar. O jogo é só automático: o seu time escolhe os golpes sozinho, pelas regras que você define.</li>
+      <li><b>Defesa:</b> evita 1 ataque dentro da janela de <span id="defDur"></span> s. Quando o adversário carrega um ataque forte, aparece um "!" e o time defende conforme a regra de defesa.</li>
+      <li><b>Trocar de monstro:</b> o time troca sozinho (regras de troca por desvantagem e vida baixa). A troca cancela a carga e a defesa, o novo monstro fica <span id="entraMs"></span> s sem agir, e só dá para trocar de novo depois de <span id="trocaCd"></span> s. Depois de um nocaute, você escolhe quem entra (se não escolher, entra o melhor contra o adversário).</li>
       <li><b>O que descansa não recarrega:</b> as recargas e os status só correm para quem está em campo.</li>
       <li><b>Crítico</b> (<span id="critCh"></span>% de chance, dano x<span id="critMu"></span>) e <b>esquiva</b> (<span id="esqCh"></span>%): sorteados em cada golpe.</li>
-      <li><b>Luta automática:</b> opcional, escolhida antes de lutar: o seu time joga sozinho (inclusive as trocas).</li>
+      <li><b>Regras da luta:</b> você escolhe o estilo, quando defender, quando soltar o ultimate e quando trocar; o time cumpre as regras sozinho.</li>
     </ul>
   </div>
 
-  <h2>Elementos</h2>
+  <h2 id="elementos">Elementos</h2>
   <p>Cada elemento tem <b class="bom">vantagem</b> sobre um, <b class="ruim">desvantagem</b> contra outro e é <b>normal</b> contra os outros dois.</p>
   <div class="caixa">
     <div class="roda" id="roda"></div>
@@ -56,7 +72,7 @@
   <div class="tabela"><table id="tabEl"></table></div>
 
   <h2>Cenários</h2>
-  <p>Cada cenário favorece um elemento: os monstros desse elemento causam <b class="bom">+<span id="bonusBioma"></span>%</b> de dano lá. O cenário aparece em uma faixa no alto da arena. Na tela de escolha dá para fixar o cenário ou deixar no sorteio. O fogo não tem cenário de casa, mas é o elemento que mais bate.</p>
+  <p>Cada cenário favorece um elemento: os monstros desse elemento causam <b class="bom">+<span id="bonusBioma"></span>%</b> de dano lá. O cenário aparece em uma faixa no alto da arena. Na tela de escolha dá para fixar o cenário ou deixar no sorteio. A Vila (com a casa e a fumaça da chaminé) favorece o Fogo.</p>
   <div class="tabela"><table id="tabBioma"></table></div>
 
   <h2>Status</h2>
@@ -64,11 +80,11 @@
   <div class="tabela"><table id="tabStatus"></table></div>
   <div class="tabela"><table id="tabChance"></table></div>
 
-  <h2>Objetos quebráveis</h2>
+  <h2>Objetos quebráveis (na arena)</h2>
   <p>Barris, caixotes e jarros espalhados pela arena quebram quando uma investida, um projétil ou um impacto passa por perto. Quem quebra leva um sorteio:</p>
   <div class="tabela"><table id="tabItens"></table></div>
 
-  <h2>Talentos</h2>
+  <h2 id="talentos">Talentos</h2>
   <p>Antes da luta, o time gasta <b id="orc"></b> pontos em <b>talentos do time</b> (valem para os 3 monstros) e cada monstro leva <b>1 talento próprio</b>, grátis. O adversário recebe talentos sorteados. Os bônus são pequenos de propósito: o que decide é a combinação com o time e o cenário.</p>
   <h3>Talentos do time</h3>
   <div class="tabela"><table id="tabTalTime"></table></div>
@@ -88,7 +104,42 @@
   <div class="tabela"><table id="tabIns"></table></div>
   <div class="tabela"><table id="tabTrein"></table></div>
 
-  <h2>Os 10 monstros</h2>
+  <h2 id="itens">Itens</h2>
+  <p>No modo <b>Explorar o mundo</b> você começa com <b id="iDin"></b> moedas, <b id="iEsf"></b> esferas e <b id="iPoc"></b> poções. Os itens ficam na mochila e são usados na luta (Esfera e Poção) pelos botões embaixo do time.</p>
+  <h3>Mercado do Vovô (Vila)</h3>
+  <p>Pise na entrada da casa do <b>MERCADO</b>, na Vila. O vovô sempre cumprimenta com "Bom dia!", "Boa tarde!" ou "Boa noite!".</p>
+  <div class="tabela"><table id="tabLoja"></table></div>
+  <h3>Como ganhar</h3>
+  <div class="tabela"><table id="tabGanho"></table></div>
+  <p class="nota">Itens de teste e valores podem mudar enquanto o jogo é um protótipo.</p>
+
+  <h2 id="capturar">Capturar e evoluir</h2>
+  <h3>Captura</h3>
+  <ul>
+    <li>Use uma <b>Esfera</b> num selvagem durante a luta. Chance de captura: <b id="cBase"></b>% + <b id="cFalta"></b>% x a vida que ele já perdeu (máximo <b id="cMax"></b>%). Esfera Forte soma <b id="cForte"></b> pontos.</li>
+    <li>Se a esfera falha, ela se perde. Treinadores não podem ser capturados.</li>
+    <li>Os monstros capturados ficam na coleção. Na tela <b>Equipe</b> você escolhe de 1 a 3 para lutar. Os outros ficam na caixa.</li>
+    <li>Capturar um monstro que você já tem vira XP extra, mas se o capturado estiver <b>evoluído</b> e o seu não, o seu evolui.</li>
+  </ul>
+  <h3>Nível e XP</h3>
+  <ul>
+    <li>Todo monstro nasce no nível 10 como referência de status: <b id="nBonus"></b>% de vida e ataque por nível acima ou abaixo de 10.</li>
+    <li>O selvagem tem o nível médio da sua equipe (com 1 a mais ou a menos). Treinadores sobem de nível junto com o seu time.</li>
+    <li>Vencer um selvagem dá <b>8 x nível</b> de XP (capturar dá 60% disso). Vencer um treinador dá <b>12 x nível</b>. Para subir de nível são necessários <b>15 x nível atual</b> de XP.</li>
+  </ul>
+  <h3>Evolução</h3>
+  <ul>
+    <li><b>No meio da luta:</b> quando o seu monstro cai abaixo de <b id="eHp"></b>% da vida, ele tem <b id="eCh"></b>% de chance de evoluir (uma tentativa por monstro por luta). Ele entra na forma nova com pelo menos metade da vida e <b>continua evoluído depois</b>.</li>
+    <li><b>Depois da luta:</b> ao chegar no nível <b id="eNv"></b>, evolui sozinho.</li>
+    <li>A forma evoluída tem os mesmos golpes, <b id="eBHp"></b>% a mais de vida e <b id="eBAt"></b>% a mais de ataque.</li>
+    <li><b>Selvagens evoluídos:</b> os monstros que já têm evolução aparecem evoluídos em cerca de <b id="eSelv"></b>% dos encontros. Dá para capturar e jogar com eles.</li>
+    <li>Todas as 20 espécies já evoluem (veja o Pixdex abaixo).</li>
+  </ul>
+
+  <h2 id="pixdex">Pixdex</h2>
+  <p>A enciclopédia dos pixmonstros. Cada cartão mostra o monstro, seus quatro poderes, o que ele vence e o que o vence, onde ele é mais forte e a evolução.</p>
+  <div class="dex" id="dex"></div>
+  <h3>Tabela comparativa</h3>
   <div class="tabela"><table id="tabMon"></table></div>
   <p class="nota">Ritmo: recarga e carga em relação ao padrão (menor = mais rápido). Quem recarrega devagar bate mais forte em cada golpe.</p>
 
@@ -145,6 +196,70 @@
   tabela('tabDif', ['Dificuldade', 'Vidas', 'Adversário', 'Talentos do adversário'], Object.values(T.dificuldades).map((d) => [d.nome, d.vidas, 'reage e ataca x' + d.ia, (d.orc >= 0 ? '+' : '') + d.orc + ' pt']));
   tabela('tabIns', ['Insígnia', 'Custo', 'Libera'], B.INSIGNIAS.map((i) => [i.nome, i.custo + ' pts', 'treinadores do nível ' + i.libera]));
   tabela('tabTrein', ['Nível', 'Treinador', 'Time', 'Jeito de jogar', 'Pontos (1ª vitória)'], B.TREINADORES.map((t) => [t.nivel, '<b>' + t.nome + '</b><br><i>“' + t.frase + '”</i>', B.timeDoTreinador(t).map((m) => m.nome).join(', '), B.ESTILOS[t.pol.estilo].nome + ' · defesa: ' + t.pol.defesa + ' · ultimate: ' + t.pol.ultimate, B.PONTOS_TREINADOR.primeira(t.nivel)]));
+  // ---------- itens, captura e evolução (valores do mundo; ficam em index.html, aqui só espelhados) ----------
+  $('iDin').textContent = 40; $('iEsf').textContent = 5; $('iPoc').textContent = 2;
+  tabela('tabLoja', ['Item', 'Preço', 'O que faz'], [
+    ['<b>Esfera</b>', '15 moedas', 'Captura um monstro selvagem'], ['<b>Esfera Forte</b>', '40 moedas', '+20 pontos de chance de captura'], ['<b>Poção</b>', '20 moedas', 'Cura 35% da vida do monstro em campo (uma a cada 8 s, também contra treinadores)'],
+  ]);
+  tabela('tabGanho', ['Fonte', 'O que dá'], [
+    ['Vencer um selvagem', '6 + 2 x nível dele em moedas · 40% de chance de achar 1 esfera (se não capturou)'],
+    ['Vencer um treinador', '30 x nível do treinador em moedas · 2 esferas · pontos de treinador (aba Treinadores)'],
+    ['Vencer o líder do ginásio (Tomás)', 'Insígnia de Bronze, que libera os treinadores do nível 2'],
+  ]);
+  $('cBase').textContent = 12; $('cFalta').textContent = 78; $('cMax').textContent = 95; $('cForte').textContent = 20; $('nBonus').textContent = 5;
+  $('eHp').textContent = 50; $('eCh').textContent = 60; $('eNv').textContent = 16; $('eSelv').textContent = 30;
+  $('eBHp').textContent = pct(B.BONUS_EVO.hp); $('eBAt').textContent = pct(B.BONUS_EVO.atk);
+  // ---------- Pixdex ----------
+  const IMG = (id) => 'sprites-pixellab/' + id + '-teste.png';
+  const PAPEL = {
+    fagulhao: 'O primeiro que aparece no mato alto. Corajoso e apressado, adora se exibir.', chamuscao: 'O mais curioso: segue o cheiro de comida e acaba queimando o que encontra.',
+    mareal: 'Calmo, marca a margem do lago e cuida de quem está ferido.', pingolino: 'Desajeitado, cai de barriga no gelo, mas nunca desiste.',
+    brotinho: 'Nasce de tronco caído. Resistente e paciente.', musgarra: 'O mais velho da floresta. Quem tem terra não se move por pouco.',
+    ventinho: 'Sopra a poeira das trilhas e gosta de assustar quem passa.', nuvelino: 'Mora nas nuvens baixas. Brinca com quem tenta pegá-lo.',
+    faiscao: 'Acende as luzes da vila sem querer. Rápido e nervoso.', trovinho: 'O mais barulhento, vive nas montanhas e é difícil de acalmar.',
+  };
+  Object.assign(PAPEL, {
+    brasinha: 'Lagarto de brasa. Aparece nas trilhas e sempre deixa um rastro quentinho.', vulcanejo: 'Tatu de lava que dorme sob a montanha. Só acorda quando alguém passa perto.',
+    algazinho: 'Uma alga com olhos, grudenta e curiosa. Gruda em quem passa.', coraline: 'Coral vivo que só aparece perto do porto. Gosta de bolhas e de música.',
+    pedrinho: 'Uma pedra que anda e faz amizade com crianças. Não gosta de ser chutado.', tatufungo: 'Cogumelo blindado que leva esporos como arma. O chapéu serve de escudo.',
+    plumelho: 'Pássaro de pena branca que canta de manhã e acorda a vila inteira.', redemoinha: 'Espírito de vento que dança no campo. Ninguém nunca viu a mesma forma duas vezes.',
+    zapinho: 'Camundongo elétrico que dá choquinhos em quem tenta pegar seu queijo.', raiomante: 'Morcego-tempestade. Só aparece em dia de chuva e é muito raro de achar.',
+    pavio: 'Gatinho de brasa com um pavio aceso no lugar do rabo. Adora brincar perto de coisas que explodem, mas sempre acaba soprando a própria chama.', bolhudo: 'Baiacu redondo que enche de bolhas quando fica envergonhado. As bolhas protegem e fazem cócegas no adversário.', taupino: 'Toupeira peluda com uma folhinha brotando na cabeça. Cava tocas fundas no mato e esconde suas coisas lá embaixo.', pipinha: 'Pipa viva que flutua no vento. Só aparece em dia de brisa forte e vive tentando não ficar presa em galho.', lampiro: 'Vagalume elétrico. Acende a barriga para avisar quando vem tempestade e as antenas soltam pequenos raios.',
+  });
+  const PAPEL_EVO = {
+    labaredo: 'As chamas crescem com a coragem. Bate forte e aguenta mais.', oceanico: 'Nada em círculos majestosos e cura a calma de quem está perto.',
+    carvalhinho: 'Uma árvore cresce nas costas. Lento e firme como o tronco.', faiscante: 'Cada passo solta faíscas. É a eletricidade em estado puro.',
+    carvaoreal: 'Brasa viva com armadura de carvão. Cada rachadura brilha quando ele se irrita.', pingueiroimperial: 'Usa uma coroa de cristais de gelo. Anda como um rei e escorrega como um pinguim.',
+    musgarrao: 'Um gigante de pedra e musgo. Dizem que a floresta cresce onde ele dorme.', vendaval: 'As asas ficam enormes e cortam o vento. Quase ninguém consegue acompanhar o voo.',
+    cumulonio: 'Uma nuvem de tempestade gigante. Se ele chora, a vila inteira leva guarda-chuva.', trovaodourado: 'Armadura dourada e aura brilhante. O raio mais raro que existe.',
+    brasalisco: 'As escamas esquentam até brilhar. Onde ele pisa, a grama vira cinza quente.', magmadilo: 'A cratera nas costas solta lava quando ele fica bravo. O casco vira um vulcão de verdade.',
+    algamar: 'Os tentáculos de alga crescem e seguram tudo que passa. Mais grudento que nunca.', recifante: 'Uma coroa de coral e pérolas. Quem a vê no fundo do porto nunca esquece.',
+    rochedao: 'Um golem de pedra com uma árvore pequena nas costas. Os punhos são pedregulhos.', esporao: 'Um cavaleiro blindado de elmo de aço. O chapéu virou escudo e os esporos, armadilha.',
+    plumareu: 'As asas abrem de ponta a ponta e a cauda desenha riscos no céu. Canta ainda mais alto.', ciclonara: 'O redemoinho ganha fitas de vento e olhar firme. Quem fica na frente dele sai voando.',
+    zapotrao: 'Em pé, com juba de faíscas e a cauda de raio gigante. O queijo agora é só dele.', tempestauro: 'O morcego da tempestade em sua forma completa. Cada relâmpago na asa conta uma tormenta.',
+  };
+  const fraco = (t) => Object.keys(B.VENCE).find((e) => B.VENCE[e] === t);
+  const casa = (t) => Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === t).map((b) => b[0].toUpperCase() + b.slice(1)).join(', ');
+  const slots = [['rapido', 'Rápido'], ['forte', 'Forte'], ['defesa', 'Defesa'], ['ultimate', 'Ultimate']];
+  const efeito = (t, sl) => { const e = B.EFEITO[t] && B.EFEITO[t][sl]; return e ? ' <span class="nota">(' + Math.round(e[1] * 100) + '% de ' + e[0] + ')</span>' : ''; };
+  const cartao = (m, num, evo) => {
+    const E = B.EVOLUCOES[m.id], eva = evo ? m : null, base = evo ? B.MONSTROS.find((x) => B.EVOLUCOES[x.id] && B.EVOLUCOES[x.id].id === evo) : null;
+    const forma = evo ? B.evoluida(base) : m, id = evo || m.id, nome = evo ? B.EVOLUCOES[base.id].nome : m.nome;
+    const el_ = (evo ? base : m).tipo, g = (evo ? base : m).golpes, t = el_;
+    const poderes = slots.map(([sl, nm]) => '<tr><td><b>' + nm + '</b></td><td>' + g[sl].nome + '</td><td>' + el(g[sl].tipo) + efeito(g[sl].tipo, sl) + '</td></tr>').join('');
+    let evolBox;
+    if (evo) evolBox = '<div class="evol"><img src="' + IMG(base.id) + '" alt=""><span>Evolução de <b>' + base.nome + '</b>. Mesmos golpes, <b class="bom">+' + pct(B.BONUS_EVO.hp) + '% de vida</b> e <b class="bom">+' + pct(B.BONUS_EVO.atk) + '% de ataque</b>.</span></div>';
+    else if (E) evolBox = '<div class="evol"><img src="' + IMG(E.id) + '" alt=""><span>Evolui para <b>' + E.nome + '</b> no nível ' + E.nv + ', ou no meio da luta (60% de chance ao cair abaixo de 50% da vida).</span></div>';
+    else evolBox = '<div class="evol"><span class="nota">Ainda sem evolução (em breve).</span></div>';
+    return '<div class="dexc' + (evo ? ' evo' : '') + '"><div class="cab"><img src="' + IMG(id) + '" alt="' + nome + '"><div><div class="num">' + num + (m.raridade && m.raridade !== 'comum' ? ' · ' + (m.raridade === 'lendaria' ? 'lendária' : 'rara') : '') + '</div><h3>' + nome + '</h3>' + el(el_) + '<p>' + (evo ? PAPEL_EVO[id] : PAPEL[id]) + '</p></div></div>' +
+      '<p class="linha"><b>Vida</b> ' + forma.hp + ' (x' + B.EL[el_].hp + ' do elemento) · <b>Ataque</b> ' + forma.atk + ' (x' + B.EL[el_].dano + ') · <b>Ritmo</b> recarga ' + m.rc + ', carga ' + m.cg + '</p>' +
+      '<p class="linha"><span class="bom">Vence:</span> ' + el(B.VENCE[el_]) + ' (x' + B.VANTAGEM + ' de dano) · <span class="ruim">Perde para:</span> ' + el(fraco(el_)) + ' (x' + B.DESVANTAGEM + ' de dano) · <b>Cenário forte:</b> ' + casa(el_) + ' (+' + pct(B.BONUS_BIOMA) + '%)</p>' +
+      '<div class="tabela"><table class="poderes"><tr><th>Slot</th><th>Poder</th><th>Elemento</th></tr>' + poderes + '</table></div>' + evolBox + '</div>';
+  };
+  let cartoes = '', k = 0;
+  B.MONSTROS.forEach((m) => { k++; cartoes += cartao(m, 'Nº ' + String(k).padStart(3, '0'), null);
+    const E = B.EVOLUCOES[m.id]; if (E) { cartoes += cartao(m, 'Nº ' + String(k).padStart(3, '0') + ' · evolução', E.id); } });
+  $('dex').innerHTML = cartoes;
   tabela('tabMon', ['Monstro', 'Elemento', 'Vida', 'Ritmo', 'Rápido', 'Forte', 'Defesa', 'Ultimate'], B.MONSTROS.map((m) => [
     '<b>' + m.nome + '</b>', el(m.tipo), m.hp, 'rec ' + m.rc + ' · carga ' + m.cg,
     m.golpes.rapido.nome, m.golpes.forte.nome, m.golpes.defesa.nome, m.golpes.ultimate.nome + ' (' + N[m.golpes.ultimate.tipo] + ')',

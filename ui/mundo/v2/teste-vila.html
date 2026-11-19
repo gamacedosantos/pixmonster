@@ -1,0 +1,43 @@
+<!doctype html><meta charset="utf-8"><title>Teste da Vila: chão, árvores e casas aprovados</title>
+<style>body{margin:0;background:#222}canvas{display:block;margin:0 auto;image-rendering:pixelated;width:720px;height:1296px}</style>
+<canvas id="c" width="240" height="432"></canvas>
+<script>
+// Cena de teste da Vila: 15 x 27 tiles de 16 px (240 x 432), mundo no tamanho proposto. Só usa o que já foi aprovado.
+const T = 16, W = 15, H = 27, g = document.getElementById('c').getContext('2d'); g.imageSmoothingEnabled = false;
+const carregar = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+(async () => {
+  const [folha, meta, tb, td, ca, cc, ger, mer, pPoste, pPlaca, pBanco, pCorreio, pCerca, pTronco, pPedra] = await Promise.all([carregar('chao_suave.png'), fetch('chao_grama_caminho.json').then((r) => r.json()), carregar('arvore_b.png'), carregar('arvore_d.png'), carregar('casa_a.png'), carregar('casa_c.png'), carregar('ginasio_a.png'), carregar('mercado_a.png'), ...['poste','placa','banco_reto','correio_manual','cerca_manual','tronco_reto','pedra'].map((n) => carregar('prop_' + n + '.png'))]);
+  const porCanto = {}; meta.tileset_data.tiles.forEach((t) => { porCanto[t.corners.NW[0] + t.corners.NE[0] + t.corners.SW[0] + t.corners.SE[0]] = t.bounding_box; });
+  // caminho: rua vertical (cols 6-8) com saída em cima e embaixo, rua horizontal larga (linhas 13-15) e praça
+  const caminho = (x, y) => (x >= 6 && x <= 8) || (y >= 13 && y <= 15) || (x >= 5 && x <= 9 && y >= 11 && y <= 17);
+  const dentro = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+  const lower = (vx, vy) => !(vx <= 0 || vy <= 0 || vx >= W || vy >= H) && [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => dentro(x, y) && caminho(x, y));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const k = (v) => (v ? 'l' : 'u'), b = porCanto[k(lower(x, y)) + k(lower(x + 1, y)) + k(lower(x, y + 1)) + k(lower(x + 1, y + 1))];
+    // as bordas do mapa viram "caminho" nas pontas das ruas: por segurança, tile vazio = grama pura
+    const bb = b || porCanto.uuuu; g.drawImage(folha, bb.x, bb.y, 16, 16, x * T, y * T, 16, 16);
+  }
+  const objetos = [];
+  const sombra = (cx, base, rx, ry) => { g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(cx + 3, base - 1, rx, ry, 0, 0, 7); g.fill(); };
+  const arv = (im, cx, base, rx) => objetos.push([base, () => { g.drawImage(im, Math.round(cx - im.width / 2), base - im.height); }]);
+  const casa = (im, x, base) => objetos.push([base, () => { g.drawImage(im, x, base - im.height); }]);
+  // muro de mata (árvore B) em volta; aberturas nas ruas
+  for (let x = 0; x < W; x++) { if (x < 6 || x > 8) { arv(tb, x * T + 8, 40, 11); arv(tb, x * T + 8, 24, 11); } }
+  for (let x = 0; x < W; x++) { if (x < 6 || x > 8) { arv(tb, x * T + 8, 432, 11); arv(tb, x * T + 8, 416, 11); } }
+  for (let y = 56; y < 400; y += 14) { if (y < 170 || y > 270) { arv(tb, 8, y, 11); arv(tb, 232, y + 6, 11); } }
+  // Ginásio no alto, no fim da rua; Mercado e casas em volta da rua horizontal
+  casa(ger, 72, 104); casa(ca, 8, 100); casa(cc, 168, 100);
+  casa(mer, 16, 200); casa(ca, 168, 200); casa(cc, 16, 330); casa(ca, 168, 330);
+  // árvores soltas da Vila (D)
+  arv(td, 100, 300, 12); arv(td, 140, 300, 12); arv(td, 40, 270, 12); arv(td, 205, 270, 12);
+  // props (base = y do pé)
+  const prop = (im, cx, base) => objetos.push([base, () => g.drawImage(im, Math.round(cx - im.width / 2), base - im.height)]);
+  [[88, 168], [152, 168], [88, 280], [152, 280], [88, 380], [152, 380]].forEach(([x, y]) => prop(pPoste, x, y));
+  prop(pPlaca, 90, 116); prop(pBanco, 38, 266); prop(pBanco, 202, 266);
+  prop(pCorreio, 62, 214); prop(pCorreio, 184, 214);
+  for (let x = 16; x < 80; x += 16) prop(pCerca, x + 8, 252 + 78);
+  for (let x = 160; x < 224; x += 16) prop(pCerca, x + 8, 252 + 78);
+  prop(pTronco, 214, 400); prop(pPedra, 30, 395); prop(pPedra, 44, 402); prop(pPedra, 200, 70);
+  objetos.sort((a, b) => a[0] - b[0]).forEach(([, f]) => f());
+})();
+</script>

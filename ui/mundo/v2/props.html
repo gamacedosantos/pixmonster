@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>Props da Vila</title>
+<style>
+  body { margin: 0; background: #9ccf88; font: 14px system-ui, sans-serif; color: #1b2a14; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .item { background: rgba(255,255,255,.35); border-radius: 10px; padding: 10px; text-align: center; }
+  .item canvas { image-rendering: pixelated; display: block; margin: 0 auto 6px; }
+  .item b { display: block; }
+  .item small { color: #35502a; }
+  .real { margin-top: 18px; background: rgba(255,255,255,.35); border-radius: 10px; padding: 10px; }
+  .real canvas { image-rendering: pixelated; width: 100%; max-width: 720px; display: block; margin: 0 auto; }
+</style>
+<main>
+  <h1>Props da Vila (câmera reta, sem sombra)</h1>
+  <div class="grade" id="g"></div>
+  <div class="real"><b>No tamanho real do jogo (16 px por tile, ampliado 4x):</b><canvas id="r" width="240" height="64"></canvas></div>
+</main>
+<script>
+const LISTA = [['prop_poste.png', 'Poste de luz'], ['prop_placa.png', 'Placa'], ['prop_banco_reto.png', 'Banco'], ['prop_correio_manual.png', 'Caixa de correio'], ['prop_cerca_manual.png', 'Cerca (1 tile)'], ['prop_tronco_reto.png', 'Tronco caído'], ['prop_pedra.png', 'Pedra'], ['arvore_b.png', 'Árvore B (mata)'], ['arvore_d.png', 'Árvore D (vila)']];
+const carregar = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+(async () => {
+  const ims = await Promise.all(LISTA.map(([f]) => carregar(f)));
+  ims.forEach((im, k) => {
+    const d = document.createElement('div'); d.className = 'item';
+    const e = Math.max(2, Math.floor(160 / Math.max(im.width, im.height))), c = document.createElement('canvas'); c.width = im.width * e; c.height = im.height * e;
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = false; g.drawImage(im, 0, 0, c.width, c.height);
+    d.appendChild(c); d.insertAdjacentHTML('beforeend', '<b>' + LISTA[k][1] + '</b><small>' + im.width + ' x ' + im.height + ' px</small>'); document.getElementById('g').appendChild(d);
+  });
+  // tamanho real, lado a lado, na mesma linha do chão
+  const g = document.getElementById('r').getContext('2d'); g.imageSmoothingEnabled = false; g.fillStyle = '#a3d68f'; g.fillRect(0, 0, 240, 64);
+  let x = 6; ims.forEach((im) => { g.drawImage(im, x, 58 - im.height); x += im.width + 6; });
+})();
+</script>

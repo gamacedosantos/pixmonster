@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8"><title>Teste do chão e das árvores</title>
+<style>body{margin:0;background:#222}canvas{display:block;margin:0 auto;image-rendering:pixelated;width:960px;height:960px}</style>
+<canvas id="c" width="240" height="240"></canvas>
+<script>
+// Cena de teste: 15 x 15 tiles de 16 px. Chão do PixelLab (grama sobre caminho) montado pelos cantos de cada tile.
+const T = 16, W = 15, H = 15, g = document.getElementById('c').getContext('2d'); g.imageSmoothingEnabled = false;
+const carregar = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+(async () => {
+  const [folha, meta, tb, td] = await Promise.all([carregar('chao_grama_caminho.png'), fetch('chao_grama_caminho.json').then((r) => r.json()), carregar('arvore_b.png'), carregar('arvore_d.png')]);
+  const tiles = meta.tileset_data.tiles, porCanto = {};
+  tiles.forEach((t) => { porCanto[t.corners.NW[0] + t.corners.NE[0] + t.corners.SW[0] + t.corners.SE[0]] = t.bounding_box; });
+  // caminho em cruz com uma praça no meio; true = caminho
+  const caminho = (x, y) => (x >= 6 && x <= 8) || (y >= 6 && y <= 8) || (x >= 5 && x <= 9 && y >= 5 && y <= 9);
+  const lower = (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => x >= 0 && y >= 0 && x < W && y < H && caminho(x, y)) && !(vx <= 0 || vy <= 0 || vx >= W || vy >= H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const k = (v) => (v ? 'l' : 'u'), b = porCanto[k(lower(x, y)) + k(lower(x + 1, y)) + k(lower(x, y + 1)) + k(lower(x + 1, y + 1))];
+    g.filter = location.search.includes('suave') ? 'saturate(0.62) hue-rotate(10deg) brightness(1.06)' : location.search.includes('media') ? 'saturate(0.85) hue-rotate(8deg) brightness(1.03)' : 'none';
+    if (b) g.drawImage(folha, b.x, b.y, 16, 16, x * T, y * T, 16, 16);
+    g.filter = 'none';
+  }
+  // sombra oval (preto 18%) + árvore; a B nos cantos (mata), a D perto do caminho (vila)
+  const arvore = (im, cx, base, sombra) => { g.drawImage(im, Math.round(cx - im.width / 2), base - im.height); };
+  [[16, 60], [16, 100], [16, 140], [40, 40], [40, 80], [40, 120], [200, 60], [200, 100], [200, 140], [224, 40], [224, 80], [224, 120], [30, 230], [60, 232], [180, 232], [210, 230]].forEach(([x, y]) => arvore(tb, x, y, 11));
+  [[60, 130], [180, 70]].forEach(([x, y]) => arvore(td, x, y, 12));
+})();
+</script>

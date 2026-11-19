@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>Teste da água e da ponte</title>
+<style>body{margin:0;background:#222}canvas{display:block;margin:0 auto;image-rendering:pixelated;width:960px;height:960px}</style>
+<canvas id="c" width="240" height="240"></canvas>
+<script>
+// Cena de teste: lago + riacho com ponte + caminho de areia + árvores. 15 x 15 tiles de 16 px.
+const T = 16, W = 15, H = 15, g = document.getElementById('c').getContext('2d'); g.imageSmoothingEnabled = false;
+const carregar = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+const tabela = (meta) => { const m = {}; meta.tileset_data.tiles.forEach((t) => { m[t.corners.NW[0] + t.corners.NE[0] + t.corners.SW[0] + t.corners.SE[0]] = t.bounding_box; }); return m; };
+(async () => {
+  const [fc, mc, fa, ma, ph, pv, tb, td] = await Promise.all([carregar('chao_suave.png'), fetch('chao_grama_caminho.json').then((r) => r.json()), carregar('agua_grama.png'), fetch('agua_grama.json').then((r) => r.json()), carregar('ponte_cima.png'), carregar('ponte_baixo.png'), carregar('arvore_b.png'), carregar('arvore_d.png')]);
+  const tc = tabela(mc), ta = tabela(ma);
+  // lago (blob) em cima à esquerda e riacho vertical nas colunas 9-10, de cima até embaixo
+  const lago = (x, y) => (x >= 1 && x <= 5 && y >= 2 && y <= 5) || (x === 0 + 2 && y === 6) || (x >= 2 && x <= 4 && y === 1);
+  const riacho = (x, y) => x >= 9 && x <= 10;
+  const agua = (x, y) => lago(x, y) || riacho(x, y);
+  const caminho = (x, y) => y >= 8 && y <= 9 && !agua(x, y) || (x >= 4 && x <= 5 && y >= 9);
+  const dentro = (x, y) => x >= 0 && y >= 0 && x < W && y < H;
+  const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => dentro(x, y) && f(x, y)) && vx > 0 && vy > 0 && vx < W && vy < H;
+  const va = vert(agua), vc = vert(caminho), k = (v) => (v ? 'l' : 'u');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const ka = k(va(x, y)) + k(va(x + 1, y)) + k(va(x, y + 1)) + k(va(x + 1, y + 1));
+    if (ka !== 'uuuu') { const b = ta[ka]; g.drawImage(fa, b.x, b.y, 16, 16, x * T, y * T, 16, 16); continue; }
+    const kc = k(vc(x, y)) + k(vc(x + 1, y)) + k(vc(x, y + 1)) + k(vc(x + 1, y + 1)), b = tc[kc] || tc.uuuu; g.drawImage(fc, b.x, b.y, 16, 16, x * T, y * T, 16, 16);
+  }
+  for (let x = 8; x <= 11; x++) { g.drawImage(ph, x * T, 8 * T); g.drawImage(pv, x * T, 9 * T); }   // ponte de 2 tiles de largura, atravessando as margens
+  const obj = [];
+  const arv = (im, cx, base) => obj.push([base, () => g.drawImage(im, Math.round(cx - im.width / 2), base - im.height)]);
+  [[16, 232], [40, 236], [200, 232], [224, 236], [232, 30], [210, 22], [232, 120], [16, 160], [20, 120], [226, 190]].forEach(([x, y]) => arv(tb, x, y));
+  arv(td, 60, 205); arv(td, 190, 70); arv(td, 130, 215);
+  obj.sort((a, b) => a[0] - b[0]).forEach(([, f]) => f());
+})();
+</script>
