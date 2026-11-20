@@ -14,6 +14,7 @@
   mato(12, 14, 25, 19); mato(13, 3, 24, 8); mato(24, 38, 36, 45);
   ret(0, 0, 39, 1, 'T'); ret(0, 46, 39, 47, 'T'); ret(0, 0, 1, 47, 'T'); ret(38, 0, 39, 47, 'T');
   ret(0, 22, 1, 23, ','); grade[22][0] = grade[23][0] = '<';
+  ret(34, 22, 39, 23, ','); grade[22][39] = grade[23][39] = '>'; // saida leste para o Bosque leste
 
   // ---- construcoes (a base inteira bloqueia): celeiro, cabana e a torre do moinho ----
   const predios = [['celeiro_f', 3, 8, 8, 3], ['casa_2_f', 27, 8, 6, 3], ['moinho_torre', 35, 14, 3, 2]];
@@ -121,7 +122,7 @@
   });
 
   // ---- desenho ----
-  const SETA = { '<': [-1, 0] };
+  const SETA = { '<': [-1, 0], '>': [1, 0] };
   function desenhar(g, cx, cy, extras) {
     g.fillStyle = '#9fd68a'; g.fillRect(0, 0, RES[0], RES[1]);
     if (!pronto) return;
@@ -151,6 +152,6 @@
     desenhar, RES,
     area: { nome: 'Fazenda', largura: W, bioma: 'campo', elemento: 'terra', v2: true, T, res: RES, mapa, bloq, desenhar,
       npcs: [{ id: 'otto', nome: 'Otto', pele: '#c98a5e', c: 13, r: 21, dir: 'baixo', vis: 2, cor: '#34231b', camisa: '#c0763a', cab: '#3a2a1a' }],
-      portais: { '<': { area: 'vila', c: 37, r: 34 } } },
+      portais: { '<': { area: 'vila', c: 37, r: 34 }, '>': { area: 'bosquel', c: 2, r: 60 } } },
   };
 })();

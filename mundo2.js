@@ -22,6 +22,7 @@
   ret(6, 0, 7, 1, ','); ret(0, 34, 1, 35, ','); ret(38, 34, 39, 35, ',');
   ret(0, 18, 1, 21, '.'); ret(38, 18, 39, 21, '.'); for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; } ret(19, 18, 20, 21, 'P'); // abre o muro para o rio passar; a ponte volta por cima da água
   grade[0][6] = grade[0][7] = '^'; grade[34][0] = grade[35][0] = '<'; grade[34][39] = grade[35][39] = '>';
+  grade[9][19] = grade[9][20] = 'G'; // W7: porta do Ginásio (líder Dan), no fim da rua do Ginásio
 
   // ---- construções (a base inteira bloqueia): [imagem, coluna, linha, largura, altura] em tiles ----
   const predios = [
@@ -107,7 +108,8 @@
   window.PixmonMundo2 = {
     desenhar, RES,
     area: { nome: 'Vila', largura: W, bioma: 'vila', elemento: null, v2: true, T, res: RES, mapa, bloq, desenhar,
-      npcs: [{ id: 'tomas', nome: 'Tomy', pele: '#f6d3bb', matiz: 270, c: 19, r: 11, dir: 'baixo', vis: 3, cor: '#5a3a20', camisa: '#3a9a4a', cab: '#ebebf3' }, { id: 'ivo', nome: 'Ivo', c: 20, r: 44, vis: 0, pele: '#f6d3bb', cor: '#34231b', cab: '#3a2a1a', camisa: '#c0392b', dir: 'baixo', paradas: [{ c: 20, r: 44, espera: [9000, 15000] }, { c: 15, r: 34, espera: [4000, 6000] }, { c: 7, r: 45, espera: [4000, 6000] }] }, { id: 'luki', nome: 'Luki', c: 27, r: 8, vis: 0, pele: '#c98a5e', cor: '#2f4a6a', cab: '#1b1020', camisa: '#f0b830', dir: 'baixo', paradas: [{ c: 27, r: 8, espera: [8000, 14000] }, { c: 32, r: 3, espera: [3000, 5000] }, { c: 33, r: 8, espera: [3000, 5000] }] }, { id: 'jony', nome: 'Jony', c: 4, r: 55, vis: 0, pele: '#8a5a3a', cor: '#3a5a3a', cab: '#b8501f', camisa: '#7a4ab8', dir: 'baixo', paradas: [{ c: 4, r: 55, espera: [10000, 16000] }, { c: 7, r: 56, espera: [5000, 8000] }, { c: 5, r: 51, espera: [4000, 6000] }] }],
+      npcs: [{ id: 'tomas', nome: 'Tomy', pele: '#f6d3bb', matiz: 270, c: 19, r: 24, dir: 'baixo', vis: 3, cor: '#5a3a20', camisa: '#3a9a4a', cab: '#ebebf3' }, { id: 'ivo', nome: 'Ivo', c: 20, r: 44, vis: 0, pele: '#f6d3bb', cor: '#34231b', cab: '#3a2a1a', camisa: '#c0392b', dir: 'baixo', paradas: [{ c: 20, r: 44, espera: [9000, 15000] }, { c: 15, r: 34, espera: [4000, 6000] }, { c: 7, r: 45, espera: [4000, 6000] }] }, { id: 'luki', nome: 'Luki', c: 27, r: 8, vis: 0, pele: '#c98a5e', cor: '#2f4a6a', cab: '#1b1020', camisa: '#f0b830', dir: 'baixo', paradas: [{ c: 27, r: 8, espera: [8000, 14000] }, { c: 32, r: 3, espera: [3000, 5000] }, { c: 33, r: 8, espera: [3000, 5000] }] }, { id: 'jony', nome: 'Jony', c: 4, r: 55, vis: 0, pele: '#8a5a3a', cor: '#3a5a3a', cab: '#b8501f', camisa: '#7a4ab8', dir: 'baixo', paradas: [{ c: 4, r: 55, espera: [10000, 16000] }, { c: 7, r: 56, espera: [5000, 8000] }, { c: 5, r: 51, espera: [4000, 6000] }] }],
+      ginasios: { G: 'dan' },
       portais: { '^': { area: 'rota1', c: 13, r: 61 }, '<': { area: 'lago', c: 33, r: 26 }, '>': { area: 'fazenda', c: 2, r: 22 } } },
   };
 })();

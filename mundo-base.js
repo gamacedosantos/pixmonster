@@ -1,6 +1,6 @@
 // Construtor de areas do PixMonster (W0 do PLANO-fases.md). Monta uma area de floresta/lago no estilo do Bosque (identidade visual v2: tiles de 16 px, camera reta, arvores B e D, mato alto,
 // agua animada, trilha, props sorteados) a partir de um arquivo de dados `spec` (ver mundo7.js, a Floresta Oculta, como exemplo). O `spec` traz o tamanho (W x H tiles), o terreno (callback com
-// ret/mato/aguaRet), predios ([imagem, col, lin, larg, alt] em tiles; a base bloqueia), props fixos, imagens extras, recolorir (troca de canais, ex.: { ginasio_f: 'rb' }), densidade das arvores, portas L (loja) e G (ginasio), as saidas sem arvore (vaoSul/vaoNorte: colunas pares; vaoOeste/vaoLeste: linhas pares R e R+2 para um portal nas linhas R e R+1), a tinta do chao, a camada de cor e os vagalumes, os NPCs e os portais. Registra a area em window.PixmonAreasExtra[spec.id],
+// ret/mato/aguaRet), sprites (imagens desenhadas em codigo: { nome: { w, h, desenhar(g, w, h) } }, usadas em predios), muros (castelo: 'R' vira parede de pedra e some a borda de arvores), glifos (C bau, K chave, D porta trancada, X teleporte), eventos ({ C: 'bau', K: 'chave', D: 'porta' }), predios ([imagem, col, lin, larg, alt] em tiles; a base bloqueia), props fixos, imagens extras, recolorir (troca de canais, ex.: { ginasio_f: 'rb' }), densidade das arvores, portas L (loja) e G (ginasio), as saidas sem arvore (vaoSul/vaoNorte: colunas pares; vaoOeste/vaoLeste: linhas pares R e R+2 para um portal nas linhas R e R+1), a tinta do chao, a camada de cor e os vagalumes, os NPCs e os portais. Registra a area em window.PixmonAreasExtra[spec.id],
 // que o mundo.js carrega. Tamanho de referencia das areas novas: ~60x110 tiles (3x em area).
 (function () {
   function criar(spec) {
@@ -21,7 +21,7 @@
 
   // ---- arvores geradas em grade com sorteio: sempre longe de trilha, clareira, agua e mato alto (a copa nunca cai na trilha) ----
   const arvB = [], arvD = [];
-  const perigo = (ch, tolMato) => ',~^vP<>LG'.includes(ch) || (!tolMato && ch === '"');
+  const perigo = (ch, tolMato) => ',~^vP<>LGCKDX'.includes(ch) || (!tolMato && ch === '"');
   const margemLivre = (c0, r0, c1, r1, tolMato = false) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { if (c < 0 || r < 0 || c >= W || r >= H) return false; if (perigo(grade[r][c], tolMato)) return false; } return true; };
   const tentar = (c, r, sem, pB, pD) => { // sorteia uma arvore B (2x2) ou D (2x1, copa 2 tiles acima) perto de (c, r); so entra se a base e a margem estiverem livres
     const cc = c + (hsh(c, r, sem) % 2), rr = r + (hsh(c, r, sem + 1) % 2), p = hsh(c, r, sem + 2);
@@ -64,13 +64,27 @@
     L.forEach((l, j) => [...l].forEach((ch, i) => { if (ch === '.') return; g.fillStyle = PALT[v][ch]; g.fillRect(i, j, 1, 1); }));
     return c;
   }
+  // tijolos de pedra (castelo): topo claro, rejunte escuro e base sombreada, com juntas deslocadas por fileira
+  function pedra(g, x, y, h) {
+    g.fillStyle = '#585c74'; g.fillRect(x, y, 16, 16); g.fillStyle = '#8a8ea8'; g.fillRect(x, y, 16, 3); g.fillStyle = '#464960'; g.fillRect(x, y + 13, 16, 3);
+    g.fillStyle = '#3a3c52'; for (let j = 0; j < 3; j++) { const yy = y + 3 + j * 4; g.fillRect(x, yy + 3, 16, 1); const off = (j % 2) * 4; for (let i = 0; i < 3; i++) g.fillRect(x + off + i * 8 + (h % 3), yy, 1, 3); }
+  }
+  // glifos de chao: C bau, K chave, D porta trancada, X teleporte (posicoes lidas do mapa)
+  const glifos = []; if (spec.glifos) mapa.forEach((l, r) => [...l].forEach((ch, c) => { if ('CKDX'.includes(ch)) glifos.push([ch, c, r]); }));
+  const colet = (ch) => !!(window.PixmonColetados && window.PixmonColetados[spec.id + ':' + ch]); // o index.html marca o que o jogador ja pegou
+  function glifo(g, ch, x, y, t) {
+    if (ch === 'C') { const ab = colet('C'); g.fillStyle = '#1b1020'; g.fillRect(x + 1, y + 4, 14, 11); g.fillStyle = ab ? '#3a2410' : '#8a5a2a'; g.fillRect(x + 2, y + 6, 12, 8); g.fillStyle = ab ? '#5a3a1a' : '#a8793f'; g.fillRect(x + 2, y + (ab ? 2 : 5), 12, 3); g.fillStyle = '#ffd35a'; g.fillRect(x + 7, y + (ab ? 4 : 7), 2, 3); }
+    else if (ch === 'K') { if (colet('K')) return; const b = Math.round(Math.sin(t / 300) * 2); g.fillStyle = '#1b1020'; g.fillRect(x + 4, y + 2 + b, 8, 12); g.fillStyle = '#ffd35a'; g.fillRect(x + 5, y + 3 + b, 6, 4); g.fillRect(x + 7, y + 7 + b, 2, 6); g.fillRect(x + 9, y + 11 + b, 2, 1); g.fillStyle = '#1b1020'; g.fillRect(x + 7, y + 4 + b, 2, 2); }
+    else if (ch === 'D') { g.fillStyle = '#2a2a38'; g.fillRect(x, y, 16, 16); g.fillStyle = '#4a4d62'; for (let i = 0; i < 4; i++) g.fillRect(x + 2 + i * 4, y + 1, 2, 14); g.fillStyle = '#ffd35a'; g.fillRect(x + 7, y + 7, 2, 3); }
+    else if (ch === 'X') { const q = 0.5 + 0.5 * Math.sin(t / 250); g.fillStyle = 'rgba(180,120,255,' + (0.25 + 0.2 * q).toFixed(2) + ')'; g.beginPath(); g.ellipse(x + 8, y + 10, 8, 4, 0, 0, Math.PI * 2); g.fill(); g.strokeStyle = 'rgba(236,200,255,' + (0.7 + 0.3 * q).toFixed(2) + ')'; g.beginPath(); g.ellipse(x + 8, y + 10, 7 + q, 3 + q / 2, 0, 0, Math.PI * 2); g.stroke(); g.fillStyle = '#ffffff'; g.fillRect(x + 7, y + 6 - Math.round(q * 3), 2, 2); }
+  }
   let TUFO = null;
-  Promise.all([Promise.all(Object.keys(arqs).map(carregar)).then(() => { for (const [k, modo] of Object.entries(spec.recolorir || {})) { const im = IM[k]; if (!im) continue; const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height), p = d.data; if (modo === 'rb') for (let i = 0; i < p.length; i += 4) { const r = p[i]; p[i] = p[i + 2]; p[i + 2] = r; } x.putImageData(d, 0, 0); IM[k] = c; } }), fetch(D + 'chao_grama_caminho.json').then((r) => r.json()), fetch(D + 'agua_grama.json').then((r) => r.json())]).then(([, mc, ma]) => {
+  Promise.all([Promise.all(Object.keys(arqs).map(carregar)).then(() => { for (const [k, sp] of Object.entries(spec.sprites || {})) { const cv = document.createElement('canvas'); cv.width = sp.w; cv.height = sp.h; sp.desenhar(cv.getContext('2d'), sp.w, sp.h); IM[k] = cv; } for (const [k, modo] of Object.entries(spec.recolorir || {})) { const im = IM[k]; if (!im) continue; const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height), p = d.data; for (let i = 0; i < p.length; i += 4) { const r = p[i], gg = p[i + 1], b = p[i + 2]; if (modo === 'rb') { p[i] = b; p[i + 2] = r; } else if (modo === 'rg') { p[i] = gg; p[i + 1] = r; } else if (modo === 'gb') { p[i + 1] = b; p[i + 2] = gg; } else if (modo === 'amarelo') p[i + 1] = Math.max(gg, r * 0.85); else if (modo === 'cinza') { const m = (r + gg + b) / 3; p[i] = p[i + 1] = p[i + 2] = m; } else if (modo === 'frio') { p[i] = r * 0.75; p[i + 2] = Math.min(255, b * 1.15 + 10); } else if (modo === 'neve') { p[i] = Math.min(255, r * 0.5 + 110); p[i + 1] = Math.min(255, gg * 0.5 + 118); p[i + 2] = Math.min(255, b * 0.5 + 125); } } x.putImageData(d, 0, 0); IM[k] = c; } }), fetch(D + 'chao_grama_caminho.json').then((r) => r.json()), fetch(D + 'agua_grama.json').then((r) => r.json())]).then(([, mc, ma]) => {
     TUFO = { g: PALT.map((_, v) => [tufo('g', 0, v), tufo('g', 1, v)]), p: PALT.map((_, v) => [tufo('p', 0, v), tufo('p', 1, v)]) };
     const tc = tabela(mc), ta = tabela(ma), c = document.createElement('canvas'); c.width = W * T; c.height = H * T; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
     const cl = (x, y) => [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
     const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => { const [a, b] = cl(x, y); return f(a, b); });
-    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v<>LG'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
+    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v<>LGCKDX'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const ka = k(vA(x, y)) + k(vA(x + 1, y)) + k(vA(x, y + 1)) + k(vA(x + 1, y + 1));
       if (ka === 'llll') brilhos.push([x, y]);
@@ -80,10 +94,11 @@
     // escurece o chao: areia (trilha) vira terra suja e a grama fica mais fechada; a agua escurece pouco
     { const im = g.getImageData(0, 0, W * T, H * T), d = im.data;
       const TI = spec.tinta || { trilha: [0.72, 0.67, 0.6], agua: [0.82, 0.85, 0.9], grama: [0.72, 0.8, 0.74] }; // multiplicadores de r, g, b por tipo de chao
+      const aplica = (T, i, r, gg, b) => { if (T.lum) { const l = 0.3 * r + 0.59 * gg + 0.11 * b; d[i] = l * T.lum[0]; d[i + 1] = l * T.lum[1]; d[i + 2] = l * T.lum[2]; } else { d[i] = r * T[0]; d[i + 1] = gg * T[1]; d[i + 2] = b * T[2]; } }; // { lum: [r, g, b] } tira a cor e pinta pela luminosidade (rocha, neve)
       for (let i = 0; i < d.length; i += 4) { const r = d[i], gg = d[i + 1], b = d[i + 2]; if (!d[i + 3]) continue;
-        if (r > 190 && r - b > 45) { d[i] = r * TI.trilha[0]; d[i + 1] = gg * TI.trilha[1]; d[i + 2] = b * TI.trilha[2]; }
-        else if (b > r + 20 && b > gg) { d[i] = r * TI.agua[0]; d[i + 1] = gg * TI.agua[1]; d[i + 2] = b * TI.agua[2]; }
-        else { d[i] = r * TI.grama[0]; d[i + 1] = gg * TI.grama[1]; d[i + 2] = b * TI.grama[2]; } }
+        if (r > 190 && r - b > 45) aplica(TI.trilha, i, r, gg, b);
+        else if (b > r + 20 && b > gg) aplica(TI.agua, i, r, gg, b);
+        else aplica(TI.grama, i, r, gg, b); }
       g.putImageData(im, 0, 0); }
     // textura suja: pontinhos analogos na grama (mais densos que na Rota 1) e na trilha (terra escura, folhas e pedrinhas)
     const GRAMA = ['#2c5f35', '#356d3e', '#27562f', '#7bb868', '#a6bd70', '#4a7030'], TERRA = ['#6b5336', '#7d6240', '#5a452c', '#8f7650', '#4a3a26'];
@@ -107,6 +122,7 @@
       else if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([a2, b2]) => ehMato(cx + a2, cy + b2)) && hsh(gx, gy, 24) < 120 && livreTufo(x, y)) tufos.push([x, y, 'p', hsh(gx, gy, 25)]);
     }
     tufos.sort((p, q) => p[1] - q[1]);
+    if (spec.muros) for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (mapa[y][x] === 'R') pedra(g, x * T, y * T, hsh(x, y, 7)); // castelo: 'R' vira muro de pedra
     chao = c; pronto = true;
   });
 
@@ -121,9 +137,10 @@
     for (const [x, y] of brilhos) { if (y * T < cy - 16 || y * T > cy + RES[1]) continue; const h = (x * 7 + y * 13) % 16, o = (x * 5 + y * 11) % 3;
       g.fillStyle = 'rgba(190,225,250,.5)'; g.fillRect(x * T + ((h + t / 160) % 16 | 0) % 14, y * T + 3 + o * 5, 4, 1); g.fillRect(x * T + ((h * 3 + 9 + t / 200) % 16 | 0) % 14, y * T + 9 + o * 2, 3, 1);
       g.fillStyle = 'rgba(20,50,100,.3)'; g.fillRect(x * T + ((h + 5 + t / 240) % 16 | 0) % 14, y * T + 6 + o * 3, 5, 1); }
+    for (const [ch, c, r] of glifos) { if (r * T < cy - 16 || r * T > cy + RES[1]) continue; glifo(g, ch, c * T, r * T, performance.now()); }
     const objs = extras.slice(), img = (k, x, y) => g.drawImage(IM[k], Math.round(x), Math.round(y)), visivel = (y) => y > cy - 60 && y < cy + RES[1] + 90;
-    for (let c = 0; c < W; c += 2) { if (!(spec.vaoNorte || []).includes(c)) objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); if (!(spec.vaoSul || []).includes(c)) objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); }
-    for (let r = 2; r < H - 2; r += 2) { if (!(spec.vaoOeste || []).includes(r)) objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); if (!(spec.vaoLeste || []).includes(r)) objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); }
+    if (!spec.muros) for (let c = 0; c < W; c += 2) { if (!(spec.vaoNorte || []).includes(c)) objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); if (!(spec.vaoSul || []).includes(c)) objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); }
+    if (!spec.muros) for (let r = 2; r < H - 2; r += 2) { if (!(spec.vaoOeste || []).includes(r)) objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); if (!(spec.vaoLeste || []).includes(r)) objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); }
     arvB.forEach(([c, r]) => objs.push({ y: (r + 2) * T, f: () => img('arvore_b', c * T, (r + 2) * T - 40) }));
     arvD.forEach(([c, r]) => objs.push({ y: (r + 1) * T, f: () => img('arvore_d', c * T, (r + 1) * T - 48) }));
     predios.forEach(([k, c, r, w, h]) => objs.push({ y: (r + h) * T, f: () => { const im = IM[k]; if (im) g.drawImage(im, Math.round((c + w / 2) * T - im.width / 2), Math.round((r + h) * T - im.height + 1)); } }));
@@ -144,7 +161,7 @@
   }
 
   const out = { desenhar, RES,
-    area: { nome: spec.nome, largura: W, bioma: spec.bioma || 'floresta', elemento: spec.elemento || null, soEvo: spec.soEvo, nvMais: spec.nvMais, v2: true, T, res: RES, mapa, bloq, desenhar, npcs: spec.npcs || [], portais: spec.portais || {}, ginasios: spec.ginasios || null } };
+    area: { nome: spec.nome, largura: W, bioma: spec.bioma || 'floresta', elemento: spec.elemento || null, soEvo: spec.soEvo, nvMais: spec.nvMais, v2: true, T, res: RES, mapa, bloq, desenhar, npcs: spec.npcs || [], portais: spec.portais || {}, ginasios: spec.ginasios || null, eventos: spec.eventos || null } };
   if (spec.id) (window.PixmonAreasExtra = window.PixmonAreasExtra || {})[spec.id] = out.area;
   return out;
   }

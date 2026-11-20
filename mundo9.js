@@ -1,8 +1,8 @@
 // Vila da Agua (identidade visual v2), a oeste do Lago 2: so os dados; o desenho vem do construtor mundo-base.js (estilo de vila). 60 x 110 tiles (3x em area, W1 do PLANO-fases.md).
 // Avenida norte-sul com o ginasio no topo (a porta G chama a lider Tati), praca com fonte e loja (porta L), duas ruas de casas, lagoa do porto a oeste e outra a leste, mato alto nas bordas.
-// Legenda: . grama · , rua/praca · " mato alto · ~ agua · T arvore (muro) · L porta da loja · G porta do ginasio · > saida para o Lago 2 (leste). A saida oeste (Praia) entra com a Praia.
+// Legenda: . grama · , rua/praca · " mato alto · ~ agua · T arvore (muro) · L porta da loja · G porta do ginasio · > saida para o Lago 2 (leste). < saida para a Praia (oeste).
 window.PixmonMundo9 = window.PixmonBase.criar({
-  id: 'vilaagua', nome: 'Vila da Água', W: 60, H: 110, bioma: 'lago', elemento: 'agua', nvMais: 1, densidade: 0.3, semAleatorios: true, vaoLeste: [60, 62],
+  id: 'vilaagua', nome: 'Vila da Água', W: 60, H: 110, bioma: 'lago', elemento: 'agua', nvMais: 1, densidade: 0.3, semAleatorios: true, vaoLeste: [60, 62], vaoOeste: [38, 40],
   tinta: { trilha: [0.95, 0.9, 0.85], agua: [1, 1, 1], grama: [0.95, 1, 0.95] },
   recolorir: { ginasio_f: 'rb' }, // o ginasio de agua: o telhado vermelho vira azul
   imagens: { casa_1_f: 'casa_1_f.png', casa_2_f: 'casa_2_f.png', casa_3_f: 'casa_3_f.png', loja_f: 'loja_f.png', ginasio_f: 'ginasio_f.png', fonte: 'fonte.png', horta: 'horta.png', flores: 'flores.png',
@@ -14,6 +14,7 @@ window.PixmonMundo9 = window.PixmonBase.criar({
     mato(3, 8, 20, 30); mato(40, 8, 57, 30); mato(3, 92, 26, 105); mato(33, 92, 57, 105);
     ret(0, 0, 59, 1, 'T'); ret(0, 108, 59, 109, 'T'); ret(0, 0, 1, 109, 'T'); ret(58, 0, 59, 109, 'T');
     ret(54, 60, 59, 61, ','); grade[60][59] = grade[61][59] = '>';
+    ret(0, 38, 7, 39, ','); grade[38][0] = grade[39][0] = '<';                            // saida oeste para a Praia
     grade[19][29] = grade[19][30] = 'G';                                                 // porta do ginasio (embaixo do predio)
     grade[61][22] = grade[61][23] = 'L';                                                 // porta da loja
   },
@@ -31,5 +32,5 @@ window.PixmonMundo9 = window.PixmonBase.criar({
     { id: 'beto', nome: 'Beto', pele: '#d8a878', c: 30, r: 24, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#2f78a8', cab: '#ffd35a' },
   ],
   ginasios: { G: 'tati' },
-  portais: { '>': { area: 'lago2', c: 2, r: 60 } },
+  portais: { '>': { area: 'lago2', c: 2, r: 60 }, '<': { area: 'praia', c: 57, r: 60 } },
 });

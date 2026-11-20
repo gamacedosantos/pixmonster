@@ -406,6 +406,17 @@
 <script src="mundo7.js"></script>
 <script src="mundo8.js"></script>
 <script src="mundo9.js"></script>
+<script src="mundo10.js"></script>
+<script src="mundo11.js"></script>
+<script src="mundo12.js"></script>
+<script src="mundo13.js"></script>
+<script src="mundo14.js"></script>
+<script src="mundo15.js"></script>
+<script src="mundo16.js"></script>
+<script src="mundo17.js"></script>
+<script src="mundo18.js"></script>
+<script src="mundo19.js"></script>
+<script src="mundo20.js"></script>
 <script src="mundo.js"></script>
 <script>
 (function () {
@@ -782,7 +793,7 @@
   // ---------- jogo do mundo (Fase B): coleção, níveis, captura ----------
   const JOGO_K = 'pixmon-jogo', INICIAIS = ['fagulhao', 'mareal', 'brotinho'];
   let jogo = { v: 1, col: {}, eq: [], esf: 5, venc: {}, din: 40, esfF: 0, poc: 2 }, capt = false, nvSel = 5, biomaMundo = null, trMundo = null, selvagemEvo = false, evoTentou = new Set(); // trMundo: treinador do mapa que está lutando
-  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
+  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.achados = Array.isArray(jogo.achados) ? jogo.achados : []; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
   // Ginásios (PLANO-fases.md): ordem obrigatória Água, Vento, Raio, Pedra, Fogo; para desafiar qualquer um: 6 pixmons capturados e 20 batalhas contra treinadores (vitória ou derrota).
   // As regras ficam DESLIGADAS enquanto as fases são criadas (decisão do George): é só trocar REGRAS_GINASIO para true. jogo.lutas conta as lutas com treinadores do mapa; jogo.ins guarda os ids dos líderes vencidos.
   const REGRAS_GINASIO = false, ORDEM_GINASIOS = ['tati', 'laura', 'du', 'guto', 'dan'], GINASIO_CAPTURADOS = 6, GINASIO_LUTAS = 20;
@@ -794,6 +805,7 @@
     if (i > 0 && !jogo.ins.includes(ORDEM_GINASIOS[i - 1])) faltam.push('vença antes o ginásio anterior (' + ORDEM_GINASIOS[i - 1] + ')');
     return { ok: !faltam.length, faltam };
   }
+  window.PixmonColetados = {}; jogo.achados.forEach((k) => { window.PixmonColetados[k] = true; }); // o que ja foi pego no mapa (bau, chave): o construtor desenha o bau aberto e some com a chave
   const salvarJogo = () => { try { localStorage.setItem(JOGO_K, JSON.stringify(jogo)); } catch (e) { /* sem save */ } };
   const idxDe = (id) => B.MONSTROS.findIndex((m) => m.id === id);
   const fator = (nv) => 1 + 0.05 * (nv - 10); // nível 10 = status base
@@ -907,13 +919,19 @@
       trMundo = B.treinadorPorId(id); const med = jogo.eq.reduce((a, i) => a + jogo.col[i].nv, 0) / jogo.eq.length;
       nvSel = Math.max(3, Math.min(30, Math.round(med) + trMundo.nivel - 1)); mundoEl.hidden = true;
       const AR = window.PixmonMundo.AREAS[window.PixmonMundo.estado().area] || {};
-      iniciar(jogo.eq.map(idxDe), id === 'tomas' || ORDEM_GINASIOS.includes(id) ? 'ginasio' : (AR.bioma || null));
+      iniciar(jogo.eq.map(idxDe), ORDEM_GINASIOS.includes(id) ? 'ginasio' : (AR.bioma || null));
     };
     const comecar = () => window.PixmonMundo.iniciar(document.getElementById('mundoCv'), { encontro: (a) => {
       const AR = window.PixmonMundo.AREAS[a] || {}; biomaMundo = AR.bioma || null;
       trMundo = null; selvagem = sortearSelvagem(AR.elemento, AR.soEvo); selvagemEvo = !!B.EVOLUCOES[B.MONSTROS[selvagem].id] && (AR.soEvo || Math.random() < CHANCE_SELVAGEM_EVO); // Floresta Oculta: só evoluídos
       const med = jogo.eq.reduce((a, id) => a + jogo.col[id].nv, 0) / jogo.eq.length; nvSel = Math.max(2, Math.min(30, Math.round(med) + Math.floor(Math.random() * 3) - 1 + (AR.nvMais || 0))); // áreas fortes somam níveis
       mundoEl.hidden = true; iniciar(jogo.eq.map(idxDe), biomaMundo);
+    }, evento: (tipo, a, ch) => { // baú, chave e porta trancada do Castelo
+      const M = window.PixmonMundo, k = a + ':' + ch, tem = jogo.achados.includes(k), chave = jogo.achados.includes('castelo:K');
+      if (tipo === 'bau') { if (tem) M.aviso('O baú está vazio.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; jogo.esfF += 3; jogo.poc += 3; jogo.din += 150; salvarJogo(); atualizarEsfera(); M.aviso('Baú: +itens e moedas!'); } }
+      else if (tipo === 'chave') { if (tem) M.aviso('Você já pegou a chave.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; salvarJogo(); M.aviso('Você pegou a Chave do Castelo!'); } }
+      else if (tipo === 'porta') M.aviso(chave ? 'Selada por magia (em breve)' : 'Trancada: falta uma chave');
+      M.retomar();
     }, loja: abrirLoja, area: (a) => S.mundo(a), vencido: (id) => !!jogo.venc[id], ginasio: (id) => { // porta do ginasio: confere as regras (desligadas por enquanto) e chama o lider
       const tr = B.treinadorPorId(id), r = podeEntrarGinasio(id), M = window.PixmonMundo;
       if (jogo.venc[id]) { M.aviso('Você já venceu ' + tr.nome); M.retomar(); return; }

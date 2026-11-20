@@ -17,11 +17,12 @@
   for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; }
   ret(0, 0, 35, 1, 'T'); ret(0, 62, 35, 63, 'T'); ret(0, 0, 1, 63, 'T'); ret(34, 0, 35, 63, 'T');
   ret(17, 62, 18, 63, ','); grade[63][17] = grade[63][18] = 'v';
+  ret(0, 44, 9, 45, ','); grade[44][0] = grade[45][0] = '<'; // saida oeste para a Floresta Escondida
   ret(12, 0, 13, 6, ','); grade[0][12] = grade[0][13] = '^'; // saida norte para a Floresta Oculta (clareira do monolito)
 
   // ---- arvores geradas em grade com sorteio: sempre longe de trilha, clareira, agua e mato alto (a copa nunca cai na trilha) ----
   const arvB = [], arvD = [];
-  const perigo = (ch, tolMato) => ',~^vP'.includes(ch) || (!tolMato && ch === '"');
+  const perigo = (ch, tolMato) => ',~^vP<'.includes(ch) || (!tolMato && ch === '"');
   const margemLivre = (c0, r0, c1, r1, tolMato = false) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { if (c < 0 || r < 0 || c >= W || r >= H) return false; if (perigo(grade[r][c], tolMato)) return false; } return true; };
   const tentar = (c, r, sem, pB, pD) => { // sorteia uma arvore B (2x2) ou D (2x1, copa 2 tiles acima) perto de (c, r); so entra se a base e a margem estiverem livres
     const cc = c + (hsh(c, r, sem) % 2), rr = r + (hsh(c, r, sem + 1) % 2), p = hsh(c, r, sem + 2);
@@ -70,7 +71,7 @@
     const tc = tabela(mc), ta = tabela(ma), c = document.createElement('canvas'); c.width = W * T; c.height = H * T; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
     const cl = (x, y) => [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
     const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => { const [a, b] = cl(x, y); return f(a, b); });
-    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
+    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v<'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const ka = k(vA(x, y)) + k(vA(x + 1, y)) + k(vA(x, y + 1)) + k(vA(x + 1, y + 1));
       if (ka === 'llll') brilhos.push([x, y]);
@@ -99,7 +100,7 @@
     }
     // posicoes dos tufos de mato alto (favo de mel ralo, bordas irregulares, zona segura de 10 px em volta da trilha)
     const ehMato = (cx, cy) => cx >= 0 && cy >= 0 && cx < W && cy < H && mapa[cy][cx] === '"';
-    const livreTufo = (x, y) => { const cx0 = Math.floor(x / T), cy0 = Math.floor(y / T); for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) { const cx = cx0 + i, cy = cy0 + j; if (cx < 0 || cy < 0 || cx >= W || cy >= H) return false; const ch = mapa[cy][cx], dx = Math.max(cx * T - (x + 5), (x - 5) - (cx + 1) * T, 0), dy = Math.max(cy * T - y, (y - 8) - (cy + 1) * T, 0), d = Math.hypot(dx, dy); if (',^v'.includes(ch) && d < 10) return false; if (ch !== '.' && ch !== '"' && d < 1) return false; if (bloq.has(cel(cx, cy)) && d < 1) return false; } return true; };
+    const livreTufo = (x, y) => { const cx0 = Math.floor(x / T), cy0 = Math.floor(y / T); for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) { const cx = cx0 + i, cy = cy0 + j; if (cx < 0 || cy < 0 || cx >= W || cy >= H) return false; const ch = mapa[cy][cx], dx = Math.max(cx * T - (x + 5), (x - 5) - (cx + 1) * T, 0), dy = Math.max(cy * T - y, (y - 8) - (cy + 1) * T, 0), d = Math.hypot(dx, dy); if (',^v<'.includes(ch) && d < 10) return false; if (ch !== '.' && ch !== '"' && d < 1) return false; if (bloq.has(cel(cx, cy)) && d < 1) return false; } return true; };
     for (let gy = 0; gy < H * 2; gy++) for (let gx = 0; gx < W * 1.7; gx++) {
       const x = gx * 10 + (gy % 2) * 5 + (hsh(gx, gy, 20) % 5) - 2, y = gy * 8 + (hsh(gx, gy, 21) % 4), cx = Math.floor(x / T), cy = Math.floor(y / T);
       if (ehMato(cx, cy)) { const borda = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]].some(([a2, b2]) => !ehMato(cx + a2, cy + b2)); if (hsh(gx, gy, 22) < (borda ? 400 : 580) && livreTufo(x, y)) tufos.push([x, y, borda ? 'p' : 'g', hsh(gx, gy, 23)]); }
@@ -110,7 +111,7 @@
   });
 
   // ---- desenho ----
-  const SETA = { v: [0, 1], '^': [0, -1] };
+  const SETA = { v: [0, 1], '^': [0, -1], '<': [-1, 0] };
   function desenhar(g, cx, cy, extras) {
     g.fillStyle = '#5f8f55'; g.fillRect(0, 0, RES[0], RES[1]);
     if (!pronto) return;
@@ -122,7 +123,7 @@
       g.fillStyle = 'rgba(20,50,100,.3)'; g.fillRect(x * T + ((h + 5 + t / 240) % 16 | 0) % 14, y * T + 6 + o * 3, 5, 1); }
     const objs = extras.slice(), img = (k, x, y) => g.drawImage(IM[k], Math.round(x), Math.round(y)), visivel = (y) => y > cy - 60 && y < cy + RES[1] + 90;
     for (let c = 0; c < W; c += 2) { if (c !== 12) objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); if (![16, 18].includes(c)) objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); }
-    for (let r = 2; r < H - 2; r += 2) { objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); }
+    for (let r = 2; r < H - 2; r += 2) { if (![44, 46].includes(r)) objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); }
     arvB.forEach(([c, r]) => objs.push({ y: (r + 2) * T, f: () => img('arvore_b', c * T, (r + 2) * T - 40) }));
     arvD.forEach(([c, r]) => objs.push({ y: (r + 1) * T, f: () => img('arvore_d', c * T, (r + 1) * T - 48) }));
     props.forEach(([k, c, r, w]) => objs.push({ y: (r + 1) * T, f: () => { const im = IM[k]; if (im) g.drawImage(im, Math.round((c + w / 2) * T - im.width / 2), (r + 1) * T - im.height); } }));
@@ -138,6 +139,6 @@
     desenhar, RES,
     area: { nome: 'Bosque', largura: W, bioma: 'floresta', elemento: 'ar', v2: true, T, res: RES, mapa, bloq, desenhar,
       npcs: [{ id: 'davi', nome: 'Iuri', pele: '#f0c8a0', c: 14, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#6a3aa8', cab: '#ffd35a' }],
-      portais: { v: { area: 'rota1', c: 13, r: 2 }, '^': { area: 'oculta', c: 12, r: 61 } } },
+      portais: { v: { area: 'rota1', c: 13, r: 2 }, '^': { area: 'oculta', c: 12, r: 61 }, '<': { area: 'escondida', c: 57, r: 30 } } },
   };
 })();

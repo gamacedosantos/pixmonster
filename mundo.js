@@ -499,6 +499,7 @@
           px = col * T + T / 2; py = lin * T + T; mostrarAviso(AREAS[area].nome); salvar(); vigiar(); if (cb.area) cb.area(area);
         } else if (ch === '"' && Math.random() < CHANCE) { flash = 700; salvar(); }
         else if (AREAS[area].ginasios && AREAS[area].ginasios[ch] && cb.ginasio) { salvar(); pausado = true; cb.ginasio(AREAS[area].ginasios[ch]); } // porta do ginásio: chama o líder (regras em index.html)
+        else if (AREAS[area].eventos && AREAS[area].eventos[ch] && cb.evento) { salvar(); pausado = true; cb.evento(AREAS[area].eventos[ch], area, ch); } // bau, chave, porta trancada (regras em index.html)
         else if (ch === 'L' && cb.loja) { salvar(); pausado = true; cb.loja(); }
         else { if (passos % 5 === 0) salvar(); vigiar(); }
       }

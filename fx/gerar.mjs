@@ -26,6 +26,10 @@ const CATALOGO = {
   "agua-orbe": { id: "water/water-orb", opts: { palette: PAL.agua }, quadros: null },
   "eletrico-bola": { id: "lightning/ball-lightning", opts: { palette: PAL.eletrico }, quadros: null },
   "ar-folhas": { id: "nature/leaf-storm", opts: { palette: PAL.ar }, quadros: null },
+  // Lightbeam (teste): feixe arcano de 168 px saindo da mão, com chama na origem e no fim; a arena estica e gira conforme a distância
+  "feixe-arcano": { id: "arcane/arcane-beam", opts: {}, quadros: null },
+  // carga do Lightbeam (teste): energia em espiral numa esfera na mão (120x86, mão em 59,58), 1,6 s em loop
+  "carga-arcana": { id: "arcane/spell-charge", opts: {}, quadros: null },
   // impactos (uma vez)
   "fogo-impacto": { id: "fire/meteor", opts: { palette: PAL.fogo }, quadros: 24 },
   "agua-impacto": { id: "water/splash", opts: { palette: PAL.agua }, quadros: 30 },
