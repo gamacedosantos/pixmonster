@@ -195,6 +195,26 @@
       const s = c.createBufferSource(), f = c.createBiquadFilter(); s.buffer = ruidoBuf(c); s.loop = true; f.type = 'bandpass'; f.Q.value = 1.5; f.frequency.value = 3200; s.connect(f); sust(f, 0.45); s.start(t); s.stop(t + T + 0.02);
       fm(c, d, f0 * 12, 1.5, 4, T, 0.16, 0.02);
     },
+    // Supernova, carga (dur em segundos): zumbido grave que sobe até um grito agudo, ruído que incha, pulsos de grave cada vez mais rápidos e um brilho metálico
+    supernovaCarga: (c, dur = 1.2, pan = 0) => {
+      const d = canal(c, pan, 0.5);
+      tom(c, d, 'sawtooth', 45, 700, dur, 0.28, 0, dur * 0.7); tom(c, d, 'sine', 40, 220, dur, 0.7, 0, dur * 0.4);
+      sopro(c, d, 'bandpass', 200, 7000, dur, 0.6, 0, 2, dur * 0.8); fm(c, d, 300, 2.01, 3, dur, 0.15);
+      for (let i = 0; i < 12; i++) tom(c, d, 'sine', 90, 45, 0.12, 0.5 + 0.05 * i, dur * Math.pow(i / 12, 0.55)); // pulsos que aceleram
+      sopro(c, d, 'highpass', 4000, 10000, 0.15, 0.6, dur - 0.12, 0.7, 0.1);
+    },
+    // Supernova, explosão (o grande impacto): estalo, soco de sub-grave, onda de ruído que varre, rumor longo, anel metálico, acorde sombrio e detritos caindo
+    supernova: (c, pan = 0) => {
+      const d = canal(c, pan, 0.7);
+      sopro(c, d, 'highpass', 3000, 9500, 0.1, 1.3); tom(c, d, 'sine', 240, 28, 0.3, 1.0);
+      tom(c, d, 'sine', 120, 18, 1.8, 1.0, 0.03); tom(c, d, 'sawtooth', 90, 30, 0.9, 0.3, 0.03);
+      sopro(c, d, 'lowpass', 7000, 150, 1.5, 1.0, 0.02, 0.8, 0.01); sopro(c, d, 'bandpass', 5000, 180, 1.2, 0.8, 0.05, 1.2, 0.02);
+      fm(c, d, 520, 1.41, 3, 1.5, 0.28, 0.05);
+      [65.4, 98, 130.8, 196, 261.6].forEach((f, i) => tom(c, d, 'triangle', f, f * 0.98, 1.7, 0.2, 0.06 + i * 0.02));
+      tom(c, d, 'sine', 55, 28, 2.0, 0.7, 0.25);
+      for (let i = 0; i < 12; i++) sopro(c, d, 'highpass', alea(2500, 5500), 4000, 0.03, 0.5, 0.2 + alea(0, 1.1)); // detritos
+      [0.35, 0.6].forEach((q, i) => tom(c, d, 'sine', 1800 - i * 500, 900, 0.3, 0.12, q)); // ecos do anel
+    },
     // Frenesi (ativa o buff): grito grave que sobe, rugido de ruído que incha e três pulsos de força
     frenesi: (c, pan = 0) => {
       const d = canal(c, pan, 0.4);

@@ -95,18 +95,18 @@
   const MONSTROS = [
     { id: 'fagulhao', nome: 'Fagulhão', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.95, cg: 0.9, golpes: h(['Faísca', 'fogo'], ['Labareda', 'fogo'], 'Manto de Brasas', 'Tempestade de Brasas', 'eletrico') },
     { id: 'chamuscao', nome: 'Chamuscão', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.05, cg: 1.15, golpes: h(['Brasa Curta', 'fogo'], ['Cinza Quente', 'fogo'], 'Muralha de Cinzas', 'Tormenta Roxa', 'eletrico') },
-    { id: 'mareal', nome: 'Mareal', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.0, cg: 1.0, golpes: h(['Jato', 'agua'], ['Onda Funda', 'agua'], 'Bolha Protetora', 'Avalanche de Pedras', 'terra') },
+    { id: 'mareal', nome: 'Mareal', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.0, cg: 1.0, golpes: h(['Jato', 'agua'], ['Onda Funda', 'agua'], 'Bolha Protetora', 'Esfera da Maré', 'terra') },
     { id: 'pingolino', nome: 'Pingolino', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.85, cg: 0.8, golpes: h(['Borrifo', 'agua'], ['Redemoinho', 'agua'], 'Escudo de Névoa', 'Maré de Lama', 'terra') },
     { id: 'brotinho', nome: 'Brotinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.05, cg: 1.1, golpes: h(['Espinho', 'terra'], ['Pedregulho', 'terra'], 'Casca Dura', 'Chuva de Fagulhas', 'fogo') },
     { id: 'musgarra', nome: 'Musgarra', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.25, golpes: h(['Rocha Baixa', 'terra'], ['Deslizamento', 'terra'], 'Muralha de Musgo', 'Erupção Surda', 'fogo') },
     { id: 'ventinho', nome: 'Ventinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.8, cg: 0.75, golpes: h(['Sopro', 'ar'], ['Rajada', 'ar'], 'Bolha de Vento', 'Aguaceiro Furioso', 'agua') },
-    { id: 'nuvelino', nome: 'Nuvelino', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.15, golpes: h(['Brisa', 'ar'], ['Ciclone', 'ar'], 'Nevoeiro', 'Dilúvio', 'agua') },
+    { id: 'nuvelino', nome: 'Nuvelino', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.15, golpes: h(['Brisa', 'ar'], ['Ciclone', 'ar'], 'Nevoeiro', 'Esfera da Tormenta', 'agua') },
     { id: 'faiscao', nome: 'Faiscão', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.85, cg: 0.7, golpes: h(['Choquinho', 'eletrico'], ['Relâmpago', 'eletrico'], 'Gaiola Elétrica', 'Furacão de Raios', 'ar') },
-    { id: 'trovinho', nome: 'Trovinho', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.3, golpes: h(['Faísca Azul', 'eletrico'], ['Trovão', 'eletrico'], 'Campo de Estática', 'Rasante Final', 'ar') },
+    { id: 'trovinho', nome: 'Trovinho', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.3, golpes: h(['Faísca Azul', 'eletrico'], ['Trovão', 'eletrico'], 'Campo de Estática', 'Esfera Trovejante', 'ar') },
     { id: 'brasinha', nome: 'Brasinha', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.9, cg: 0.85, raridade: 'comum', golpes: h(['Cuspe de Brasa', 'fogo'], ['Rabada Ardente', 'fogo'], 'Escama Quente', 'Trovão de Cinzas', 'eletrico') },
     { id: 'vulcanejo', nome: 'Vulcanejo', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.2, raridade: 'rara', golpes: h(['Pedra Quente', 'fogo'], ['Rolada de Lava', 'fogo'], 'Casco Vulcânico', 'Descarga de Magma', 'eletrico') },
     { id: 'algazinho', nome: 'Algazinho', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.92, cg: 0.95, raridade: 'comum', golpes: h(['Gosma', 'agua'], ['Chicote de Alga', 'agua'], 'Véu de Limo', 'Pedras do Fundo', 'terra') },
-    { id: 'coraline', nome: 'Coraline', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.08, cg: 1.12, raridade: 'rara', golpes: h(['Bolha Rosa', 'agua'], ['Galhada de Coral', 'agua'], 'Recife Vivo', 'Desabamento do Recife', 'terra') },
+    { id: 'coraline', nome: 'Coraline', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.08, cg: 1.12, raridade: 'rara', golpes: h(['Bolha Rosa', 'agua'], ['Galhada de Coral', 'agua'], 'Recife Vivo', 'Esfera do Recife', 'terra') },
     { id: 'pedrinho', nome: 'Pedrinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.12, cg: 1.18, raridade: 'comum', golpes: h(['Cascalho', 'terra'], ['Rolamento', 'terra'], 'Pele de Pedra', 'Brasa de Rocha', 'fogo') },
     { id: 'tatufungo', nome: 'Tatufungo', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1, cg: 1.05, raridade: 'rara', golpes: h(['Esporo', 'terra'], ['Cabeçada do Chapéu', 'terra'], 'Escudo de Cogumelo', 'Nuvem Ardente de Esporos', 'fogo') },
     { id: 'plumelho', nome: 'Plumelho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.82, cg: 0.78, raridade: 'comum', golpes: h(['Bicada', 'ar'], ['Mergulho Veloz', 'ar'], 'Penas Fofas', 'Chuva de Orvalho', 'agua') },
@@ -128,12 +128,14 @@
     frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha'],
     pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo'],
     nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo'],
+    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho'],
   };
-  Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.ultimate.poder = p; }));
+  Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { const m = MONSTROS.find((x) => x.id === id); m.golpes.ultimate.poder = p; if (p === 'esfera') m.golpes.ultimate.tipo = m.tipo; })); // a esfera gigante é do elemento do próprio monstro (sem cobrir a fraqueza como o ultimate comum), senão o golpe enorme vira o jogo contra quem tem vantagem
   // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
   // pulo (super pulo): a carga é o salto; depois de `subida` (fração da carga) o monstro fica no ar e intocável (ataques que o alcançam erram), e cai em área:
   // não pode ser esquivado e deixa o alvo atordoado por `stun` ms (se não for bloqueado). dano = multiplicador sobre o ultimate padrão.
-  const PODERES = { frenesi: { dur: 10000, dano: 1.35, ritmo: 1.5, custo: 0.01 }, pulo: { subida: 0.4, dano: 0.7, stun: 500 }, nova: { dano: 0.9, atravessa: 0.5 } };
+  const PODERES = { frenesi: { dur: 10000, dano: 1.35, ritmo: 1.5, custo: 0.01 }, pulo: { subida: 0.4, dano: 0.7, stun: 500 }, nova: { dano: 0.9, atravessa: 0.5 }, esfera: { carga: 2.4, cd: 1.5, dano: 2, atravessa: 0.5 } };
+  // esfera (esfera gigante): carga bem longa (o monstro fica parado e é vulnerável: stun e paralisia cancelam) e recarga maior; em troca, dano muito maior. A defesa ainda bloqueia.
   // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
   // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
   const FX_FORTE = {
@@ -150,8 +152,8 @@
   MONSTROS.forEach((m) => { m.hp =Math.round(60 * EL[m.tipo].hp); m.dano = EL[m.tipo].dano; m.raridade = m.raridade || 'comum'; });
   const PESO_RARIDADE = { comum: 1, rara: 0.4, lendaria: 0.1 }; // chance relativa de aparecer como selvagem no mundo
 
-  const cdDe = (m, slot) => BASE[slot].cd * m.rc;          // recarga efetiva (ms)
-  const cargaDe = (m, slot) => BASE[slot].carga * m.cg;    // tempo de carga efetivo (ms)
+  const cdDe = (m, slot) => BASE[slot].cd * m.rc * (slot === 'ultimate' && m.golpes.ultimate.poder === 'esfera' ? PODERES.esfera.cd : 1);          // recarga efetiva (ms)
+  const cargaDe = (m, slot) => BASE[slot].carga * m.cg * (slot === 'ultimate' && m.golpes.ultimate.poder === 'esfera' ? PODERES.esfera.carga : 1);    // tempo de carga efetivo (ms)
   const danoBase = (m, slot) => BASE[slot].pow * (m.atk / 10) * (m.dano || 1) * Math.pow(m.rc, RITMO_EXP) / DIVISOR; // dano médio sem elemento, sorte ou crítico
 
   function criarRng(seed) { // mulberry32: mesma semente, mesma luta
@@ -255,15 +257,15 @@
     // sempre 3 sorteios por golpe: a mesma semente repete a luta
     const aereo = !!(df.acao && df.acao.slot === 'ultimate' && df.m.golpes.ultimate.poder === 'pulo' && bt.t - df.acao.inicio >= df.acao.dur * PODERES.pulo.subida); // o alvo está no ar (super pulo): o golpe erra
     const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE, esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
-    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
+    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (g.poder === 'esfera' ? PODERES.esfera.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
       * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tal === 'res_' + g.tipo ? RESIST_MULT : 1);
     if (bt.tt[i].has('abertura') && !at.abriu) aviso(bt, i, 'Abertura');
     if (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE && !at.ultAvisou) { at.ultAvisou = true; aviso(bt, i, 'Último suspiro'); }
     at.abriu = true;
-    const atravessou = g.poder === 'nova' && df.defesaAte > bt.t; // a supernova parte a defesa e deixa passar parte do dano
+    const atravessou = (g.poder === 'nova' || g.poder === 'esfera') && df.defesaAte > bt.t; // a supernova e a esfera gigante partem a defesa e deixam passar parte do dano
     const bloqueado = df.defesaAte > bt.t && !atravessou; // a defesa evita este ataque e se desfaz
-    if (atravessou) { df.defesaAte = 0; dano *= PODERES.nova.atravessa; }
+    if (atravessou) { df.defesaAte = 0; dano *= PODERES[g.poder].atravessa; }
     if (bloqueado) { df.defesaAte = 0; dano = 0; } else if (esquiva) dano = 0;
     df.hp -= dano;
     let status = null;
@@ -349,7 +351,7 @@
     const vivo = [0, 1].map((i) => bt.times[i].some((x) => x.hp > 0));
     const frac = (i) => bt.times[i].reduce((a, x) => a + Math.max(0, x.hp), 0) / bt.times[i].reduce((a, x) => a + x.m.hp, 0);
     if (!vivo[0] || !vivo[1]) bt.fim = { vencedor: vivo[0] === vivo[1] ? null : vivo[0] ? 0 : 1, motivo: 'K.O.' };
-    else if (bt.t >= MAX_MS) bt.fim = { vencedor: frac(0) === frac(1) ? null : frac(0) > frac(1) ? 0 : 1, motivo: 'tempo' };
+    else if (bt.t >= (bt.maxMs || MAX_MS)) bt.fim = { vencedor: frac(0) === frac(1) ? null : frac(0) > frac(1) ? 0 : 1, motivo: 'tempo' };
     return bt;
   }
 

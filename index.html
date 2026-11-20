@@ -210,6 +210,7 @@
   .abas { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
   .aba { flex: 1 1 auto; width: auto; padding: 8px 6px; margin: 0; font-size: 13px; background: #24417f; border: 2px solid #4a6fb8; border-radius: 14px; color: #dfe9ff; }
   .aba.sel { border-color: #ffd35a; color: #ffd35a; background: #2f5aa8; }
+  #treinoSair { position: absolute; left: 2%; top: 10.8%; width: auto; z-index: 6; padding: 6px 10px; font-size: 12px; margin: 0; border: 2px solid #ffffff; border-radius: 8px; background: rgba(20,17,15,.82); color: #ffd35a; }
   #lutar { margin-top: 0; padding: 14px; font-size: 18px; background: #ffd35a; color: #1b1020; border: 2px solid #ffffff; border-radius: 8px; }
   #mundo .coluna { position: relative; --resto: 172px; } /* sobra espaço para o D-pad embaixo do mapa */
   #mundoCv { display: block; width: 100%; aspect-ratio: 360 / 640; image-rendering: pixelated; background: #1b1020; border-radius: 10px; }
@@ -275,6 +276,7 @@
           <button class="modo" id="mTorneio"><b>Torneio</b><small id="mTorneioTxt">5 lutas contra campeões</small></button>
           <button class="modo" id="mTrein"><b>Treinador</b><small id="mTreinTxt">desafie um treinador</small></button>
         </div>
+        <button class="modo" id="mTreino" style="width:100%;margin-top:8px"><b>Área de treino</b><small>um alvo parado, com vida infinita, para ver os poderes do seu time</small></button>
         <div id="torneioInfo"></div>
       </div>
       <div class="cartao">
@@ -367,6 +369,7 @@
       <div class="palco">
         <canvas id="arena" width="360" height="640"></canvas>
         <div id="intro" hidden></div>
+        <button id="treinoSair" hidden>Sair do treino</button>
         <div id="resultado" hidden>
           <h2 id="resTitulo"></h2>
           <p id="resSub"></p>
@@ -405,6 +408,7 @@
   const MAX_VEL = Math.max(...B.MONSTROS.map((m) => 1 / m.rc));
   const cv = document.getElementById('arena');
   let bt = null, rng = null, ultimoT = 0, noMundo = false, selvagem = 0;
+  let treino = false; // área de treino: alvo com vida infinita que não ataca (não é salvo)
   let sel = 0, cena = 'sorteio', ultimoBioma = null, time = [], ultimoTime = null; // time: índices dos monstros escolhidos (até 3)
   // Talentos escolhidos (lembrados no navegador): time = ids dos talentos do time; mon = talento por id de monstro
   let tal = { time: [], mon: {} }; try { tal = Object.assign(tal, JSON.parse(localStorage.getItem('pixmon-tal'))); } catch (e) { /* ok */ }
@@ -509,6 +513,13 @@
     const dt = Math.min(50, t - ultimoT);
     ultimoT = t;
     if (dt <= 0) return;
+    if (treino) { // área de treino: o ultimate volta a ficar pronto em 1,5 s e é usado sempre; o alvo não age e a vida dele nunca acaba
+      const L = bt.lados[0]; L.cd.ultimate = Math.min(L.cd.ultimate, 1500);
+      B.passo(bt, rng, dt, [B.iaPolitica(bt, 0, rng, dt, Object.assign({}, pol, { ultimate: 'pronto' })), null]);
+      const alvo = bt.lados[1]; alvo.hp = alvo.m.hp; bt.fim = null;
+      A.eventos(bt.eventos);
+      return;
+    }
     const cmd = B.iaPolitica(bt, 0, rng, dt, pol); // o jogo é só automático: o monstro do jogador luta sozinho, pelas regras escolhidas
     { const tr = B.iaTroca(bt, 0, rng, dt, pol); if (tr != null) B.trocar(bt, 0, tr); }
     { const tr = B.iaTroca(bt, 1, rng, dt, polAdv); if (tr != null) B.trocar(bt, 1, tr); }
@@ -541,7 +552,9 @@
     const biomas = Object.keys(B.BIOMA_ELEMENTO);
     bioma = bioma || biomas[Math.floor(Math.random() * biomas.length)]; // o cenário vale na lógica (favorece um elemento), então é sorteado aqui
     let adv = [], talAdv, cfg = null;
-    if (emTorneio()) { cfg = TORN.adv[torneio.fase - 1]; adv = B.adversariosTorneio(Math.random, meuTime.map((i) => B.MONSTROS[i]), torneio.fase); talAdv = B.talentosAdversario(Math.random, torneio.fase, torneio.dif, adv.length); iaAdv = B.iaAdversario(torneio.fase, torneio.dif); polAdv = cfg.pol; torneio.hpIni = torneio.hp.slice(); salvarT(); }
+    const emTreino = treino; treino = false; // consome o pedido de treino
+    if (emTreino) { const alvo = B.MONSTROS.find((m) => m.id === 'bolhudo' && !meuTime.includes(B.MONSTROS.indexOf(m))) || B.MONSTROS.find((_, k) => !meuTime.includes(k)); adv = [Object.assign({}, alvo, { nome: 'Alvo', hp: 9999 })]; talAdv = { time: [], mon: [null] }; iaAdv = B.IA_FACIL; polAdv = null; }
+    else if (emTorneio()) { cfg = TORN.adv[torneio.fase - 1]; adv = B.adversariosTorneio(Math.random, meuTime.map((i) => B.MONSTROS[i]), torneio.fase); talAdv = B.talentosAdversario(Math.random, torneio.fase, torneio.dif, adv.length); iaAdv = B.iaAdversario(torneio.fase, torneio.dif); polAdv = cfg.pol; torneio.hpIni = torneio.hp.slice(); salvarT(); }
     else if (emTreinador()) { const tr = B.treinadorPorId(treinadorSel); adv = B.timeDoTreinador(tr); talAdv = B.talentosTreinador(tr); iaAdv = B.iaTreinador(tr); polAdv = tr.pol; }
     else if (noMundo && trMundo) { adv = B.timeDoTreinador(trMundo).slice(0, meuTime.length).map((m) => escalar(m, nvSel)); talAdv = B.talentosTreinador(trMundo); iaAdv = B.iaTreinador(trMundo); polAdv = trMundo.pol; }
     else if (noMundo) { adv = [escalar(selvagemEvo ? B.evoluida(B.MONSTROS[selvagem]) : B.MONSTROS[selvagem], nvSel)]; talAdv = B.sortearTalentos(Math.random, 1); iaAdv = B.IA_FACIL; polAdv = null; }
@@ -549,6 +562,7 @@
     rng = B.criarRng(Date.now() >>> 0);
     const meus = talEfetivo(meuTime);
     bt = B.novaBatalha(meuTime.map((i) => (noMundo ? monDoMundo(i) : B.MONSTROS[i])), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : null);
+    treino = emTreino; if (emTreino) bt.maxMs = 1e12; document.getElementById('treinoSair').hidden = !emTreino;
     mostrarIntro(emTorneio() ? { f: (cfg.chefe ? 'CHEFE · ' : '') + 'FASE ' + torneio.fase + '/' + TORN.fases, n: cfg.nome + ', ' + cfg.titulo, q: cfg.frase, chefe: !!cfg.chefe } : emTreinador() ? (() => { const tr = B.treinadorPorId(treinadorSel); return { f: 'NÍVEL ' + tr.nivel, n: tr.nome, q: tr.frase, chefe: tr.id === 'aurora' }; })() : null);
     const nomes = (t) => [...t.time.map((id) => B.TAL_TIME[id].nome), ...t.mon.filter(Boolean).map((id) => B.TAL_MON[id].nome)];
     ultimoT = performance.now();
@@ -880,6 +894,7 @@
   document.getElementById('mundoDica').textContent = matchMedia('(pointer: coarse)').matches ? 'Segure o dedo na tela\npara andar' : 'Setas ou WASD\nseta amarela = saída\nmato alto = monstros';
   function voltarEscolha() {
     document.getElementById('resultado').hidden = true;
+    treino = false; document.getElementById('treinoSair').hidden = true;
     bt = null;
     document.getElementById('escolha').hidden = false;
     document.getElementById('luta').hidden = true;
@@ -1006,6 +1021,10 @@
     lutar.textContent = emTorneio() ? (torneio.time ? 'Próxima luta (fase ' + torneio.fase + '/' + TORN.fases + ')' : 'Começar torneio' + sorteia) : 'Lutar!' + sorteia;
   }
   if (location.search.includes('dbg')) window.__pixmon = { resultadoModo, iniciar, get bt() { return bt; }, get torneio() { return torneio; } }; // conferência: ?dbg
+  document.getElementById('mTreino').onclick = () => { // área de treino: usa o seu time (mínimo 1 monstro) e um alvo parado
+    S.tocar('toque'); if (!time.length) time.push(Math.floor(Math.random() * B.MONSTROS.length)); marcarTime(); treino = true; iniciar(time, cena === 'sorteio' ? null : cena);
+  };
+  document.getElementById('treinoSair').onclick = () => { S.tocar('toque'); voltarEscolha(); };
   const mTr = document.getElementById('mTrein');
   mTr.onclick = () => { modo = 'treinador'; salvarT(); salvarTrein(); S.tocar('toque'); atualizarModo(); if (!treinadorSel) irPagina('trein'); };
   mR.onclick = () => { modo = 'rapido'; salvarT(); S.tocar('toque'); atualizarModo(); };
