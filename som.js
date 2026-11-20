@@ -215,6 +215,13 @@
       for (let i = 0; i < 12; i++) sopro(c, d, 'highpass', alea(2500, 5500), 4000, 0.03, 0.5, 0.2 + alea(0, 1.1)); // detritos
       [0.35, 0.6].forEach((q, i) => tom(c, d, 'sine', 1800 - i * 500, 900, 0.3, 0.12, q)); // ecos do anel
     },
+    // Kienzan (disco): zumbido agudo de lâmina girando, que sobe e desce (vai e volta), com chiado metálico
+    disco: (c, tipo, pan = 0) => {
+      const d = canal(c, pan, 0.4);
+      fm(c, d, 1100, 2.5, 4, 1.0, 0.3); tom(c, d, 'sawtooth', 600, 1500, 0.5, 0.18); tom(c, d, 'sawtooth', 1500, 500, 0.5, 0.18, 0.5);
+      sopro(c, d, 'bandpass', 2500, 6500, 0.5, 0.5, 0, 3); sopro(c, d, 'bandpass', 6500, 2500, 0.5, 0.5, 0.5, 3);
+      for (let i = 0; i < 6; i++) tom(c, d, 'square', 2600 + (i % 2) * 400, 1800, 0.03, 0.12, 0.06 * i); // dentes
+    },
     // Frenesi (ativa o buff): grito grave que sobe, rugido de ruído que incha e três pulsos de força
     frenesi: (c, pan = 0) => {
       const d = canal(c, pan, 0.4);
@@ -310,7 +317,7 @@
     if (!MENU.includes(querida)) { const lista = MENU.filter((k) => k !== ultimoMenu); ultimoMenu = lista[Math.floor(Math.random() * lista.length)]; }
     trilha(ultimoMenu);
   }
-  function mundo(area) { trilha(area === 'vila' ? 'vila' : 'rota'); } // exploração: Vila = PokéMart Memories, Rota = Hidden Trail Whispers
+  function mundo(area) { trilha(area === 'vila' ? 'vila' : area === 'oculta' ? 'caverna1' : 'rota'); } // exploração: Vila = PokéMart Memories, Rota = Hidden Trail Whispers
   function loja(ligar) { if (ligar) trilha('loja'); }
   function caverna() { const lista = CAVERNA.filter((k) => k !== ultimaCaverna); ultimaCaverna = lista[Math.floor(Math.random() * lista.length)]; trilha(ultimaCaverna); } // ainda sem área de caverna no mundo
   function intensidade(n) { nivel = Math.max(0, Math.min(3, n)); }

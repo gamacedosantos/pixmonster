@@ -204,6 +204,7 @@
   AREAS.bosque = window.PixmonMundo4.area; // e o Bosque (mundo4.js)
   AREAS.lago = window.PixmonMundo5.area; // e o Lago (mundo5.js)
   AREAS.fazenda = window.PixmonMundo6.area; // e a Fazenda (mundo6.js)
+  Object.assign(AREAS, window.PixmonAreasExtra || {}); // areas feitas pelo construtor mundo-base.js (Floresta Oculta e as novas): cada arquivo de dados se registra la
   Object.values(AREAS).forEach((A) => { A.mapa = A.mapa.map((l) => l.padEnd(A.largura, 'T').slice(0, A.largura)); });
   const BLOQUEIA = new Set(['T', 'R', 'b', 'W', 'B', '~', 'n', 'm', 'k', 'e']);
   // tiles ocupados pela base das construções (deco e chao não bloqueiam)
@@ -444,7 +445,7 @@
   }
   function andarFiguras(dt) {
     for (const n of AREAS[area].npcs || []) {
-      if (!n.paradas || !n.paradas.length) continue;
+      if (!n.paradas || !n.paradas.length || (des && des.id === n.id)) continue; // o treinador que está vindo desafiar não anda por aí
       const p = npcPos[n.id], f = figs[n.id] || (figs[n.id] = { parada: 0, t: 0, espera: sorteia(n.paradas[0].espera), caminho: [], bloq: 0, passo: 0 }), mv = npcMov[n.id];
       if (mv) { mv.t += dt; if (mv.t < DUR_PASSO) continue; delete npcMov[n.id]; }
       if (f.caminho.length) {
@@ -457,7 +458,9 @@
       }
     }
   }
+  let tVig = 0;
   function atualizar(dt) { andarFiguras(dt);
+    if (!des && !pausado && flash <= 0) { tVig += dt; if (tVig > 250) { tVig = 0; vigiar(); } } // treinador que anda vê o jogador mesmo parado
     if (des) {
       des.t += dt; const p = npcPos[des.id];
       if (des.fase === 'ex') { if (des.t > 700) { des.fase = 'anda'; des.t = 0; } return; }
@@ -495,6 +498,7 @@
           if (!livre(area, col, lin)) { col = p.c; lin = p.r; }
           px = col * T + T / 2; py = lin * T + T; mostrarAviso(AREAS[area].nome); salvar(); vigiar(); if (cb.area) cb.area(area);
         } else if (ch === '"' && Math.random() < CHANCE) { flash = 700; salvar(); }
+        else if (AREAS[area].ginasios && AREAS[area].ginasios[ch] && cb.ginasio) { salvar(); pausado = true; cb.ginasio(AREAS[area].ginasios[ch]); } // porta do ginásio: chama o líder (regras em index.html)
         else if (ch === 'L' && cb.loja) { salvar(); pausado = true; cb.loja(); }
         else { if (passos % 5 === 0) salvar(); vigiar(); }
       }
@@ -618,5 +622,5 @@
   }
   addEventListener('resize', () => { if (cv) usarArea(); }); // girar o celular ou mostrar/esconder a barra do navegador
 
-  window.PixmonMundo = { BLOQUEIA, BLOQ_OBJ, iniciar, parar, pausar, retomar, ligarToque, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
+  window.PixmonMundo = { BLOQUEIA, BLOQ_OBJ, aviso: mostrarAviso, iniciar, parar, pausar, retomar, ligarToque, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
 })();

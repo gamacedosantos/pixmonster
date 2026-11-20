@@ -1,6 +1,6 @@
 // Lago (identidade visual v2): tiles de 16 px, camera reta. Lago grande de ponta a ponta com pier vertical, barco, vitorias-regias e juncos que balancam, laguinho no canto, cabana do pescador,
 // trilha de terra ate o pier, mato alto nas margens, arvores com zona segura e florzinhas. Mapa de 36 x 52 tiles, canvas de 240 x 427. Usado pelo mundo.js: PixmonMundo5.area.
-// Legenda: . grama · , trilha · " mato alto · ~ agua · P pier (anda por cima da agua) · T arvore (muro) · > saida para a Vila (leste)
+// Legenda: . grama · , trilha · " mato alto · ~ agua · P pier (anda por cima da agua) · T arvore (muro) · > saida para a Vila (leste) · < saida para o Lago 2 (oeste)
 (function () {
   const T = 16, W = 36, H = 52, RES = [240, 427], D = 'ui/mundo/v2/';
   const grade = Array.from({ length: H }, () => Array(W).fill('.'));
@@ -19,6 +19,7 @@
   for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; }
   ret(0, 0, 35, 1, 'T'); ret(0, 50, 35, 51, 'T'); ret(0, 0, 1, 51, 'T'); ret(34, 0, 35, 51, 'T');
   ret(34, 26, 35, 27, ','); grade[26][35] = grade[27][35] = '>';
+  ret(0, 26, 3, 27, ','); grade[26][0] = grade[27][0] = '<'; // saida oeste para o Lago 2
   ret(15, 12, 16, 24, 'P');                                           // pier vertical por cima da agua (anda)
 
   // ---- cabana do pescador (a base bloqueia) ----
@@ -27,7 +28,7 @@
 
   // ---- arvores geradas em grade com sorteio, sempre longe de trilha, pier, agua e cabana (a copa nunca cai na trilha) ----
   const arvB = [], arvD = [];
-  const perigo = (ch, tolMato) => ',~^v>P'.includes(ch) || (!tolMato && ch === '"');
+  const perigo = (ch, tolMato) => ',~^v<>P'.includes(ch) || (!tolMato && ch === '"');
   const margemLivre = (c0, r0, c1, r1, tolMato = false) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) { if (c < 0 || r < 0 || c >= W || r >= H) return false; if (perigo(grade[r][c], tolMato) || bloq.has(cel(c, r))) return false; } return true; };
   const tentar = (c, r, sem, pB, pD) => {
     const cc = c + (hsh(c, r, sem) % 2), rr = r + (hsh(c, r, sem + 1) % 2), p = hsh(c, r, sem + 2);
@@ -79,7 +80,7 @@
     const tc = tabela(mc), ta = tabela(ma), c = document.createElement('canvas'); c.width = W * T; c.height = H * T; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
     const cl = (x, y) => [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
     const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => { const [a, b] = cl(x, y); return f(a, b); });
-    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',>^v'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
+    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',>^v<'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const ka = k(vA(x, y)) + k(vA(x + 1, y)) + k(vA(x, y + 1)) + k(vA(x + 1, y + 1));
       if (ka === 'llll') brilhos.push([x, y]);
@@ -108,7 +109,7 @@
   });
 
   // ---- desenho ----
-  const SETA = { '>': [1, 0] };
+  const SETA = { '>': [1, 0], '<': [-1, 0] };
   function desenhar(g, cx, cy, extras) {
     g.fillStyle = '#9fd68a'; g.fillRect(0, 0, RES[0], RES[1]);
     if (!pronto) return;
@@ -142,6 +143,6 @@
     desenhar, RES,
     area: { nome: 'Lago', largura: W, bioma: 'lago', elemento: 'agua', v2: true, T, res: RES, mapa, bloq, desenhar,
       npcs: [{ id: 'vera', nome: 'Bia', pele: '#e0ac84', c: 15, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#3a8ac8', cab: '#1b1020' }],
-      portais: { '>': { area: 'vila', c: 2, r: 34 } } },
+      portais: { '>': { area: 'vila', c: 2, r: 34 }, '<': { area: 'lago2', c: 57, r: 96 } } },
   };
 })();

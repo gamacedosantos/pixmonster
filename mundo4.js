@@ -1,6 +1,6 @@
 // Bosque (identidade visual v2, versao floresta): tiles de 16 px, camera reta. Grama mais escura e cheia de pontinhos (textura suja), trilha escura e suja, muitas arvores e props de mata
 // (arbustos, tocos, cogumelos, pedras, troncos), manchas de mato alto escuro, laguinho animado e uma clareira com um monolito no fim da trilha.
-// Mapa de 36 x 64 tiles, canvas de 240 x 427. Usado pelo mundo.js: PixmonMundo4.area. Legenda: . grama · , trilha/clareira · " mato alto · ~ agua · T arvore (muro) · v saida para a Rota 1 (sul)
+// Mapa de 36 x 64 tiles, canvas de 240 x 427. Usado pelo mundo.js: PixmonMundo4.area. Legenda: . grama · , trilha/clareira · " mato alto · ~ agua · T arvore (muro) · v saida para a Rota 1 (sul) · ^ saida para a Floresta Oculta (norte)
 (function () {
   const T = 16, W = 36, H = 64, RES = [240, 427], D = 'ui/mundo/v2/';
   const grade = Array.from({ length: H }, () => Array(W).fill('.'));
@@ -17,6 +17,7 @@
   for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; }
   ret(0, 0, 35, 1, 'T'); ret(0, 62, 35, 63, 'T'); ret(0, 0, 1, 63, 'T'); ret(34, 0, 35, 63, 'T');
   ret(17, 62, 18, 63, ','); grade[63][17] = grade[63][18] = 'v';
+  ret(12, 0, 13, 6, ','); grade[0][12] = grade[0][13] = '^'; // saida norte para a Floresta Oculta (clareira do monolito)
 
   // ---- arvores geradas em grade com sorteio: sempre longe de trilha, clareira, agua e mato alto (a copa nunca cai na trilha) ----
   const arvB = [], arvD = [];
@@ -109,7 +110,7 @@
   });
 
   // ---- desenho ----
-  const SETA = { v: [0, 1] };
+  const SETA = { v: [0, 1], '^': [0, -1] };
   function desenhar(g, cx, cy, extras) {
     g.fillStyle = '#5f8f55'; g.fillRect(0, 0, RES[0], RES[1]);
     if (!pronto) return;
@@ -120,7 +121,7 @@
       g.fillStyle = 'rgba(190,225,250,.5)'; g.fillRect(x * T + ((h + t / 160) % 16 | 0) % 14, y * T + 3 + o * 5, 4, 1); g.fillRect(x * T + ((h * 3 + 9 + t / 200) % 16 | 0) % 14, y * T + 9 + o * 2, 3, 1);
       g.fillStyle = 'rgba(20,50,100,.3)'; g.fillRect(x * T + ((h + 5 + t / 240) % 16 | 0) % 14, y * T + 6 + o * 3, 5, 1); }
     const objs = extras.slice(), img = (k, x, y) => g.drawImage(IM[k], Math.round(x), Math.round(y)), visivel = (y) => y > cy - 60 && y < cy + RES[1] + 90;
-    for (let c = 0; c < W; c += 2) { objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); if (![16, 18].includes(c)) objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); }
+    for (let c = 0; c < W; c += 2) { if (c !== 12) objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); if (![16, 18].includes(c)) objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); }
     for (let r = 2; r < H - 2; r += 2) { objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); }
     arvB.forEach(([c, r]) => objs.push({ y: (r + 2) * T, f: () => img('arvore_b', c * T, (r + 2) * T - 40) }));
     arvD.forEach(([c, r]) => objs.push({ y: (r + 1) * T, f: () => img('arvore_d', c * T, (r + 1) * T - 48) }));
@@ -137,6 +138,6 @@
     desenhar, RES,
     area: { nome: 'Bosque', largura: W, bioma: 'floresta', elemento: 'ar', v2: true, T, res: RES, mapa, bloq, desenhar,
       npcs: [{ id: 'davi', nome: 'Iuri', pele: '#f0c8a0', c: 14, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#6a3aa8', cab: '#ffd35a' }],
-      portais: { v: { area: 'rota1', c: 13, r: 2 } } },
+      portais: { v: { area: 'rota1', c: 13, r: 2 }, '^': { area: 'oculta', c: 12, r: 61 } } },
   };
 })();

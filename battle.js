@@ -129,12 +129,14 @@
     pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo'],
     nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo'],
     esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho'],
+    disco: ['ventinho', 'redemoinha', 'algazinho', 'pingolino'],
   };
   Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { const m = MONSTROS.find((x) => x.id === id); m.golpes.ultimate.poder = p; if (p === 'esfera') m.golpes.ultimate.tipo = m.tipo; })); // a esfera gigante é do elemento do próprio monstro (sem cobrir a fraqueza como o ultimate comum), senão o golpe enorme vira o jogo contra quem tem vantagem
   // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
   // pulo (super pulo): a carga é o salto; depois de `subida` (fração da carga) o monstro fica no ar e intocável (ataques que o alcançam erram), e cai em área:
   // não pode ser esquivado e deixa o alvo atordoado por `stun` ms (se não for bloqueado). dano = multiplicador sobre o ultimate padrão.
-  const PODERES = { frenesi: { dur: 10000, dano: 1.35, ritmo: 1.5, custo: 0.01 }, pulo: { subida: 0.4, dano: 0.7, stun: 500 }, nova: { dano: 0.9, atravessa: 0.5 }, esfera: { carga: 2.4, cd: 1.5, dano: 2, atravessa: 0.5 } };
+  const PODERES = { frenesi: { dur: 10000, dano: 1.35, ritmo: 1.5, custo: 0.01 }, pulo: { subida: 0.4, dano: 0.7, stun: 500 }, nova: { dano: 0.9, atravessa: 0.5 }, esfera: { carga: 2.4, cd: 1.5, dano: 2, atravessa: 0.5 }, disco: { dano: 0.56, volta: 700 } };
+  // disco (Kienzan): o disco acerta duas vezes, na ida e na volta (`volta` ms depois); cada acerto sorteia crítico e esquiva e tem `dano` do ultimate; o status só entra no segundo.
   // esfera (esfera gigante): carga bem longa (o monstro fica parado e é vulnerável: stun e paralisia cancelam) e recarga maior; em troca, dano muito maior. A defesa ainda bloqueia.
   // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
   // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
@@ -188,7 +190,7 @@
     const sin = lista.map((t) => { const n = {}; t.forEach((m) => { n[m.tipo] = (n[m.tipo] || 0) + 1; }); return { dupla: new Set(Object.keys(n).filter((e) => n[e] >= 2)), arco: Object.keys(n).length === 3 }; });
     return {
       t: 0, // relógio da luta, em ms
-      bioma, times, talentos, tt, sin, ativo: times.map((t) => Math.max(0, t.findIndex((l) => l.hp > 0))), lados: times.map((t) => t[Math.max(0, t.findIndex((l) => l.hp > 0))]), trocaCd: [0, 0], pendente: [null, null], regra: [null, null], // regra: texto da regra do modo automático que causou a próxima ação (para a tela)
+      bioma, times, talentos, tt, sin, agenda: [], ativo: times.map((t) => Math.max(0, t.findIndex((l) => l.hp > 0))), lados: times.map((t) => t[Math.max(0, t.findIndex((l) => l.hp > 0))]), trocaCd: [0, 0], pendente: [null, null], regra: [null, null], // regra: texto da regra do modo automático que causou a próxima ação (para a tela)
       pre: [], // pre: eventos de trocas feitas entre dois passos
      
       fim: null, // { vencedor: 0|1|null, motivo }
@@ -257,7 +259,7 @@
     // sempre 3 sorteios por golpe: a mesma semente repete a luta
     const aereo = !!(df.acao && df.acao.slot === 'ultimate' && df.m.golpes.ultimate.poder === 'pulo' && bt.t - df.acao.inicio >= df.acao.dur * PODERES.pulo.subida); // o alvo está no ar (super pulo): o golpe erra
     const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE, esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
-    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (g.poder === 'esfera' ? PODERES.esfera.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
+    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (g.poder === 'esfera' ? PODERES.esfera.dano : 1) * (g.poder === 'disco' ? PODERES.disco.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
       * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tal === 'res_' + g.tipo ? RESIST_MULT : 1);
     if (bt.tt[i].has('abertura') && !at.abriu) aviso(bt, i, 'Abertura');
@@ -271,7 +273,7 @@
     let status = null;
     if (g.poder === 'nova' && dano > 0 && (df.st.forca || df.st.frenesi)) { delete df.st.forca; delete df.st.frenesi; aviso(bt, 1 - i, 'Buffs derrubados'); } // a supernova limpa os buffs do alvo
     if (g.poder === 'pulo') { if (dano > 0 && df.hp > 0) status = aplicar(bt, 1 - i, 'stun', g.tipo, PODERES.pulo.stun); } // o super pulo sempre atordoa
-    else if (dano > 0 && df.hp > 0) { // acertou: talvez aplique um status
+    else if (dano > 0 && df.hp > 0 && !(g.poder === 'disco' && !a.parte)) { // acertou: talvez aplique um status (o disco só no segundo acerto)
       const ef = (EFEITO[g.tipo] || {})[a.slot === 'ultimate' ? 'forte' : a.slot], chance = a.slot === 'ultimate' ? ULT_STATUS_CHANCE : ef && ef[1];
       if (ef && sorteioSt < chance) {
         if (df.tal === 'corpo' && rng() < CORPO_CH) aviso(bt, 1 - i, 'Corpo fechado');
@@ -284,9 +286,10 @@
       if (at.tal === 'folego') curar(bt, i, [bt.ativo[i]], FOLEGO_PCT, 'Fôlego');
       if (bt.tt[i].has('cura_cadeia')) curar(bt, i, bt.times[i].map((l, k) => k).filter((k) => bt.times[i][k].hp > 0), CADEIA_PCT, 'Cura em cadeia');
     }
+    if (g.poder === 'disco' && !a.parte) bt.agenda.push({ t: bt.t + PODERES.disco.volta, i, lado: at, acao: { slot: 'ultimate', parte: 2 } });
     bt.log.push(`${at.m.nome} usa ${g.nome} (${bloqueado ? 'bloqueado' : esquiva ? 'esquivou' : dano.toFixed(1) + (critico ? ' crítico' : '')})`);
     bt.eventos.push({
-      ev: 'golpe', atq: i, def: 1 - i, slot: a.slot, idx: IDX[a.slot], dano, tipo: g.tipo, golpe: g.nome, poder: g.poder || null, fx: g.fx || 'proj', aereo, atravessou, mult,
+      ev: 'golpe', atq: i, def: 1 - i, slot: a.slot, idx: IDX[a.slot], dano, tipo: g.tipo, golpe: g.nome, poder: g.poder || null, fx: g.fx || 'proj', aereo, atravessou, parte: a.parte || 1, mult,
       crit: critico && !esquiva && !bloqueado, esquiva: esquiva && !bloqueado, bloqueado, hpApos: Math.max(0, df.hp), status,
     });
   }
@@ -338,6 +341,7 @@
     // os ataques que terminam a carga neste passo acertam juntos: ninguém ganha por acertar primeiro
     const prontos = [0, 1].filter((i) => bt.lados[i].acao && bt.t >= bt.lados[i].acao.fim).map((i) => [i, bt.lados[i].acao]);
     for (const [i, a] of prontos) { bt.lados[i].acao = null; resolver(bt, rng, i, a); } // o stun de um golpe não desfaz o outro que já terminou a carga
+    while (bt.agenda.length && bt.agenda[0].t <= bt.t) { const x = bt.agenda.shift(); if (!bt.fim && x.lado === bt.lados[x.i] && x.lado.hp > 0) resolver(bt, rng, x.i, x.acao); } // golpes agendados (a volta do disco)
     // nocaute do monstro em campo: com reserva viva, o próximo entra depois de um tempo; sem reserva, o time caiu
     for (const i of [0, 1]) {
       const l = bt.lados[i];
@@ -428,10 +432,22 @@
     { id: 'hugo', nome: 'Treinador Hugo', nivel: 4, time: ['pingolino', 'mareal', 'trovinho'], frase: 'Mergulhe fundo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['arco'], mon: ['corpo', null, null] } },
     { id: 'yara', nome: 'Treinadora Yara', nivel: 5, time: ['ventinho', 'nuvelino', 'chamuscao'], frase: 'O vento decide.', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'abertura'], mon: ['folego', null, null] } },
     { id: 'magno', nome: 'Treinador Magno', nivel: 5, time: ['chamuscao', 'fagulhao', 'musgarra'], frase: 'Eu sou a erupção.', pol: POL('agressivo', 'forte', 'finalizar', true, 20), tal: { time: ['dupla', 'sede'], mon: ['espinhos', null, null] } },
+    // W1 (PLANO-fases.md, aprovados pelo George): Lago 2, Vila da Água e a líder do 1º ginásio (Tati). Nomes de até 5 letras.
+    { id: 'caio', nome: 'Treinador Caio', nivel: 2, time: ['mareal', 'pingolino', 'nuvelino'], frase: 'Quem pesca, tem paciência.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['casca', null, null] } },
+    { id: 'duda', nome: 'Treinadora Duda', nivel: 2, time: ['pingolino', 'ventinho', 'mareal'], frase: 'Mergulha comigo!', pol: POL('equilibrado'), tal: { time: ['abertura'], mon: [] } },
+    { id: 'nico', nome: 'Treinador Nico', nivel: 2, time: ['faiscao', 'trovinho', 'pingolino'], frase: 'Choque na água é perigoso!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: [], mon: [null, 'corpo', null] } },
+    { id: 'bela', nome: 'Treinadora Bela', nivel: 3, time: ['brotinho', 'musgarra', 'mareal'], frase: 'Raiz firme na margem.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['espinhos', null, null] } },
+    { id: 'rafa', nome: 'Treinador Rafa', nivel: 3, time: ['mareal', 'nuvelino', 'chamuscao'], frase: 'Pega a onda!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: [null, null, 'veneno_pot'] } },
+    { id: 'lia', nome: 'Treinadora Lia', nivel: 3, time: ['ventinho', 'nuvelino', 'pingolino'], frase: 'O vento sopra a favor.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
+    { id: 'beto', nome: 'Treinador Beto', nivel: 3, time: ['pingolino', 'mareal', 'brotinho'], frase: 'A Tati não perde para quem tem pressa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['reserva'], mon: [null, 'casca', null] } },
+    { id: 'tati', nome: 'Líder Tati', nivel: 3, time: ['algazinho', 'coraline', 'mareal'], frase: 'A maré leva quem hesita.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: ['folego', 'res_agua', 'casca'] } },
+    // Floresta Oculta: andam pela clareira, times só de evoluídos (por isso nível 5 e dois talentos de time)
+    { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'sede'], mon: ['ultimo', null, 'veneno_pot'] } },
+    { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'dupla'], mon: ['folego', 'casca', null] } },
     { id: 'aurora', nome: 'Mestra Aurora', nivel: 5, time: ['faiscao', 'mareal', 'brotinho'], frase: 'Mostre o que aprendeu.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate'], mon: ['espinhos', 'corpo', 'folego'] } },
   ];
   const treinadorPorId = (id) => TREINADORES.find((t) => t.id === id);
-  const timeDoTreinador = (t) => t.time.map((id) => MONSTROS.find((m) => m.id === id));
+  const timeDoTreinador = (t) => t.time.map((id) => { const m = MONSTROS.find((x) => x.id === id); return t.evo ? evoluida(m) : m; }); // evo: o time inteiro já vem evoluído
   const talentosTreinador = (t) => normalizarTalentos(t.tal, t.time.length);
   const iaTreinador = (t) => NIVEL_TREINADOR[t.nivel - 1].ia;
 

@@ -1,0 +1,1208 @@
+{
+ "frames": [
+  {
+   "filename": "carga-arcana 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 1",
+   "frame": {
+    "x": 120,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 2",
+   "frame": {
+    "x": 240,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 3",
+   "frame": {
+    "x": 360,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 4",
+   "frame": {
+    "x": 480,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 5",
+   "frame": {
+    "x": 600,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 6",
+   "frame": {
+    "x": 0,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 7",
+   "frame": {
+    "x": 120,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 8",
+   "frame": {
+    "x": 240,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 9",
+   "frame": {
+    "x": 360,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 10",
+   "frame": {
+    "x": 480,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 11",
+   "frame": {
+    "x": 600,
+    "y": 86,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 12",
+   "frame": {
+    "x": 0,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 13",
+   "frame": {
+    "x": 120,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 14",
+   "frame": {
+    "x": 240,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 15",
+   "frame": {
+    "x": 360,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 16",
+   "frame": {
+    "x": 480,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 17",
+   "frame": {
+    "x": 600,
+    "y": 172,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 18",
+   "frame": {
+    "x": 0,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 19",
+   "frame": {
+    "x": 120,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 20",
+   "frame": {
+    "x": 240,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 21",
+   "frame": {
+    "x": 360,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 22",
+   "frame": {
+    "x": 480,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 23",
+   "frame": {
+    "x": 600,
+    "y": 258,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 24",
+   "frame": {
+    "x": 0,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 25",
+   "frame": {
+    "x": 120,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 26",
+   "frame": {
+    "x": 240,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 27",
+   "frame": {
+    "x": 360,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 28",
+   "frame": {
+    "x": 480,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 29",
+   "frame": {
+    "x": 600,
+    "y": 344,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 30",
+   "frame": {
+    "x": 0,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 31",
+   "frame": {
+    "x": 120,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 32",
+   "frame": {
+    "x": 240,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 33",
+   "frame": {
+    "x": 360,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 34",
+   "frame": {
+    "x": 480,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 35",
+   "frame": {
+    "x": 600,
+    "y": 430,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 36",
+   "frame": {
+    "x": 0,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 37",
+   "frame": {
+    "x": 120,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 38",
+   "frame": {
+    "x": 240,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 39",
+   "frame": {
+    "x": 360,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 40",
+   "frame": {
+    "x": 480,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 41",
+   "frame": {
+    "x": 600,
+    "y": 516,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 42",
+   "frame": {
+    "x": 0,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 43",
+   "frame": {
+    "x": 120,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 44",
+   "frame": {
+    "x": 240,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 45",
+   "frame": {
+    "x": 360,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 46",
+   "frame": {
+    "x": 480,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  },
+  {
+   "filename": "carga-arcana 47",
+   "frame": {
+    "x": 600,
+    "y": 602,
+    "w": 120,
+    "h": 86
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 86
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 86
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "https://github.com/patch-gg/pixelfx",
+  "version": "1",
+  "image": "carga-arcana.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 720,
+   "h": 688
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "carga-arcana",
+    "from": 0,
+    "to": 47,
+    "direction": "forward"
+   }
+  ],
+  "pixelfx": {
+   "id": "arcane/spell-charge",
+   "name": "Spell charge",
+   "fps": 30,
+   "loop": true,
+   "frames": 48,
+   "frameSize": [
+    120,
+    86
+   ],
+   "pivot": [
+    44,
+    80
+   ],
+   "columns": 6,
+   "act": {
+    "windup": 0.46,
+    "recovery": 0,
+    "onBody": false,
+    "targets": [],
+    "hits": [],
+    "poses": [
+     {
+      "t": -0.46,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 11,
+       "fy": -21,
+       "bx": 9,
+       "by": -21,
+       "ffx": 7,
+       "fbx": -7,
+       "x": -3
+      }
+     },
+     {
+      "t": -0.12,
+      "how": "smooth",
+      "pose": {
+       "crouch": 3,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 2
+      }
+     },
+     {
+      "t": 0,
+      "how": "smooth",
+      "pose": {
+       "crouch": 4,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 2
+      }
+     },
+     {
+      "t": 0.4,
+      "how": "smooth",
+      "pose": {
+       "crouch": 5,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 2
+      }
+     },
+     {
+      "t": 0.8,
+      "how": "smooth",
+      "pose": {
+       "crouch": 4,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 3
+      }
+     },
+     {
+      "t": 1.2,
+      "how": "smooth",
+      "pose": {
+       "crouch": 5,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 2
+      }
+     },
+     {
+      "t": 1.6,
+      "how": "smooth",
+      "pose": {
+       "crouch": 4,
+       "fx": 18,
+       "fy": -22,
+       "bx": 11,
+       "by": -17,
+       "ffx": 10,
+       "fbx": -8,
+       "x": -3,
+       "lean": 2
+      }
+     }
+    ]
+   }
+  }
+ }
+}
