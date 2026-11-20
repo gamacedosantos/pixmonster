@@ -82,6 +82,7 @@
     p.start(t); m.start(t); p.stop(t + dur + 0.02); m.stop(t + dur + 0.02);
   }
   const alea = (a, b) => a + Math.random() * (b - a);
+  const TOM_FEIXE = { fogo: 90, agua: 130, terra: 70, ar: 150, eletrico: 110 }; // tom base do Lightbeam por elemento do ultimate
 
   // ---------- efeitos ----------
   const SONS = {
@@ -171,6 +172,34 @@
       tom(c, d, 'sine', 95, 22, 1.1, 1.0); tom(c, d, 'sawtooth', 220, 40, 0.5, 0.3);
       sopro(c, d, 'highpass', 2500, 9000, 0.9, 0.55, 0, 0.7, 0.12);
       [261.6, 392, 523.3, 784, 1046.5].forEach((f, i) => { tom(c, d, 'triangle', f, f, 0.9, 0.2, 0.02 + i * 0.02); tom(c, d, 'sine', f * 2, f * 2, 0.6, 0.08, 0.02 + i * 0.02); });
+    },
+    // Lightbeam, carga (dura o mesmo que a carga do golpe: dur em segundos): zumbido que sobe, brilho metálico que abre, estalos que aceleram e um "puxão" de ar no fim
+    feixeCarga: (c, tipo, dur = 1, pan = 0) => {
+      const d = canal(c, pan, 0.45), f0 = TOM_FEIXE[tipo] || 110;
+      tom(c, d, 'sawtooth', f0, f0 * 8, dur, 0.22, 0, dur * 0.5); tom(c, d, 'sine', f0 / 2, f0 * 2, dur, 0.55, 0, dur * 0.3);
+      sopro(c, d, 'bandpass', 300, 5000, dur, 0.45, 0, 2.5, dur * 0.6); fm(c, d, f0 * 6, 2.01, 2.5, dur, 0.18);
+      for (let i = 0; i < 14; i++) { const q = dur * Math.pow(i / 14, 0.6); tom(c, d, 'square', alea(2200, 4200), 600, 0.02, 0.12 + 0.2 * (i / 14), q); } // estalos mais seguidos perto do disparo
+      sopro(c, d, 'highpass', 2000, 9000, 0.12, 0.5, dur - 0.1, 0.7, 0.08);
+    },
+    // Lightbeam, disparo: estalo, queda de sub-grave e um raio contínuo (zumbido tremulando + chiado) que dura ~0,6 s e apaga
+    feixe: (c, tipo, pan = 0) => {
+      const d = canal(c, pan, 0.4), f0 = TOM_FEIXE[tipo] || 110, T = 0.62, t = c.currentTime;
+      sopro(c, d, 'highpass', 3500, 9000, 0.05, 1.0); tom(c, d, 'sine', 220, 35, 0.3, 0.9);
+      const sust = (no, vol) => { // volume sustentado: sobe em 40 ms, segura e apaga nos últimos 0,2 s; tremulação de 26 Hz
+        const g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.04); g.gain.setValueAtTime(vol, t + T - 0.2); g.gain.exponentialRampToValueAtTime(0.0001, t + T);
+        l.frequency.value = 26; lg.gain.value = vol * 0.35; l.connect(lg).connect(g.gain); no.connect(g).connect(d); l.start(t); l.stop(t + T + 0.02);
+      };
+      const osc = (tipoO, f) => { const o = c.createOscillator(); o.type = tipoO; o.frequency.value = f; o.start(t); o.stop(t + T + 0.02); return o; };
+      sust(osc('sawtooth', f0 * 2), 0.2); sust(osc('sawtooth', f0 * 2.02), 0.2); sust(osc('sine', f0 / 2), 0.6);
+      const s = c.createBufferSource(), f = c.createBiquadFilter(); s.buffer = ruidoBuf(c); s.loop = true; f.type = 'bandpass'; f.Q.value = 1.5; f.frequency.value = 3200; s.connect(f); sust(f, 0.45); s.start(t); s.stop(t + T + 0.02);
+      fm(c, d, f0 * 12, 1.5, 4, T, 0.16, 0.02);
+    },
+    // Frenesi (ativa o buff): grito grave que sobe, rugido de ruído que incha e três pulsos de força
+    frenesi: (c, pan = 0) => {
+      const d = canal(c, pan, 0.4);
+      tom(c, d, 'sine', 140, 30, 0.5, 0.9); tom(c, d, 'sawtooth', 70, 420, 0.45, 0.3, 0, 0.15); sopro(c, d, 'bandpass', 250, 2800, 0.5, 0.7, 0, 1.5, 0.15);
+      [0, 0.12, 0.24].forEach((q, i) => { tom(c, d, 'square', 180 + i * 40, 90, 0.1, 0.25, 0.1 + q); tom(c, d, 'sine', 90, 40, 0.14, 0.6, 0.1 + q); });
     },
     // o ultimate ficou pronto: "bi-bip" agudo
     pronto: (c) => { const d = canal(c, 0, 0.15); tom(c, d, 'square', 1320, 1320, 0.09, 0.28); tom(c, d, 'square', 1760, 1760, 0.14, 0.28, 0.12); tom(c, d, 'sine', 2640, 2640, 0.14, 0.12, 0.12); },

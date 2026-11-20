@@ -1,0 +1,1067 @@
+{
+ "frames": [
+  {
+   "filename": "pixmon-area-fogo 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 1.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 2.png",
+   "frame": {
+    "x": 256,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 3.png",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 4.png",
+   "frame": {
+    "x": 512,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 5.png",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 6.png",
+   "frame": {
+    "x": 768,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 7.png",
+   "frame": {
+    "x": 0,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 8.png",
+   "frame": {
+    "x": 128,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 9.png",
+   "frame": {
+    "x": 256,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 10.png",
+   "frame": {
+    "x": 384,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 11.png",
+   "frame": {
+    "x": 512,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 12.png",
+   "frame": {
+    "x": 640,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 13.png",
+   "frame": {
+    "x": 768,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 14.png",
+   "frame": {
+    "x": 0,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 15.png",
+   "frame": {
+    "x": 128,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 16.png",
+   "frame": {
+    "x": 256,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 17.png",
+   "frame": {
+    "x": 384,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 18.png",
+   "frame": {
+    "x": 512,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 19.png",
+   "frame": {
+    "x": 640,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 20.png",
+   "frame": {
+    "x": 768,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 21.png",
+   "frame": {
+    "x": 0,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 22.png",
+   "frame": {
+    "x": 128,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 23.png",
+   "frame": {
+    "x": 256,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 24.png",
+   "frame": {
+    "x": 384,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 25.png",
+   "frame": {
+    "x": 512,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 26.png",
+   "frame": {
+    "x": 640,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 27.png",
+   "frame": {
+    "x": 768,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 28.png",
+   "frame": {
+    "x": 0,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 29.png",
+   "frame": {
+    "x": 128,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 30.png",
+   "frame": {
+    "x": 256,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 31.png",
+   "frame": {
+    "x": 384,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 32.png",
+   "frame": {
+    "x": 512,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 33.png",
+   "frame": {
+    "x": 640,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 34.png",
+   "frame": {
+    "x": 768,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 35.png",
+   "frame": {
+    "x": 0,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 36.png",
+   "frame": {
+    "x": 128,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 37.png",
+   "frame": {
+    "x": 256,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 38.png",
+   "frame": {
+    "x": 384,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-fogo 39.png",
+   "frame": {
+    "x": 512,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "pixmon-area-fogo.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 896,
+   "h": 834
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 64,
+   "y": 105
+  },
+  "frameTags": [
+   {
+    "name": "pixmon-area-fogo",
+    "from": 0,
+    "to": 39,
+    "direction": "forward"
+   }
+  ]
+ }
+}

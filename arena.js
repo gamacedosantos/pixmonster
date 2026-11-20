@@ -14,14 +14,14 @@
   function carregarFx(nome) {
     FX[nome] = null;
     fetch('fx/' + nome + '.json').then((r) => r.json()).then((j) => {
-      if (!j.meta.pixelfx) j.meta.pixelfx = { fps: 1000 / j.frames[0].duration, loop: nome.startsWith('escudo-') && nome !== 'escudo-quebra', pivot: [j.meta.anchor.x, j.meta.anchor.y] };
+      if (!j.meta.pixelfx) j.meta.pixelfx = { fps: 1000 / j.frames[0].duration, loop: (nome.startsWith('escudo-') && nome !== 'escudo-quebra') || nome === 'frenesi-aura', pivot: [j.meta.anchor.x, j.meta.anchor.y] };
       const im = new Image();
       im.onload = () => { FX[nome] = { j, im }; };
       im.src = 'fx/' + nome + '.png';
     }).catch(() => { /* sem a folha: segue com o desenho de código */ });
   }
   // Efeitos do vfx_workbench do PixelLab (fx/*.png + .json): sem meta.pixelfx, então o loader monta fps, loop e pivô a partir do json.
-  const FX_PL = { 'terra-rachadura': 1, 'terra-espinhos': 0.9, 'fogo-explosao': 1.2, 'agua-splash': 1.2, 'eletrico-raio': 0.9, 'ar-corte': 1, 'critico': 1, 'escudo-quebra': 0.9, 'fumaca': 0.8, 'escudo-fogo': 0.9, 'escudo-agua': 0.9, 'escudo-terra': 0.9, 'escudo-ar': 0.9, 'escudo-eletrico': 0.9 };
+  const FX_PL = { 'terra-rachadura': 1, 'terra-espinhos': 0.9, 'fogo-explosao': 1.2, 'agua-splash': 1.2, 'eletrico-raio': 0.9, 'ar-corte': 1, 'critico': 1, 'escudo-quebra': 0.9, 'fumaca': 0.8, 'escudo-fogo': 0.9, 'escudo-agua': 0.9, 'escudo-terra': 0.9, 'escudo-ar': 0.9, 'escudo-eletrico': 0.9, 'garra': 1.5, 'area-fogo': 0.9, 'area-agua': 0.9, 'area-terra': 0.9, 'area-ar': 0.9, 'area-eletrico': 0.9, 'frenesi-aura': 1.3 };
   Object.keys(FX_PL).forEach((n) => { ESCALA_FX[n] = FX_PL[n]; });
   Object.keys(ESCALA_FX).forEach(carregarFx);
 
@@ -181,10 +181,17 @@
     });
   });
   // Desenha a sprite com a base em (x, y), centralizada; espelha se flip. p é o quadro (padrão: a sprite parada)
-  function desenharPL(gg, k, x, y, flip, alfa, p = PL[k], branco = false) {
+  // Silhueta de uma sprite numa cor só (cache na própria sprite): base do brilho do frenesi
+  function silueta(p, cor) {
+    p['_s' + cor] = p['_s' + cor] || (() => { const t = document.createElement('canvas'); t.width = p.w; t.height = p.h; const tc = t.getContext('2d'); tc.drawImage(p.im, p.x0, p.y0, p.w, p.h, 0, 0, p.w, p.h); tc.globalCompositeOperation = 'source-atop'; tc.fillStyle = cor; tc.fillRect(0, 0, p.w, p.h); return t; })();
+    return p['_s' + cor];
+  }
+  function desenharPL(gg, k, x, y, flip, alfa, p = PL[k], branco = false, forma = null) {
     const s = ALT_PL[k] < 10 ? ALT_PL[k] : ALT_PL[k] / PL[k].h, w = p.w * s, h = p.h * s;
     gg.save(); gg.imageSmoothingEnabled = false; gg.globalAlpha = alfa;
-    gg.translate(Math.round(x), Math.round(y)); if (flip) gg.scale(-1, 1);
+    gg.translate(Math.round(x), Math.round(y));
+    if (forma) { gg.rotate(forma.rot); gg.scale(forma.sx, forma.sy); } // squash/stretch e inclinação, com o pivô nos pés (antes do espelho: a inclinação não inverte)
+    if (flip) gg.scale(-1, 1);
     let im = p.im, sx = p.x0, sy = p.y0, sw = p.w, sh = p.h;
     if (branco) { // piscada de dano: a silhueta da sprite toda branca (source-atop pinta só onde há pixel)
       const t = document.createElement('canvas'); t.width = sw; t.height = sh;
@@ -192,7 +199,11 @@
       tc.globalCompositeOperation = 'source-atop'; tc.fillStyle = '#ffffff'; tc.fillRect(0, 0, sw, sh);
       im = t; sx = 0; sy = 0;
     }
-    gg.drawImage(im, sx, sy, sw, sh, Math.round(-w / 2), Math.round(-h), Math.round(w), Math.round(h));
+    const dx0 = Math.round(-w / 2), dy0 = Math.round(-h), ww = Math.round(w), hh = Math.round(h);
+    const fren = forma && forma.frenesi && !branco, pulso = fren ? Math.sin(forma.t / 90) : 0;
+    if (fren) { const sil = silueta(p, '#ff3a1a'); gg.globalAlpha = alfa * (0.4 + 0.15 * pulso); for (const [ox, oy] of [[-2, 0], [2, 0], [0, -2], [0, 2]]) gg.drawImage(sil, 0, 0, sw, sh, dx0 + ox, dy0 + oy, ww, hh); gg.globalAlpha = alfa; } // brilho: contorno vermelho atrás
+    gg.drawImage(im, sx, sy, sw, sh, dx0, dy0, ww, hh);
+    if (fren) { gg.globalAlpha = alfa * (0.22 + 0.12 * pulso); gg.drawImage(silueta(p, '#ff3a1a'), 0, 0, sw, sh, dx0, dy0, ww, hh); } // e um tom avermelhado por cima
     gg.restore();
   }
 
@@ -396,19 +407,19 @@
   const S = 1.15; // escala da geometria dos monstros (era 1.8: 25% menores); contorno e pixels continuam de 1 px
   const r = (n) => Math.round(n * S);
 
-  function monstro(g, m, x, y, t, flip, flash, alpha, prog, pulo = 0) { // prog: 0..1 durante a investida, null fora dela; pulo: px acima do chão
+  function monstro(g, m, x, y, t, flip, flash, alpha, prog, pulo = 0, forma = null) { // prog: 0..1 durante a investida, null fora dela; pulo: px acima do chão
     const f = FORMAS[m.id], k = CORES[m.tipo];
     const col = (c) => (flash ? '#ffffff' : c);
     const sx = (dx, w = 0) => x + (flip ? -(r(dx) + r(w)) : r(dx));
     const P = (dx, dy, w, h, c) => px(g, sx(dx, w), y + r(dy), Math.max(1, r(w)), Math.max(1, r(h)), c);
     y += Math.floor(t / 350) % 2 ? -1 : 0; // respiração
     g.globalAlpha = alpha;
-    ellipse(g, x, y + 1, r(12) * (1 - pulo / 40), r(4) * (1 - pulo / 40), 'rgba(20,40,20,0.35)'); // a sombra encolhe no pulo
+    ellipse(g, x, y + 1, r(12) * Math.max(0.25, 1 - pulo / 40), r(4) * Math.max(0.25, 1 - pulo / 40), 'rgba(20,40,20,0.35)'); // a sombra encolhe no pulo
     y -= pulo;
     if (USA_PL && PL[m.id]) {
       const an = PL_ANIM[m.id], parado = prog == null; // sem quadros de animação, fica a sprite parada
       const quadros = an && (parado ? an.andar : an.ataque), i = parado ? Math.floor(t / 250) % 4 : Math.min(3, Math.floor(prog * 4));
-      desenharPL(g, m.id, x, y + 2, flip, alpha, (quadros && quadros[i]) || PL[m.id], flash);
+      desenharPL(g, m.id, x, y + 2, flip, alpha, (quadros && quadros[i]) || PL[m.id], flash, forma);
       g.globalAlpha = 1; return;
     }
     const blob = (dx, dy, rx, ry, c) => {
@@ -478,11 +489,13 @@
     g.restore();
   }
   // hp = vida animada, lag = faixa que mostra o dano recente; dano (0..1) = quão recente foi o golpe (treme, brilha e fica vermelho)
-  function painel(g, x, y, w, i, m, hp, lag, agora, dano) {
+  function painel(g, x, y, w, i, m, hp, lag, agora, dano, pronto = false) {
     const k = CORES[m.tipo], rh = Math.max(0, hp) / m.hp, rl = Math.max(0, lag) / m.hp, baixa = rh < 0.25 && rh > 0;
     if (dano > 0) { x += Math.round((Math.random() - 0.5) * 4 * dano); y += Math.round((Math.random() - 0.5) * 2 * dano); }
     const pulso = baixa && Math.floor(agora / 220) % 2;
-    chanfro(g, x, y, w, 52, pulso ? '#c8383a' : PAL.gold);
+    const br = pronto ? 0.5 + 0.5 * Math.sin(agora / 180) : 0; // ultimate carregado: brilho dourado pulsando em volta do painel e borda mais clara
+    if (pronto) for (let d = 6; d >= 1; d--) { g.globalAlpha = (0.22 + 0.3 * br) * (7 - d) / 6; px(g, x - d, y - d, w + 2 * d, 52 + 2 * d, d > 3 ? '#ffb02a' : '#ffe27a'); } g.globalAlpha = 1;
+    chanfro(g, x, y, w, 52, pulso ? '#c8383a' : pronto ? (br > 0.5 ? '#fff0a0' : '#ffd35a') : PAL.gold);
     chanfro(g, x + 2, y + 2, w - 4, 48, PAL.parchment);
     retrato(g, m, x + 5, y + 5, 34, i === 1, agora, dano);
     chanfro(g, x + 29, y + 29, 14, 14, PAL.uiWood); px(g, x + 31, y + 31, 10, 10, k.d); desenharIcone(g, m.tipo, x + 36, y + 36); // medalhão do elemento no canto da foto
@@ -538,7 +551,7 @@
   const CENTRO = { x: 180, y: 340 };
   let hudHit = [-9999, -9999], kos = [null, null], entrou = [null, null]; // kos: monstro caído esperando o próximo; entrou: o que acabou de entrar
   let cv, g, fundo, bt, hpVis, hpLag, hpAlvo, acoes, relogio, ultimoReal, congelaAte;
-  let lance, recuo, acerto, aura, ko, tremor, proj, nums, parts, ondas, raios, rotulos, fantasmas, fxs, onos, esquiva, clarao, escudo, koAgendado;
+  let novas, pop, lance, recuo, acerto, aura, ko, tremor, proj, nums, parts, ondas, raios, feixes, rotulos, fantasmas, fxs, onos, esquiva, clarao, escudo, koAgendado;
 
   // ---------- objetos demolíveis: barris, caixotes e jarros que quebram quando uma investida, um projétil ou um impacto passa perto ----------
   let objetos = [], restos = [];
@@ -566,7 +579,7 @@
     }
     nuvem(o.x, o.y - 4, 'poeira', 6, { anel: true, r0: 3, r1: 9 });
     ondas.push({ x: o.x, y: o.y - 8, t0: relogio, cor: c[1], grande: false });
-    if (hash(o.x, o.y) < 0.6) ono(o.x, o.y - 18, o.k === 'jarro' ? 'CRAC!' : 'CRASH!', '#e0c48a', 6, 600);
+    if (hash(o.x, o.y) < 0.05) ono(o.x, o.y - 18, o.k === 'jarro' ? 'CRAC!' : 'CRASH!', '#e0c48a', 6, 600);
     restos.push({ x: o.x, y: o.y, k: o.k });
     som('quebra', Math.max(-1, Math.min(1, (o.x - 180) / 140)) * 0.85);
     if (quem != null && B.item) agendar(120, () => B.item(bt, quem, Math.random).forEach(itemEv));
@@ -590,8 +603,8 @@
     bt = batalha;
     hpVis = bt.lados.map((l) => l.hp); hpLag = hpVis.slice(); hpAlvo = hpVis.slice();
     acoes = []; relogio = 0; ultimoReal = performance.now(); congelaAte = 0;
-    lance = [null, null]; recuo = [null, null]; acerto = [null, null]; aura = [null, null];
-    hudHit = [-9999, -9999]; kos = [null, null]; entrou = [null, null]; ko = null; tremor = null; proj = []; nums = []; parts = []; ondas = []; nuvens = []; rachas = []; raios = []; rotulos = []; fantasmas = []; fxs = [];
+    novas = []; pop = [null, null]; lance = [null, null]; recuo = [null, null]; acerto = [null, null]; aura = [null, null];
+    hudHit = [-9999, -9999]; kos = [null, null]; entrou = [null, null]; ko = null; tremor = null; proj = []; nums = []; parts = []; ondas = []; nuvens = []; rachas = []; raios = []; feixes = []; rotulos = []; fantasmas = []; fxs = [];
     onos = []; esquiva = [null, null]; clarao = null; escudo = [null, null]; koAgendado = false;
     if (window.PixmonSom) { window.PixmonSom.ambiente(bioma); window.PixmonSom.intensidade(0); } // ambiência do bioma sorteado
   }
@@ -619,7 +632,7 @@
     const b = base(i), d = dirPara(i);
     let m = 0, lado = 0;
     const l = lance[i], rc = recuo[i], a = acerto[i], es = esquiva[i];
-    if (l && agora - l.t0 < l.dur) m += Math.sin(Math.PI * ((agora - l.t0) / l.dur)) * Math.min(l.dist, d.l - 40); // para no contato: os sprites se tocam, não se sobrepõem
+    if (l && agora - l.t0 < l.dur) { const u = (agora - l.t0) / l.dur, w = (u - 0.5) * 2, c = u < 0.5 ? Math.pow(u * 2, 2.2) : 1 - w * w * (3 - 2 * w) + 0.06 * Math.sin(w * Math.PI * 2) * (1 - w); m += c * Math.min(l.dist, d.l - 40); } // vai acelerando, encosta no meio e volta suave // para no contato: os sprites se tocam, não se sobrepõem
     if (rc && agora - rc.t0 < rc.dur) m -= Math.sin(Math.PI * ((agora - rc.t0) / rc.dur)) * 9;
     if (a && agora - a.t0 < a.dur) m -= a.forca * (1 - (agora - a.t0) / a.dur); // empurrado para longe do atacante
     if (es && agora - es.t0 < es.dur) lado = Math.sin(Math.PI * ((agora - es.t0) / es.dur)) * 30 * es.lado; // esquiva: um salto de lado
@@ -678,10 +691,50 @@
       g.globalAlpha = 1;
     }
   }
-  function ono(x, y, txt, cor, tam, vida = 650) { onos.push({ x, y, txt, cor, tam, t0: relogio, vida, rot: (hash(Math.round(x), Math.round(y)) - 0.5) * 0.5 }); }
+  // Onomatopeias: raras e pequenas (no máximo 1 na tela, tamanho 55%) para não poluir a luta; só o impacto do ultimate e o crítico têm a sua
+  function ono(x, y, txt, cor, tam, vida = 650) { if (onos.length >= 1) return; tam = Math.max(5, Math.round(tam * 0.55)); onos.push({ x, y, txt, cor, tam, t0: relogio, vida, rot: (hash(Math.round(x), Math.round(y)) - 0.5) * 0.5 }); }
 
   // Evento 'carga': o monstro começa a preparar o ataque (a carga dura e.dur ms, vista no anel que fecha em volta dele):
   // nome da habilidade, aura, som e a onomatopeia de carga nos ataques maiores. É o aviso para o adversário usar a defesa.
+  // Visual de cada poder do ultimate (battle.js: PODER_DE). carga: som da carga | lanca: o ataque sai (substitui a investida) | buff: o poder é ativado (evento 'buff')
+  const CORES_FRENESI = { c: '#c8261a', d: '#7a1010', l: '#ff6a4a', a: '#ffd890' };
+  const PODERES_VIS = {
+    feixe: {
+      carga: (e, pa) => som('feixeCarga', e.tipo, e.dur / 1000, pa),
+      lanca: (e, a, d, pa, pp) => { // Lightbeam: o monstro fica parado e dispara um raio contínuo; o impacto vem logo depois da abertura do feixe
+        som('feixe', e.tipo, pa);
+        feixes.push({ a, d, t0: relogio, dur: 620, tipo: e.tipo, fixo: e.esquiva ? pos(d, relogio) : null });
+        ondas.push({ x: pp.x, y: pp.y - 14, t0: relogio, cor: corDe(e.tipo).a, grande: true });
+        clarao = { t0: performance.now(), dur: 120 };
+        if (e.esquiva) agendar(60, () => esquivar(e));
+        agendar(150, () => impacto(e));
+      },
+    },
+    nova: {
+      lanca: (e, a, d, pa, pp) => { // Supernova: o monstro explode em luz; três anéis varrem a arena, quebram os objetos (sem dar item) e o impacto chega no alvo quando o primeiro anel o alcança
+        const pd = pos(d, relogio), dist = Math.hypot(pd.x - pp.x, pd.y - pp.y), atraso = Math.max(150, Math.min(380, dist / 0.55));
+        novas.push({ a, x: pp.x, y: pp.y, t0: relogio, dur: 700, tipo: e.tipo });
+        som('ultimateImpacto', pa);
+        const ag = performance.now(); clarao = { t0: ag, dur: 220 }; tremor = { t0: ag, dur: 650, mag: 5 };
+        ondas.push({ x: pp.x, y: pp.y - 12, t0: relogio, cor: '#ffffff', grande: true });
+        for (const [t, r] of [[120, 120], [260, 260], [420, 460]]) agendar(t, () => quebraPerto(pp.x, pp.y, r, null)); // os objetos quebram conforme o anel passa; sem item para ninguém
+        agendar(atraso, () => impacto(e));
+      },
+    },
+    frenesi: {
+      carga: (e, pa) => som('ultimate', pa),
+      buff: (e) => { // o monstro explode em poder: ondas vermelhas, grito, brasas subindo e o brilho fica enquanto durar (desenharMonstro)
+        const p = pos(e.i, relogio), pa = panDe(e.i);
+        rotulos.push({ i: e.i, txt: 'FRENESI!', t0: relogio, cor: '#ff5a3a', tam: 14, dy: -66, vida: 1000 });
+        ondas.push({ x: p.x, y: p.y - 12, t0: relogio, cor: '#ff5a3a', grande: true }); agendar(120, () => ondas.push({ x: p.x, y: p.y - 12, t0: relogio, cor: '#ffd890', grande: true }));
+        for (let k = 0; k < 18; k++) parts.push({ x: p.x + (hash(k, 3) - 0.5) * 24, y: p.y - 4, vx: (hash(k, 5) - 0.5) * 1.2, vy: -1 - hash(k, 7) * 1.6, g: 0, t0: relogio, vida: 700, c: ['#ffd890', '#ff6a4a', '#c8261a'][k % 3], tam: 2 });
+        nuvem(p.x, p.y, 'poeira', 8, { anel: true, r0: 3, r1: 11 });
+        const ag = performance.now(); clarao = { t0: ag, dur: 160 }; tremor = { t0: ag, dur: 320, mag: 4 };
+        som('frenesi', pa);
+      },
+    },
+  };
+  function buff(e) { const pv = PODERES_VIS[e.poder]; if (pv && pv.buff) pv.buff(e); } // poder desconhecido: ignora
   const rotRegra = (i, txt) => rotulos.push({ i, txt: '⚙ ' + txt, t0: relogio, cor: '#9fd0ff', tam: 9, dy: -30, vida: 900 });
   function carga(e) {
     if (e.regra) rotRegra(e.atq, e.regra);
@@ -689,8 +742,10 @@
     rotulos.push({ i: a, txt: e.golpe, t0: relogio, tipo: e.tipo, cor: e.idx === 2 ? '#ffd35a' : PAL.gold, tam: e.idx === 2 ? 12 : 11, dy: -44, vida: Math.max(800, e.dur + 400) });
     aura[a] = { t0: relogio, cor: corDe(e.tipo).a };
     recuo[a] = { t0: relogio, dur: Math.max(200, e.dur) }; // um passo atrás para tomar impulso
-    if (e.idx >= 1) { som('carga', e.tipo, pa); ono(pp.x, pp.y - 30, ONO_CARGA[e.tipo], ONO_COR[e.tipo], 6, Math.min(800, e.dur + 250)); }
-    if (e.idx === 2) som('ultimate', pa);
+    const pv = PODERES_VIS[e.poder] || {}; // cada poder do ultimate tem o seu som de carga (se não, o padrão do elemento)
+    if (pv.carga) pv.carga(e, pa);
+    if (e.idx >= 1) { if (!pv.carga) som('carga', e.tipo, pa); }
+    if (e.idx === 2 && !pv.carga) som('ultimate', pa);
   }
 
   // Um talento disparou (Abertura, Último suspiro, Sede de ultimate, Casca grossa, Corpo fechado): rótulo dourado curto
@@ -740,7 +795,7 @@
   function statusAplicado(e) {
     const p = pos(e.i, relogio), [txt, cor] = ROT_ST[e.st];
     agendar(260, () => { rotulos.push({ i: e.i, txt, t0: relogio, cor, tam: 12, dy: -70, vida: 1100 }); som('status', e.st, panDe(e.i)); });
-    if (e.cancelou) { aura[e.i] = null; ono(p.x, p.y - 34, 'TOC!', '#ff6a5a', 8, 600); }
+    if (e.cancelou) { aura[e.i] = null; }
   }
   // Item de um objeto quebrado: rótulo e partículas no monstro que o pegou (benção em dourado, maldição em roxo)
   const ROT_ITEM = { cura: ['+VIDA', '#6fd66f'], forca: ['FORÇA!', '#ff9a3a'], recarga: ['RECARGA!', '#7ad0ff'], desfeito: ['DESFEITA!', '#9fd0ff'], dano: ['MALDIÇÃO!', '#c07aff'], stun: ['MALDIÇÃO!', '#c07aff'], veneno: ['MALDIÇÃO!', '#c07aff'] };
@@ -758,9 +813,10 @@
   function dot(e) { // um tique de veneno
     const p = pos(e.i, relogio);
     hpAlvo[e.i] = e.hpApos; hudHit[e.i] = performance.now() - 200;
-    nums.push({ x: p.x + 8, y: p.y - 30, txt: '-' + Math.max(1, Math.round(e.dano)), t0: relogio, tam: 11, cor: '#5cc84a' });
-    for (let k = 0; k < 3; k++) parts.push({ x: p.x + (k - 1) * 6, y: p.y - 14, vx: 0, vy: -0.4 - k * 0.1, g: 0, t0: relogio, vida: 450, c: '#5cc84a', tam: 2 });
-    som('dot', panDe(e.i));
+    const fr = e.fonte === 'Frenesi'; // o custo do frenesi aparece em vermelho e sem o som de veneno
+    nums.push({ x: p.x + 8, y: p.y - 30, txt: '-' + Math.max(1, Math.round(e.dano)), t0: relogio, tam: fr ? 9 : 11, cor: fr ? '#ff6a4a' : '#5cc84a' });
+    for (let k = 0; k < 3; k++) parts.push({ x: p.x + (k - 1) * 6, y: p.y - 14, vx: 0, vy: -0.4 - k * 0.1, g: 0, t0: relogio, vida: 450, c: fr ? '#ff6a4a' : '#5cc84a', tam: 2 });
+    if (!fr) som('dot', panDe(e.i));
   }
 
   // Evento 'defesa': o escudo sobe e fica até a duração acabar ou até bloquear um ataque.
@@ -777,17 +833,22 @@
   // Evento 'golpe': a carga acabou e o ataque sai (o dano já foi decidido pela lógica; a barra de vida desce no impacto).
   function lanca(e) {
     const a = e.atq, d = e.def, pa = panDe(a), pp = pos(a, relogio);
+    pop[a] = { t0: relogio }; // solta a carga: estica e balança até assentar
     if (e.idx === 1) { // forte: projétil do elemento
       som('projetil', e.tipo, pa);
       if (e.tipo === 'fogo') nuvem(pp.x, pp.y - 8, 'fumaca', 3, { r0: 2, r1: 7, vida: 700 });
-      proj.push({ d, t0: relogio, dur: 380, x0: pp.x, y0: pp.y - 12, tipo: e.tipo, e, trail: [] });
+      proj.push({ d, t0: relogio, dur: e.fx === 'area' ? 430 : e.fx === 'onda' ? 440 : 380, x0: pp.x, y0: pp.y - 12, tipo: e.tipo, e, trail: [], forma: e.fx || 'proj' });
       ondas.push({ x: pp.x, y: pp.y - 12, t0: relogio, cor: corDe(e.tipo).a, grande: false });
+    } else if (PODERES_VIS[e.poder] && PODERES_VIS[e.poder].lanca) {
+      PODERES_VIS[e.poder].lanca(e, a, d, pa, pp);
+    } else if (e.fx === 'rajada' && e.idx === 0) { // rápido em rajada: fica parado e dispara 3 tiros miúdos; o dano entra no último
+      som('projetil', e.tipo, pa);
+      for (let k = 0; k < 3; k++) agendar(k * 70, () => { const q0 = pos(a, relogio); proj.push({ d, t0: relogio, dur: 230, x0: q0.x, y0: q0.y - 12 + (k - 1) * 6, tipo: e.tipo, e, trail: [], forma: 'mini', parcial: k < 2 }); });
     } else { // rápido: investida curta; ultimate (idx 2): investida longa com rastro do elemento e efeito grande
       som('lance', e.tipo, pa);
-      if (e.idx === 2) ono(pp.x, pp.y - 30, ONO_LANCE[Math.floor(hash(bt.t, a + 5) * 3)], '#ffffff', 6, 480);
       const dur = e.idx === 2 ? 440 : 280;
       nuvem(pp.x, pp.y, 'poeira', e.idx === 2 ? 6 : 3, { anel: true, r0: 2, r1: 6, vida: 450 });
-      lance[a] = { t0: relogio, dur, dist: e.idx === 2 ? 170 : 130, forte: e.idx === 2, tipo: e.tipo };
+      lance[a] = { t0: relogio, dur, dist: e.idx === 2 ? 170 : 130, forte: e.idx === 2, tipo: e.tipo, pulo: e.poder === 'pulo' };
       if (e.esquiva) agendar(Math.max(0, dur * 0.5 - 110), () => esquivar(e)); // o alvo salta de lado um pouco antes do contato
       agendar(dur * 0.5, () => impacto(e));
     }
@@ -796,6 +857,7 @@
   // O alvo desvia: salto de lado, sombra onde estava, aviso e som. Chamado antes do contato (investida) ou com o projétil perto.
   function esquivar(e) {
     const d = e.def;
+    if (e.aereo) { if (!esquiva[d] || relogio - esquiva[d].t0 > 320) { esquiva[d] = { t0: relogio, dur: 1, lado: 0 }; rotulos.push({ i: d, txt: 'NO AR!', t0: relogio, cor: '#ffffff', tam: 11, dy: -58, vida: 700 }); } return; } // super pulo: o alvo está no ar, sem salto de lado
     if (esquiva[d] && relogio - esquiva[d].t0 < 320) return;
     const p = pos(d, relogio);
     esquiva[d] = { t0: relogio, dur: 300, lado: hash(bt.t, d + 3) < 0.5 ? -1 : 1 };
@@ -809,6 +871,10 @@
   function impacto(e) {
     const d = e.def, p = pos(d, relogio), forte = Math.min(1, e.dano / 8), agoraReal = performance.now();
     const est = ESTILO[e.tipo], cor = corDe(e.tipo), pa = panDe(d), ult = e.idx === 2;
+    if (e.atravessou) { // supernova: a defesa se parte mas deixa passar parte do dano
+      escudo[d] = null; if (FX['escudo-quebra']) fxs.push({ nome: 'escudo-quebra', x: p.x, y: p.y - 15, t0: relogio, escala: ESCALA_FX['escudo-quebra'] });
+      rotulos.push({ i: d, txt: 'ESCUDO PARTIDO!', t0: relogio, cor: '#9fd0ff', tam: 10, dy: -80, vida: 800 });
+    }
     if (e.bloqueado) { // a defesa segurou: o escudo se parte em faíscas, sem dano
       escudo[d] = null;
       fxs.push({ nome: 'escudo-quebra', x: p.x, y: p.y - 15, t0: relogio, escala: ESCALA_FX['escudo-quebra'] });
@@ -819,7 +885,6 @@
       }
       nuvem(p.x, p.y, 'poeira', 6, { anel: true, r0: 2, r1: 6, vida: 450 });
       rotulos.push({ i: d, txt: 'BLOQUEOU!', t0: relogio, cor: '#9fd0ff', tam: 12, dy: -58, vida: 800 });
-      ono(p.x, p.y - 26, 'CLANG!', '#9fd0ff', 7, 600);
       tremor = { t0: agoraReal, dur: 140, mag: 2 };
       congelaAte = Math.max(congelaAte, agoraReal + 60);
       som('bloqueio', pa);
@@ -827,7 +892,6 @@
     }
     if (e.esquiva) { // errou: só o vento do golpe e a onomatopeia
       ondas.push({ x: p.x, y: p.y - 12, t0: relogio, cor: '#ffffff', grande: false });
-      ono(p.x, p.y - 26, ONO_ESQ[Math.floor(hash(bt.t, d) * 3)], '#ffffff', 7, 520);
       return;
     }
     const super_ = e.mult > 1, fraco = e.mult < 1, crit = e.crit;
@@ -841,9 +905,10 @@
     if (super_) rotulos.push({ i: d, txt: 'SUPER!', t0: relogio, cor: '#ffd35a', tam: 13, dy: crit ? -80 : -58, vida: 700 });
     if (fraco) rotulos.push({ i: d, txt: 'fraco...', t0: relogio, cor: '#9fb4c8', tam: 10, dy: crit ? -80 : -58, vida: 700 });
     // onomatopeia só no ultimate, no crítico e em ~1 de cada 3 golpes rápidos/fortes (senão polui a tela); vermelha no crítico
-    if (ult || crit || hash(bt.t, d + 9) < 0.35) ono(p.x + (hash(bt.t, d + 9) - 0.5) * 16, p.y - 20, ONO[e.tipo][e.idx][Math.floor(hash(bt.t, d + 7 * e.idx) * 3)], crit ? '#ff5a3a' : ONO_COR[e.tipo], [6, 7, 9][e.idx] + (crit ? 2 : 0), crit ? 800 : 650);
-    ondas.push({ x: p.x, y: p.y - 12, t0: relogio, cor: cor.a, grande: ult || super_ || crit });
-    const n = 10 + Math.round(10 * forte) + (crit ? 12 : 0) + (ult ? 16 : 0);
+    if (ult || crit) ono(p.x + (hash(bt.t, d + 9) - 0.5) * 16, p.y - 20, ONO[e.tipo][e.idx][Math.floor(hash(bt.t, d + 7 * e.idx) * 3)], crit ? '#ff5a3a' : ONO_COR[e.tipo], [6, 7, 9][e.idx] + (crit ? 2 : 0), crit ? 800 : 650);
+    const area = e.fx === 'area';
+    ondas.push({ x: p.x, y: p.y - 12, t0: relogio, cor: cor.a, grande: ult || super_ || crit || area });
+    const n = 10 + Math.round(10 * forte) + (crit ? 12 : 0) + (ult ? 16 : 0) + (area ? 10 : 0);
     for (let k = 0; k < n; k++) {
       const an = (k / n) * Math.PI * 2 + hash(k, 3) * 0.6, v = 1.2 + hash(k, 5) * 1.6 + forte + (crit ? 0.8 : 0) + (ult ? 0.8 : 0);
       parts.push({ x: p.x, y: p.y - 12, vx: Math.cos(an) * v, vy: Math.sin(an) * v - 0.6, g: est.grav, t0: relogio, vida: 460, c: est.cores[k % 3], tam: e.tipo === 'terra' ? 3 : 2 });
@@ -856,13 +921,21 @@
     if (ult && e.tipo === 'agua') empilha('agua-splash', 0, 4);
     if (ult && e.tipo === 'eletrico') empilha('eletrico-raio', 0, 4);
     if (ult && e.tipo === 'ar') { const dir = pos(e.atq, relogio).x > p.x; empilha('ar-corte', dir ? 28 : -28, -14, 1, dir); }
+    if (e.poder === 'pulo') { // super pulo: cratera dupla, anel de choque largo, detritos, tremor forte e quebra tudo em volta
+      racha(p.x, p.y, true); racha(p.x + 10, p.y + 4, true); quebraPerto(p.x, p.y, 80, e.atq);
+      nuvem(p.x, p.y, 'poeira', 14, { anel: true, r0: 4, r1: 14, vida: 700 });
+      ondas.push({ x: p.x, y: p.y, t0: relogio, cor: '#ffffff', grande: true }); agendar(90, () => ondas.push({ x: p.x, y: p.y, t0: relogio, cor: cor.a, grande: true }));
+      for (let k = 0; k < 14; k++) parts.push({ x: p.x, y: p.y - 4, vx: (hash(k, 21) - 0.5) * 4.5, vy: -1.5 - hash(k, 23) * 2.2, g: 0.14, t0: relogio, vida: 600, c: ['#74502c', '#a8793f', '#d8b878'][k % 3], tam: 3 });
+      tremor = { t0: agoraReal, dur: 520, mag: 7 };
+    }
     if (ult || crit || e.tipo === 'terra') { racha(p.x, p.y, ult || crit); nuvem(p.x, p.y, 'poeira', ult ? 10 : 6, { anel: true, r0: 3, r1: ult ? 11 : 8 }); }
-    else if (idxForte(e)) nuvem(p.x, p.y, 'poeira', 4, { anel: true, vida: 500 });
+    else if (idxForte(e)) nuvem(p.x, p.y, 'poeira', area ? 8 : 4, { anel: true, r1: area ? 10 : 8, vida: 500 });
     if (e.tipo === 'fogo' && !empilha('fumaca', 0, -12, ult ? 1.3 : 0.8)) nuvem(p.x, p.y - 8, 'fumaca', ult ? 6 : 3, { r0: 3, r1: 9, vida: 900 });
     if (e.tipo === 'agua' || e.tipo === 'ar') nuvem(p.x, p.y - 6, 'vapor', ult ? 5 : 2, { r0: 3, r1: 8, vida: 600 });
     if (e.tipo === 'eletrico') raios.push({ x: p.x, y: p.y - 12, t0: relogio });
+    if (e.fx === 'garra' && e.idx === 0 && FX['garra']) fxs.push({ nome: 'garra', x: p.x, y: p.y - 14, t0: relogio, escala: ESCALA_FX['garra'], flip: pos(e.atq, relogio).x > p.x });
     const nomeImp = IMPACTO_FX[e.tipo];
-    if (nomeImp && FX[nomeImp]) fxs.push({ nome: nomeImp, x: p.x, y: p.y - 3, t0: relogio, escala: ult ? ESCALA_FX[nomeImp] * 1.8 : crit ? ESCALA_FX[nomeImp] * 1.4 : ESCALA_FX[nomeImp] });
+    if (nomeImp && FX[nomeImp] && !(area && FX['area-' + e.tipo])) fxs.push({ nome: nomeImp, x: p.x, y: p.y - 3, t0: relogio, escala: ult ? ESCALA_FX[nomeImp] * 1.8 : crit || area ? ESCALA_FX[nomeImp] * 1.4 : ESCALA_FX[nomeImp] });
     som('golpe', e.tipo, e.dano, e.idx, pa);
     if (ult) som('ultimateImpacto', pa);
     if (crit) som('critico', pa);
@@ -874,7 +947,7 @@
 
   // Eventos da lógica em tempo real: 'carga' (começa a preparar), 'golpe' (sai o ataque) e 'defesa' (o escudo sobe).
   function eventos(evs) {
-    for (const e of evs) { if (e.ev === 'carga') carga(e); else if (e.ev === 'defesa') defender(e); else if (e.ev === 'status') statusAplicado(e); else if (e.ev === 'dot') dot(e); else if (e.ev === 'nocaute') nocaute(e); else if (e.ev === 'cura') cura(e); else if (e.ev === 'talento') talento(e); else if (e.ev === 'troca') troca(e); else lanca(e); }
+    for (const e of evs) { if (e.ev === 'carga') carga(e); else if (e.ev === 'defesa') defender(e); else if (e.ev === 'status') statusAplicado(e); else if (e.ev === 'dot') dot(e); else if (e.ev === 'nocaute') nocaute(e); else if (e.ev === 'cura') cura(e); else if (e.ev === 'talento') talento(e); else if (e.ev === 'troca') troca(e); else if (e.ev === 'buff') buff(e); else lanca(e); }
     if (bt.fim && bt.fim.vencedor != null && !koAgendado) { // o K.O. espera o impacto final aparecer
       koAgendado = true;
       agendar(900, () => {
@@ -915,9 +988,37 @@
     }
   }
 
+  // Golpe forte em 'onda': arco de energia (meia-lua) que varre até o alvo, com rastro de arcos mais fracos
+  function arco(cx, cy, ang, R, esc, alfa, c) {
+    g.globalAlpha = alfa;
+    for (let a = -75; a <= 75; a += 7) {
+      const an = ang + (a * Math.PI) / 180, X = Math.round(cx - Math.cos(ang) * R * 0.6 + Math.cos(an) * R), Y = Math.round(cy - Math.sin(ang) * R * 0.6 + Math.sin(an) * R * 0.9), s = Math.max(1, Math.round((6 * (1 - Math.abs(a) / 95)) * esc));
+      px(g, X - Math.floor((s + 2) / 2), Y - Math.floor((s + 2) / 2), s + 2, s + 2, c.c); px(g, X - Math.floor(s / 2), Y - Math.floor(s / 2), s, s, c.l);
+      if (s > 2) px(g, X - Math.floor((s - 2) / 2), Y - Math.floor((s - 2) / 2), s - 2, s - 2, '#ffffff');
+    }
+    g.globalAlpha = 1;
+  }
+  // Golpe forte em 'area': círculo no chão do alvo que fecha e se enche de luz; sobe a coluna do elemento perto do fim (a explosão vem no impacto)
+  function marcaArea(q, x, y, agora) {
+    const c = corDe(q.tipo), p = Math.min(1, (agora - q.t0) / q.dur), gy = y + 12, rr = Math.round(28 - 14 * p);
+    g.globalAlpha = 0.15 + 0.35 * p; ellipse(g, x, gy, rr, Math.round(rr * 0.5), c.l); g.globalAlpha = 1;
+    anel(x, gy, rr + 2, c.a, 0.9, 12); anel(x, gy, Math.round(rr * 0.6), '#ffffff', 0.6 * p, 16);
+    const cores = ESTILO[q.tipo].cores;
+    for (let k = 0; k < 7; k++) { const h = hash(k, Math.round(x)), sob = ((agora / 500 + h) % 1) * 24 * p; px(g, Math.round(x + (h - 0.5) * 2 * rr * 0.8), Math.round(gy - 2 - sob), 2, 2, cores[k % 3]); }
+    if (p > 0.8) { g.globalAlpha = (p - 0.8) * 5; px(g, x - 3, gy - 40, 7, 40, c.l); px(g, x - 1, gy - 40, 3, 40, '#ffffff'); g.globalAlpha = 1; if (q.tipo === 'eletrico') raioZig(x, gy - 60, x, gy, Math.floor(agora / 40), 4); }
+  }
+
   function desenharProjetil(q, x, y, agora) {
     const c = corDe(q.tipo);
     x = Math.round(x); y = Math.round(y);
+    if (q.forma === 'mini') { q.trail.forEach((t, k) => px(g, Math.round(t.x) - 1, Math.round(t.y) - 1, 2, 2, k % 2 ? c.l : c.c)); ellipse(g, x, y, 3, 3, c.c); ellipse(g, x, y, 2, 2, c.l); px(g, x - 1, y - 1, 2, 2, '#ffffff'); return; }
+    if (q.forma === 'area') { if (FX['area-' + q.tipo]) drawFx('area-' + q.tipo, x, (q.fixo || pos(q.d, agora)).y, agora - q.t0, { escala: ESCALA_FX['area-' + q.tipo] }); else marcaArea(q, x, y, agora); return; }
+    if (q.forma === 'onda') {
+      const al = q.fixo || pos(q.d, agora), ang = Math.atan2(al.y - 12 - q.y0, al.x - q.x0);
+      q.trail.forEach((t, k) => { if (k % 2 === 0) arco(t.x, t.y, ang, 14, 0.7, 0.15 + 0.1 * k, c); }); // rastro de arcos mais fracos
+      arco(x, y, ang, 17, 1, 1, c);
+      return;
+    }
     const f = Math.floor(agora / 60) % 2;
     const nomeFx = PROJ_FX[q.tipo];
     if (nomeFx && FX[nomeFx]) {
@@ -965,6 +1066,22 @@
     }
   }
 
+  // Respiração de cada elemento: [período em ms, esticar em x, esticar em y] (fogo tremula, água ondula, terra pesa, ar flutua, elétrico vibra)
+  const IDLE = { fogo: [110, 0.02, 0.04], agua: [380, 0.04, -0.04], terra: [800, 0.015, 0.02], ar: [520, -0.02, 0.035], eletrico: [70, 0.02, 0.02] };
+  // squash/stretch do monstro em campo: respiração do elemento, agachar na carga, esticar ao soltar o golpe e achatar/inclinar ao levar dano (molas amortecidas)
+  function formaDe(i, m, agora) {
+    const [per, ax, ay] = IDLE[m.tipo] || IDLE.fogo, ws = Math.sin((agora + i * 200) / per);
+    let sx = 1 + ax * ws, sy = 1 + ay * ws, rot = 0;
+    const ac = bt.lados[i].acao;
+    if (ac && !bt.fim && ac.slot !== 'defesa') { const pr = Math.max(0, Math.min(1, 1 - (ac.fim - bt.t) / ac.dur)), k = ac.slot === 'ultimate' ? 0.16 : ac.slot === 'forte' ? 0.1 : 0.05; sy -= k * pr; sx += k * 0.8 * pr; }
+    const po = pop[i], qp = po ? (agora - po.t0) / 450 : 1;
+    if (qp < 1) { const dev = Math.exp(-4 * qp) * Math.cos(qp * 13); sy += 0.16 * dev; sx -= 0.12 * dev; }
+    const ah = acerto[i], qh = ah ? (agora - ah.t0) / 420 : 1;
+    if (qh < 1) { const fz = Math.min(1, ah.forca / 20), dev = Math.exp(-5 * qh) * Math.cos(qh * 14); sx -= 0.14 * fz * dev; sy += 0.1 * fz * dev; rot = -dirPara(i).x * 0.2 * fz * Math.exp(-5 * qh); }
+    const fr = bt.lados[i].st.frenesi;
+    return { sx, sy, rot, frenesi: !!(fr && fr.ate > bt.t), t: agora };
+  }
+  const ultFan = [0, 0];
   function desenharMonstro(i, p, agora) {
     const m = bt.lados[i].m, outro = pos(1 - i, agora);
     const flip = outro.x < p.x; // sempre de frente para o adversário
@@ -985,11 +1102,28 @@
     }
     const stv = bt.lados[i].st || {}, on = (n) => stv[n] && stv[n].ate > bt.t, perd = !!kd, venc = ko && ko.perdedor === 1 - i;
     const prog = l && agora - l.t0 < l.dur ? (agora - l.t0) / l.dur : null;
-    const treme = on('paralisia') ? Math.round(Math.sin(agora / 25) * 1.5) : 0, tomb = perd ? Math.min(1, (agora - kd.t0) / 500) : 0; // paralisia treme; o derrotado tomba
+    const acT = bt.lados[i].acao, vib = acT && !bt.fim && acT.slot !== 'defesa' && 1 - (acT.fim - bt.t) / acT.dur > 0.7; // vibra no fim da carga
+    const treme = on('paralisia') ? Math.round(Math.sin(agora / 25) * 1.5) : vib ? Math.round(Math.sin(agora / 22) * (acT.slot === 'ultimate' ? 1.5 : 1)) : 0, tomb = perd ? Math.min(1, (agora - kd.t0) / 500) : 0; // paralisia treme; o derrotado tomba
+    const frA = bt.lados[i].st.frenesi && bt.lados[i].st.frenesi.ate > bt.t && !perd; // frenesi ativo: aura de chamas atrás, rastro de imagens e brasas
+    if (frA) {
+      if (FX['frenesi-aura']) { g.globalAlpha = 0.8; drawFx('frenesi-aura', p.x, p.y + 3, agora, { escala: ESCALA_FX['frenesi-aura'] }); g.globalAlpha = 1; }
+      if (!ultFan[i] || agora - ultFan[i] > 110) { ultFan[i] = agora; fantasmas.push({ i, x: p.x, y: p.y, flip, t0: agora }); }
+      if (hash(Math.floor(agora / 40), i + 9) < 0.5) parts.push({ x: p.x + (hash(Math.floor(agora / 40), i) - 0.5) * 18, y: p.y - 6, vx: 0, vy: -0.9, g: 0, t0: agora, vida: 500, c: hash(Math.floor(agora / 40), i + 2) < 0.5 ? '#ff6a4a' : '#ffd890', tam: 2 });
+    }
+    // super pulo: agacha na carga, sobe (e some do chão) e desce sobre o alvo; no chão do alvo cresce uma sombra com anel
+    let alt = 0;
+    const acP = bt.lados[i].acao, poderP = m.golpes.ultimate.poder === 'pulo';
+    if (poderP && !perd) {
+      const lP = lance[i], uP = lP && lP.pulo && agora - lP.t0 < lP.dur ? (agora - lP.t0) / lP.dur : null;
+      let q = 0;
+      if (acP && !bt.fim && acP.slot === 'ultimate') { const pr = Math.max(0, Math.min(1, 1 - (acP.fim - bt.t) / acP.dur)); q = Math.max(0, (pr - 0.4) / 0.6); alt = 95 * Math.sin(Math.min(1, q / 0.5) * Math.PI / 2); }
+      else if (uP != null) { q = 1; alt = uP < 0.5 ? 95 * Math.pow(1 - uP / 0.5, 2) : 0; }
+      if (q > 0) { const t = pos(1 - i, agora), cc = corDe(m.golpes.ultimate.tipo); g.globalAlpha = 0.18 + 0.3 * q; ellipse(g, Math.round(t.x), Math.round(t.y + 2), Math.round(8 + 16 * q), Math.round(4 + 8 * q), '#000000'); g.globalAlpha = 1; anel(t.x, t.y + 2, 10 + 16 * q, cc.a, 0.85, 14); }
+    }
     if (alpha > 0) {
       g.save();
       if (perd) { g.translate(Math.round(p.x), Math.round(p.y)); g.rotate((flip ? 1 : -1) * 1.4 * tomb); g.translate(-Math.round(p.x), -Math.round(p.y) + Math.round(8 * tomb)); }
-      monstro(g, m, Math.round(p.x) + treme, Math.round(p.y), agora * 1.8 + i * 170, flip, flash, alpha, prog, on('stun') || perd ? 0 : venc ? 8 * Math.abs(Math.sin(agora / 140)) : pulo);
+      monstro(g, m, Math.round(p.x) + treme, Math.round(p.y), agora * 1.8 + i * 170, flip, flash, alpha, prog, (on('stun') || perd ? 0 : venc ? 8 * Math.abs(Math.sin(agora / 140)) : pulo) + alt, perd ? null : formaDe(i, m, agora));
       g.restore();
     }
     if (on('veneno')) for (let k = 0; k < 4; k++) { const ph = (agora / 900 + k / 4) % 1; g.globalAlpha = 1 - ph; ellipse(g, Math.round(p.x + (hash(k, i) - 0.5) * 20), Math.round(p.y - 8 - ph * 28), ph < 0.8 ? 2 : 1, ph < 0.8 ? 2 : 1, '#5cc84a'); g.globalAlpha = 1; }
@@ -1007,6 +1141,41 @@
       g.globalAlpha = pisca ? 0.12 : 0.28; ellipse(g, p.x, p.y - 15, r, r * 0.95, corDe(es.tipo).l); g.globalAlpha = 1;
       anel(p.x, p.y - 15, r, pisca ? '#ffffff' : corDe(es.tipo).a, pisca ? 0.5 : 0.95, 10);
       }
+    }
+    // Carga de poder (some sozinha se a carga for cancelada). Ultimate (e Lightbeam): luz sugada, orbe na boca, coluna de luz, anéis e tremor crescente.
+    // Forte: esfera do elemento com faíscas orbitando. Rápido: brilho curto na boca.
+    const acF = bt.lados[i].acao;
+    if (acF && !bt.fim && acF.slot === 'ultimate') {
+      const poderN = bt.lados[i].m.golpes.ultimate.poder === 'nova', poderF = bt.lados[i].m.golpes.ultimate.poder === 'frenesi', pr = Math.max(0, Math.min(1, 1 - (acF.fim - bt.t) / acF.dur)), cc = poderF ? CORES_FRENESI : corDe(bt.lados[i].m.golpes.ultimate.tipo), fac = poderN ? 0 : flip ? -1 : 1; // na supernova a luz se concentra no corpo, não na boca
+      g.globalAlpha = 0.2 + 0.4 * pr; ellipse(g, Math.round(p.x), Math.round(p.y), Math.round(10 + 16 * pr), Math.round(4 + 6 * pr), cc.l); g.globalAlpha = 1;
+      if (pr > 0.5) { g.globalAlpha = (pr - 0.5) * 1.2; const ap = Math.floor(agora / 60) % 2; px(g, Math.round(p.x) - 4 - ap, Math.round(p.y) - 46, 2, 46, cc.l); px(g, Math.round(p.x) + 3 + ap, Math.round(p.y) - 46, 2, 46, cc.l); g.globalAlpha = 1; }
+      for (let k = 0; k < 12; k++) { // partículas entram em espiral e aceleram ao chegar
+        const ph = ((agora / (700 - 300 * pr) + k / 12) % 1), an = k * 2.4 + ph * 2, r = 4 + 34 * (1 - ph) * (1 - ph);
+        g.globalAlpha = Math.min(1, ph * 3);
+        px(g, Math.round(p.x + fac * 12 + Math.cos(an) * r), Math.round(p.y - 14 + Math.sin(an) * r * 0.8), ph > 0.8 ? 3 : 2, ph > 0.8 ? 3 : 2, k % 3 === 0 ? '#ffffff' : k % 3 === 1 ? cc.l : cc.c);
+      }
+      g.globalAlpha = 1;
+      const ro = Math.round(2 + (poderN ? 15 : 9) * pr + Math.sin(agora / 40) * (1 + 2 * pr)), ox = Math.round(p.x + fac * 14), oy = Math.round(p.y - 14);
+      if (!poderF) { ellipse(g, ox, oy, ro + 2, ro + 2, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 3), Math.max(1, ro - 3), '#ffffff'); } // o frenesi não tem orbe: o poder fica no corpo
+      if (pr > 0.3) { anel(p.x, p.y - 12, 8 + 22 * pr, cc.l, 0.5 * pr, 14); anel(p.x, p.y - 12, 4 + 12 * pr, '#ffffff', 0.4 * pr, 18); }
+      const agoraReal = performance.now(); if (pr > 0.5 && (!tremor || agoraReal - tremor.t0 >= tremor.dur)) tremor = { t0: agoraReal, dur: 90, mag: pr > 0.85 ? 2 : 1 }; // o chão treme mais perto do disparo
+    } else if (acF && !bt.fim && (acF.slot === 'forte' || acF.slot === 'rapido')) {
+      const pr = Math.max(0, Math.min(1, 1 - (acF.fim - bt.t) / acF.dur)), cc = corDe(bt.lados[i].m.golpes[acF.slot].tipo), fac = flip ? -1 : 1, ox = Math.round(p.x + fac * 13), oy = Math.round(p.y - 13);
+      if (acF.slot === 'forte') {
+        const ro = Math.round(2 + 6 * pr + Math.sin(agora / 50) * pr);
+        for (let k = 0; k < 5; k++) { const an = agora / 150 + (k * Math.PI * 2) / 5; px(g, Math.round(ox + Math.cos(an) * (ro + 6)), Math.round(oy + Math.sin(an) * (ro + 6) * 0.8), 2, 2, ESTILO[bt.lados[i].m.golpes.forte.tipo].cores[k % 3]); }
+        ellipse(g, ox, oy, ro + 1, ro + 1, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 2), Math.max(1, ro - 2), '#ffffff');
+      } else {
+        const ro = Math.round(1 + 3 * pr); ellipse(g, ox, oy, ro + 1, ro + 1, cc.l); ellipse(g, ox, oy, ro, ro, '#ffffff');
+        if (Math.floor(agora / 60) % 2) px(g, ox + Math.round((hash(Math.floor(agora / 60), i) - 0.5) * 10), oy + Math.round((hash(Math.floor(agora / 60), i + 4) - 0.5) * 8), 2, 2, cc.a);
+      }
+    }
+    // ultimate pronto: aro dourado pulsando no chão (aviso de que vem um golpe grande, de qualquer lado)
+    // aro de recarga do ultimate: enche no chão em volta do monstro; cheio, pulsa dourado (de qualquer lado)
+    const Ls = bt.lados[i];
+    if (!bt.fim && !Ls.acao && !(kos[i] || (ko && ko.perdedor === i))) {
+      if (Ls.cd.ultimate <= 0) { const q = (agora / 700 + i * 0.4) % 1; anel(p.x, p.y + 2, 11 + 4 * q, '#ffd35a', 0.55 * (1 - q), 24); anel(p.x, p.y + 2, 11, '#ffd35a', 0.8, 24); }
+      else { const fr = 1 - Ls.cd.ultimate / Ls.cdTotal.ultimate; g.globalAlpha = i === 0 ? 0.85 : 0.5; for (let a = 0; a < fr * 360; a += 12) { const rad = ((a - 90) * Math.PI) / 180; px(g, Math.round(p.x + 11 * Math.cos(rad)), Math.round(p.y + 2 + 11 * 0.4 * Math.sin(rad)), 2, 2, '#ffd35a'); } g.globalAlpha = 1; }
     }
     // aviso de ataque carregando: o anel fecha em volta do atacante; nos ataques fortes do adversário aparece também um "!"
     const ac = bt.lados[i].acao;
@@ -1051,10 +1220,48 @@
       const p = Math.min(1, (agora - q.t0) / q.dur);
       if (q.e.esquiva && !q.fixo && p >= 0.7) { q.fixo = pos(q.d, agora); esquivar(q.e); } // o alvo desvia e o projétil segue para onde ele estava
       const alvo = q.fixo || pos(q.d, agora);
-      const x = q.x0 + (alvo.x - q.x0) * p, y = q.y0 + (alvo.y - 12 - q.y0) * p - Math.sin(Math.PI * p) * 10;
+      let x = q.x0 + (alvo.x - q.x0) * p, y = q.y0 + (alvo.y - 12 - q.y0) * p - Math.sin(Math.PI * p) * 10;
+      if (q.forma === 'area') { x = alvo.x; y = alvo.y - 12; } // área: a marca fica no alvo (segue até travar na esquiva)
       q.trail.push({ x, y }); if (q.trail.length > 8) q.trail.shift();
       quebraPerto(x, y, 14, q.e.atq); desenharProjetil(q, x, y, agora);
-      if (p >= 1) { impacto(q.e); return false; }
+      if (p >= 1) {
+        if (q.parcial) { ondas.push({ x: alvo.x, y: alvo.y - 12, t0: relogio, cor: corDe(q.tipo).a, grande: false }); }
+        else { if (q.forma === 'area' && FX['area-' + q.tipo]) fxs.push({ nome: 'area-' + q.tipo, x: alvo.x, y: alvo.y, t0: q.t0, escala: ESCALA_FX['area-' + q.tipo] }); impacto(q.e); } // a folha da área continua tocando depois do impacto
+        return false;
+      }
+      return true;
+    });
+
+    feixes = feixes.filter((b) => { // Lightbeam: três camadas (borda, meio, núcleo) com ondulação por quadro, flare na boca e no alvo
+      const t = agora - b.t0; if (t >= b.dur) return false;
+      const o = pos(b.a, agora), fac = pos(b.d, agora).x < o.x ? -1 : 1, al = b.fixo || pos(b.d, agora), cc = corDe(b.tipo);
+      const x0 = o.x + fac * 14, y0 = o.y - 14, x1 = al.x, y1 = al.y - 12;
+      const w = (t < 100 ? t / 100 : t > b.dur - 180 ? (b.dur - t) / 180 : 1) * (1 + 0.08 * Math.sin(t / 35));
+      const nx = -(y1 - y0), ny = x1 - x0, nl = Math.hypot(nx, ny) || 1, N = 14;
+      const camadas = [[Math.max(2, Math.round(12 * w)), cc.c, 0.7], [Math.max(2, Math.round(8 * w)), cc.l, 1], [Math.max(1, Math.round(4 * w)), '#ffffff', 1]];
+      for (const [e, cor, alfa] of camadas) {
+        g.globalAlpha = alfa;
+        let ax = x0, ay = y0;
+        for (let k = 1; k <= N; k++) {
+          const f = k / N, on = k === N ? 0 : Math.sin(t / 45 + k * 1.4) * 2 * w;
+          const bx = Math.round(x0 + (x1 - x0) * f + (nx / nl) * on), by = Math.round(y0 + (y1 - y0) * f + (ny / nl) * on);
+          linha(ax - e / 2, ay - e / 2, bx - e / 2, by - e / 2, cor, e); ax = bx; ay = by;
+        }
+      }
+      g.globalAlpha = 1;
+      for (const [x, y, r] of [[x0, y0, 7], [x1, y1, 10]]) { const rr = Math.round(r * w + Math.sin(t / 30) * 1.5); if (rr > 1) { ellipse(g, Math.round(x), Math.round(y), rr + 2, rr + 2, cc.c); ellipse(g, Math.round(x), Math.round(y), rr, rr, cc.l); ellipse(g, Math.round(x), Math.round(y), Math.max(1, rr - 3), Math.max(1, rr - 3), '#ffffff'); } }
+      if (t > 100) for (let k = 0; k < 2; k++) { // faíscas saltando do ponto de impacto
+        const an = hash(Math.floor(t / 16), k + 3) * Math.PI * 2;
+        parts.push({ x: x1, y: y1, vx: Math.cos(an) * 1.8, vy: Math.sin(an) * 1.8 - 0.8, g: 0.06, t0: agora, vida: 320, c: ESTILO[b.tipo].cores[k % 3], tam: 2 });
+      }
+      return true;
+    });
+
+    novas = novas.filter((n) => { // Supernova: disco de luz que some e três anéis largos saindo do atacante
+      const t = agora - n.t0; if (t >= n.dur) return false;
+      const q = t / n.dur, cc = corDe(n.tipo);
+      g.globalAlpha = 0.22 * (1 - q); const R = Math.round(430 * Math.pow(q, 0.6)); ellipse(g, Math.round(n.x), Math.round(n.y - 12), R, Math.round(R * 0.8), '#ffffff'); g.globalAlpha = 1;
+      [['#ffffff', 0], [cc.l, 70], [cc.c, 140]].forEach(([cor, atraso]) => { const qq = (t - atraso) / (n.dur - 140); if (qq <= 0 || qq >= 1) return; const rr = 430 * Math.pow(qq, 0.6); for (let w = 0; w < 3; w++) anel(n.x, n.y - 12, rr - w * 2, cor, 1 - qq, Math.max(0.6, 340 / Math.max(rr, 20))); });
       return true;
     });
 
@@ -1103,7 +1310,7 @@
     for (let i = 0; i < 2; i++) { hpVis[i] += (hpAlvo[i] - hpVis[i]) * 0.3; hpLag[i] += (hpAlvo[i] - hpLag[i]) * 0.05; }
     const dn = (i) => Math.max(0, 1 - (agoraReal - hudHit[i]) / 320); // 1 no golpe, cai a 0 em 320 ms
     desenharTimes(g, agoraReal);
-    painel(g, 6, 8, 172, 0, bt.lados[0].m, hpVis[0], hpLag[0], agoraReal, dn(0));   // você, à esquerda
+    painel(g, 6, 8, 172, 0, bt.lados[0].m, hpVis[0], hpLag[0], agoraReal, dn(0), !bt.fim && bt.lados[0].hp > 0 && bt.lados[0].cd.ultimate <= 0);   // você, à esquerda
     painel(g, 182, 8, 172, 1, bt.lados[1].m, hpVis[1], hpLag[1], agoraReal, dn(1)); // adversário, à direita
     if (ko) { // escurece o campo no fim da luta (o cartão de resultado entra no centro, sem banner de K.O.)
       const q = Math.min(1, (agora - ko.t0) / 400);

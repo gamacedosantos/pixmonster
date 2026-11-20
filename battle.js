@@ -120,7 +120,34 @@
     { id: 'lampiro', nome: 'Lampiro', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.83, cg: 0.75, raridade: 'rara', golpes: h(['Pisca-Pisca', 'eletrico'], ['Luz Cegante', 'eletrico'], 'Brilho de Escudo', 'Ventania de Asas', 'ar') },
   ];
 
-  MONSTROS.forEach((m) => { m.hp = Math.round(60 * EL[m.tipo].hp); m.dano = EL[m.tipo].dano; m.raridade = m.raridade || 'comum'; });
+  // Poder do ultimate (PLANO-poderes.md): regra própria na luta, mais um visual próprio na arena. Sem poder = o ultimate padrão (golpe grande).
+  //   feixe = Lightbeam, raio contínuo (só visual) | frenesi = não causa dano: buff de dano e ritmo por um tempo, que custa vida
+  // Evoluções herdam pelo spread de `golpes`.
+  const PODER_DE = {
+    feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao'],
+    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha'],
+    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo'],
+    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo'],
+  };
+  Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.ultimate.poder = p; }));
+  // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
+  // pulo (super pulo): a carga é o salto; depois de `subida` (fração da carga) o monstro fica no ar e intocável (ataques que o alcançam erram), e cai em área:
+  // não pode ser esquivado e deixa o alvo atordoado por `stun` ms (se não for bloqueado). dano = multiplicador sobre o ultimate padrão.
+  const PODERES = { frenesi: { dur: 10000, dano: 1.35, ritmo: 1.5, custo: 0.01 }, pulo: { subida: 0.4, dano: 0.7, stun: 500 }, nova: { dano: 0.9, atravessa: 0.5 } };
+  // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
+  // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
+  const FX_FORTE = {
+    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante'],
+    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro'],
+  };
+  // Forma do golpe rápido: investida (padrão), 'garra' (investida e arranhões no alvo) ou 'rajada' (fica parado e dispara 3 tiros miúdos)
+  const FX_RAPIDO = {
+    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo'],
+    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho'],
+  };
+  Object.keys(FX_RAPIDO).forEach((fx) => FX_RAPIDO[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.rapido.fx = fx; }));
+  Object.keys(FX_FORTE).forEach((fx) => FX_FORTE[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.forte.fx = fx; }));
+  MONSTROS.forEach((m) => { m.hp =Math.round(60 * EL[m.tipo].hp); m.dano = EL[m.tipo].dano; m.raridade = m.raridade || 'comum'; });
   const PESO_RARIDADE = { comum: 1, rara: 0.4, lendaria: 0.1 }; // chance relativa de aparecer como selvagem no mundo
 
   const cdDe = (m, slot) => BASE[slot].cd * m.rc;          // recarga efetiva (ms)
@@ -188,9 +215,9 @@
       bt.eventos.push({ ev: 'defesa', i, slot, golpe: g.nome, tipo: g.tipo, dur: BASE.defesa.dur, regra: bt.regra[i] }); bt.regra[i] = null;
       return;
     }
-    const carga = cargaDe(l.m, slot) * (ativo(bt, l, 'lento') ? 1.3 : 1);
+    const carga = cargaDe(l.m, slot) * (ativo(bt, l, 'lento') ? 1.3 : 1) / (ativo(bt, l, 'frenesi') ? PODERES.frenesi.ritmo : 1);
     l.acao = { slot, inicio: bt.t, fim: bt.t + carga, dur: carga };
-    bt.eventos.push({ ev: 'carga', atq: i, def: 1 - i, slot, idx: IDX[slot], golpe: g.nome, tipo: g.tipo, dur: carga, regra: bt.regra[i] }); bt.regra[i] = null;
+    bt.eventos.push({ ev: 'carga', atq: i, def: 1 - i, slot, idx: IDX[slot], golpe: g.nome, tipo: g.tipo, poder: g.poder || null, dur: carga, regra: bt.regra[i] }); bt.regra[i] = null;
   }
 
   // Aplica um status em um lado (refresca se já tem). Paralisia e stun respeitam a imunidade; stun cancela a carga em andamento.
@@ -218,21 +245,31 @@
 
   function resolver(bt, rng, i, a) {
     const at = bt.lados[i], df = bt.lados[1 - i], g = at.m.golpes[a.slot];
+    if (g.poder === 'frenesi') { // buff: sem alvo, sem dano
+      const P = PODERES.frenesi; at.st.frenesi = { ate: bt.t + P.dur, dur: P.dur, prox: bt.t + 1000 };
+      bt.log.push(`${at.m.nome} usa ${g.nome}`); bt.eventos.push({ ev: 'buff', i, poder: 'frenesi', golpe: g.nome, tipo: g.tipo, dur: P.dur });
+      return;
+    }
     if (df.hp <= 0) return; // o alvo já caiu: o golpe se perde
     const mult = multiplicador(g.tipo, df.m.tipo);
     // sempre 3 sorteios por golpe: a mesma semente repete a luta
-    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE, esquiva = rng() < ESQUIVA_CHANCE, sorteioSt = rng();
-    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
+    const aereo = !!(df.acao && df.acao.slot === 'ultimate' && df.m.golpes.ultimate.poder === 'pulo' && bt.t - df.acao.inicio >= df.acao.dur * PODERES.pulo.subida); // o alvo está no ar (super pulo): o golpe erra
+    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE, esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
+    let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
       * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tal === 'res_' + g.tipo ? RESIST_MULT : 1);
     if (bt.tt[i].has('abertura') && !at.abriu) aviso(bt, i, 'Abertura');
     if (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE && !at.ultAvisou) { at.ultAvisou = true; aviso(bt, i, 'Último suspiro'); }
     at.abriu = true;
-    const bloqueado = df.defesaAte > bt.t; // a defesa evita este ataque e se desfaz
+    const atravessou = g.poder === 'nova' && df.defesaAte > bt.t; // a supernova parte a defesa e deixa passar parte do dano
+    const bloqueado = df.defesaAte > bt.t && !atravessou; // a defesa evita este ataque e se desfaz
+    if (atravessou) { df.defesaAte = 0; dano *= PODERES.nova.atravessa; }
     if (bloqueado) { df.defesaAte = 0; dano = 0; } else if (esquiva) dano = 0;
     df.hp -= dano;
     let status = null;
-    if (dano > 0 && df.hp > 0) { // acertou: talvez aplique um status
+    if (g.poder === 'nova' && dano > 0 && (df.st.forca || df.st.frenesi)) { delete df.st.forca; delete df.st.frenesi; aviso(bt, 1 - i, 'Buffs derrubados'); } // a supernova limpa os buffs do alvo
+    if (g.poder === 'pulo') { if (dano > 0 && df.hp > 0) status = aplicar(bt, 1 - i, 'stun', g.tipo, PODERES.pulo.stun); } // o super pulo sempre atordoa
+    else if (dano > 0 && df.hp > 0) { // acertou: talvez aplique um status
       const ef = (EFEITO[g.tipo] || {})[a.slot === 'ultimate' ? 'forte' : a.slot], chance = a.slot === 'ultimate' ? ULT_STATUS_CHANCE : ef && ef[1];
       if (ef && sorteioSt < chance) {
         if (df.tal === 'corpo' && rng() < CORPO_CH) aviso(bt, 1 - i, 'Corpo fechado');
@@ -247,7 +284,7 @@
     }
     bt.log.push(`${at.m.nome} usa ${g.nome} (${bloqueado ? 'bloqueado' : esquiva ? 'esquivou' : dano.toFixed(1) + (critico ? ' crítico' : '')})`);
     bt.eventos.push({
-      ev: 'golpe', atq: i, def: 1 - i, slot: a.slot, idx: IDX[a.slot], dano, tipo: g.tipo, golpe: g.nome, mult,
+      ev: 'golpe', atq: i, def: 1 - i, slot: a.slot, idx: IDX[a.slot], dano, tipo: g.tipo, golpe: g.nome, poder: g.poder || null, fx: g.fx || 'proj', aereo, atravessou, mult,
       crit: critico && !esquiva && !bloqueado, esquiva: esquiva && !bloqueado, bloqueado, hpApos: Math.max(0, df.hp), status,
     });
   }
@@ -282,8 +319,13 @@
     bt.trocaCd = bt.trocaCd.map((v) => Math.max(0, v - dt));
     for (const i of [0, 1]) if (bt.tt[i].has('reserva')) bt.times[i].forEach((l, k) => { if (k !== bt.ativo[i] && l.hp > 0) l.hp = Math.min(l.m.hp, l.hp + l.m.hp * RESERVA_PCT * dt / 1000); });
     for (const l of bt.lados) {
-      const v = ativo(bt, l, 'lento') ? 0.7 : 1;
+      const v = (ativo(bt, l, 'lento') ? 0.7 : 1) * (ativo(bt, l, 'frenesi') ? PODERES.frenesi.ritmo : 1);
       for (const s of SLOTS) l.cd[s] = Math.max(0, l.cd[s] - dt * v);
+      const fr = l.st.frenesi;
+      if (fr) while (fr.prox <= bt.t && fr.prox <= fr.ate && l.hp > 1) { // custo do frenesi: um tique por segundo, sem deixar a vida abaixo de 1
+        const dano = Math.min(l.hp - 1, l.m.hp * PODERES.frenesi.custo); l.hp -= dano; fr.prox += 1000;
+        bt.eventos.push({ ev: 'dot', i: bt.lados.indexOf(l), dano, hpApos: Math.max(0, l.hp), fonte: 'Frenesi' });
+      }
       const ve = l.st.veneno;
       if (ve && ve.ate > ve.prox - 1000) while (ve.prox <= bt.t && ve.prox <= ve.ate) { // um tique por segundo
         const dano = l.m.hp * VENENO_PCT; l.hp -= dano; ve.prox += 1000;
@@ -421,10 +463,11 @@
     if (quer && podeUsar(bt, i, 'defesa') && o.acao.fim - bt.t < 500 && p(reacao)) { bt.regra[i] = 'defender'; return 'defesa'; }
     if (l.acao || !p(ritmo)) return null;
     const fo = o.hp / o.m.hp, vant = VENCE[l.m.tipo] === o.m.tipo;
-    const ultOk = pol.ultimate === 'pronto' || (pol.ultimate === 'vantagem' && (vant || fo < 0.5)) || (pol.ultimate === 'finalizar' && fo < 0.5);
+    const buffUlt = l.m.golpes.ultimate.poder === 'frenesi'; // poder de buff: vale pela hora, não pelo elemento do alvo, então ignora as regras vantagem/finalizar
+    const ultOk = buffUlt || pol.ultimate === 'pronto' || (pol.ultimate === 'vantagem' && (vant || fo < 0.5)) || (pol.ultimate === 'finalizar' && fo < 0.5);
     for (const sl of ['ultimate', 'forte', 'rapido']) {
       if (sl === 'ultimate' && !ultOk) continue;
-      if (l.cd[sl] <= 0) { if (sl === 'ultimate' && pol.ultimate !== 'pronto') bt.regra[i] = 'ultimate: ' + (pol.ultimate === 'vantagem' ? 'vantagem' : 'finalizar'); return sl; }
+      if (l.cd[sl] <= 0) { if (sl === 'ultimate' && !buffUlt && pol.ultimate !== 'pronto') bt.regra[i] = 'ultimate: ' + (pol.ultimate === 'vantagem' ? 'vantagem' : 'finalizar'); return sl; }
     }
     return null;
   }
@@ -486,7 +529,7 @@
     POLITICA_PADRAO, ESTILOS, OPCOES_POLITICA, iaPolitica,
     TAL_TIME, TAL_MON, ORCAMENTO, custoTalentos, normalizarTalentos, sortearTalentos, ABERTURA_MULT, RESIST_MULT,
     EL, BIOMA_ELEMENTO, BONUS_BIOMA, TROCA_CD, trocar, iaTroca, melhorReserva,
-    IA_FORTE, IA_FACIL, IA_HUMANO, item, FORCA_MULT,
+    IA_FORTE, IA_FACIL, IA_HUMANO, item, FORCA_MULT, PODERES,
     MONSTROS, VENCE, VANTAGEM, DESVANTAGEM, MAX_MS, NIVEL, EFEITO, DURACAO, CRIT_CHANCE, CRIT_MULT, ESQUIVA_CHANCE, SLOTS, BASE, IDX, DIVISOR,
     cdDe, cargaDe, danoBase, criarRng, multiplicador, novaBatalha, podeUsar, passo, ia,
   };

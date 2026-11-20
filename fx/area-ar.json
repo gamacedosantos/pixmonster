@@ -1,0 +1,1067 @@
+{
+ "frames": [
+  {
+   "filename": "pixmon-area-ar 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 1.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 2.png",
+   "frame": {
+    "x": 256,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 3.png",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 4.png",
+   "frame": {
+    "x": 512,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 5.png",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 6.png",
+   "frame": {
+    "x": 768,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 7.png",
+   "frame": {
+    "x": 0,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 8.png",
+   "frame": {
+    "x": 128,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 9.png",
+   "frame": {
+    "x": 256,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 10.png",
+   "frame": {
+    "x": 384,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 11.png",
+   "frame": {
+    "x": 512,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 12.png",
+   "frame": {
+    "x": 640,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 13.png",
+   "frame": {
+    "x": 768,
+    "y": 139,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 14.png",
+   "frame": {
+    "x": 0,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 15.png",
+   "frame": {
+    "x": 128,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 16.png",
+   "frame": {
+    "x": 256,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 17.png",
+   "frame": {
+    "x": 384,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 18.png",
+   "frame": {
+    "x": 512,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 19.png",
+   "frame": {
+    "x": 640,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 20.png",
+   "frame": {
+    "x": 768,
+    "y": 278,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 21.png",
+   "frame": {
+    "x": 0,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 22.png",
+   "frame": {
+    "x": 128,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 23.png",
+   "frame": {
+    "x": 256,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 24.png",
+   "frame": {
+    "x": 384,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 25.png",
+   "frame": {
+    "x": 512,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 26.png",
+   "frame": {
+    "x": 640,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 27.png",
+   "frame": {
+    "x": 768,
+    "y": 417,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 28.png",
+   "frame": {
+    "x": 0,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 29.png",
+   "frame": {
+    "x": 128,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 30.png",
+   "frame": {
+    "x": 256,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 31.png",
+   "frame": {
+    "x": 384,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 32.png",
+   "frame": {
+    "x": 512,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 33.png",
+   "frame": {
+    "x": 640,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 34.png",
+   "frame": {
+    "x": 768,
+    "y": 556,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 35.png",
+   "frame": {
+    "x": 0,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 36.png",
+   "frame": {
+    "x": 128,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 37.png",
+   "frame": {
+    "x": 256,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 38.png",
+   "frame": {
+    "x": 384,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  },
+  {
+   "filename": "pixmon-area-ar 39.png",
+   "frame": {
+    "x": 512,
+    "y": 695,
+    "w": 128,
+    "h": 139
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 139
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 139
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7553956834532374
+   },
+   "duration": 17
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "pixmon-area-ar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 896,
+   "h": 834
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 64,
+   "y": 105
+  },
+  "frameTags": [
+   {
+    "name": "pixmon-area-ar",
+    "from": 0,
+    "to": 39,
+    "direction": "forward"
+   }
+  ]
+ }
+}
