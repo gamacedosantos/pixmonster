@@ -44,10 +44,13 @@
   // ---------- Talentos (antes da luta): o time gasta ORCAMENTO pontos em talentos do time, e cada monstro leva 1 talento próprio (grátis).
   const ORCAMENTO = 8;
   const NOME_EL = { fogo: 'fogo', agua: 'água', terra: 'terra', ar: 'ar', eletrico: 'eletricidade' };
-  const CADEIA_PCT = 0.022, FOLEGO_PCT = 0.04, ULT_TAL_INICIO = 0.25, ABERTURA_MULT = 1.2, ULTIMO_MULT = 1.15, ULTIMO_LIMITE = 0.25, RESIST_MULT = 0.9;
+  const CADEIA_PCT = 0.022, FOLEGO_PCT = 0.03, ULT_TAL_INICIO = 0.25, ABERTURA_MULT = 1.2, ULTIMO_MULT = 1.15, ULTIMO_LIMITE = 0.25, RESIST_MULT = 0.9;
   const DUPLA_MULT = 1.1, ARCO_MULT = 0.94, RESERVA_PCT = 0.008, SEDE_MS = 1000, PE_BONUS = 1.35, ESPINHOS_PCT = 0.05, CORPO_CH = 0.25, VENENO_EXTRA = 2000;
   // B5: talentos novos da árvore (PLANO-balanceamento.md seção 6)
   const COMBO_MULT = 1.25, FOCO_MULT = 1.08, ESCUDO_MULT = 0.85, ESCUDO_MS = 5000, MURALHA_MULT = 0.7, MURALHA_MS = 5000, RECARGA_MULT = 0.85, ULT_PODER_DANO = 1.12, ULT_PODER_CD = 1.15, ULT_DUPLA_PCT = 0.10;
+  // T2: traço de cada família (todo membro tem) e sinergias de time. Números iniciais, calibrados no sim.js.
+  const TRACO = { fera: 0.05, ave: 0.04, inseto: 1.08, planta: 0.0025, pedra: { dano: 0.94, cd: 1.06 }, dragao: { forte: 0.9, ult: 1.08 }, psiquico: 0.65, aquatico: 1.05 };
+  const LACOS_MULT = 1.08, MISTO_MULT = 0.95;
   const PELE_GROSSA = 1.08, CRIT_FINO = 0.05, PESADO_DANO = 1.16, PESADO_CD = 1.10, PARALISIA_EXTRA = 1500;
   const SORTE_OTIMO = 0.3, SORTE_DESFAZ = 0.5, TROCA_AGIL_CD = 3000;
   const TAL_TIME = {
@@ -68,6 +71,8 @@
     recarga: { nome: 'Recarga rápida', custo: 2, desc: 'a recarga do ultimate cai ' + Math.round((1 - RECARGA_MULT) * 100) + '%' },
     ult_dupla: { nome: 'Ult em dupla', custo: 3, desc: 'cada ultimate que um monstro solta adianta em ' + Math.round(ULT_DUPLA_PCT * 100) + '% o ultimate dos outros do time' },
     ult_poder: { nome: 'Ult poderoso', custo: 3, desc: 'o ultimate causa +' + Math.round((ULT_PODER_DANO - 1) * 100) + '% de dano, mas leva +' + Math.round((ULT_PODER_CD - 1) * 100) + '% de recarga' },
+    lacos: { nome: 'Laços de família', custo: 2, desc: 'monstros do time que têm um parceiro da mesma família causam +' + Math.round((LACOS_MULT - 1) * 100) + '% de dano' },
+    misto: { nome: 'Time misto', custo: 2, desc: 'com 3 famílias diferentes no time, o time recebe ' + Math.round((1 - MISTO_MULT) * 100) + '% menos dano' },
     abertura: { nome: 'Abertura', custo: 2, desc: 'o primeiro golpe de cada monstro causa +' + Math.round((ABERTURA_MULT - 1) * 100) + '% de dano' },
   };
   const TAL_MON = {
@@ -131,6 +136,7 @@
     for (const id of taticaIds) { const t = TAL_TATICA[id]; if (t && gasto + t.custo <= orc) { out.push(id); gasto += t.custo; } }
     return out;
   }
+  Object.assign(ARVORE, { lacos: { arvore: 'time', ramo: 'ataque', degrau: 2, pre: ['abertura'] }, misto: { arvore: 'time', ramo: 'defesa', degrau: 2, pre: ['arco'] } });
   Object.keys(EL).forEach((t) => { ARVORE['res_' + t] = { arvore: 'mon', ramo: 'corpo', degrau: 2 }; });
   const custoNo = (id) => (TAL_TIME[id] ? TAL_TIME[id].custo : TAL_TATICA[id] ? TAL_TATICA[id].custo : ARVORE[id] ? ARVORE[id].degrau : 0); // time: custo do talento; monstro: custo = degrau
   // Confere uma escolha na árvore. tipo 'time': ids do time; tipo 'mon': ids de UM monstro, com o nível dele. Devolve a lista de problemas (vazia = válida).
@@ -176,14 +182,14 @@
     { id: 'fagulhao', nome: 'Fagulhão', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.95, cg: 0.9, golpes: h(['Faísca', 'fogo'], ['Labareda', 'fogo'], 'Manto de Brasas', 'Tempestade de Brasas', 'eletrico') },
     { id: 'chamuscao', nome: 'Chamuscão', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.05, cg: 1.15, golpes: h(['Brasa Curta', 'fogo'], ['Cinza Quente', 'fogo'], 'Muralha de Cinzas', 'Tormenta Roxa', 'eletrico') },
     { id: 'mareal', nome: 'Mareal', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.0, cg: 1.0, golpes: h(['Jato', 'agua'], ['Onda Funda', 'agua'], 'Bolha Protetora', 'Esfera da Maré', 'terra') },
-    { id: 'pingolino', nome: 'Pingolino', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.85, cg: 0.8, golpes: h(['Borrifo', 'agua'], ['Redemoinho', 'agua'], 'Escudo de Névoa', 'Maré de Lama', 'terra') },
+    { id: 'pingolino', nome: 'Pingolino', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.89, cg: 0.84, golpes: h(['Borrifo', 'agua'], ['Redemoinho', 'agua'], 'Escudo de Névoa', 'Maré de Lama', 'terra') },
     { id: 'brotinho', nome: 'Brotinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.05, cg: 1.1, golpes: h(['Espinho', 'terra'], ['Pedregulho', 'terra'], 'Casca Dura', 'Chuva de Fagulhas', 'fogo') },
     { id: 'musgarra', nome: 'Musgarra', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.25, golpes: h(['Rocha Baixa', 'terra'], ['Deslizamento', 'terra'], 'Muralha de Musgo', 'Erupção Surda', 'fogo') },
     { id: 'ventinho', nome: 'Ventinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.8, cg: 0.75, golpes: h(['Sopro', 'ar'], ['Rajada', 'ar'], 'Bolha de Vento', 'Aguaceiro Furioso', 'agua') },
     { id: 'nuvelino', nome: 'Nuvelino', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.15, golpes: h(['Brisa', 'ar'], ['Ciclone', 'ar'], 'Nevoeiro', 'Esfera da Tormenta', 'agua') },
     { id: 'faiscao', nome: 'Faiscão', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.85, cg: 0.7, golpes: h(['Choquinho', 'eletrico'], ['Relâmpago', 'eletrico'], 'Gaiola Elétrica', 'Furacão de Raios', 'ar') },
     { id: 'trovinho', nome: 'Trovinho', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.3, golpes: h(['Faísca Azul', 'eletrico'], ['Trovão', 'eletrico'], 'Campo de Estática', 'Esfera Trovejante', 'ar') },
-    { id: 'brasinha', nome: 'Brasinha', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.9, cg: 0.85, raridade: 'comum', golpes: h(['Cuspe de Brasa', 'fogo'], ['Rabada Ardente', 'fogo'], 'Escama Quente', 'Trovão de Cinzas', 'eletrico') },
+    { id: 'brasinha', nome: 'Brasinha', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.9, cg: 0.85, raridade: 'rara', golpes: h(['Cuspe de Brasa', 'fogo'], ['Rabada Ardente', 'fogo'], 'Escama Quente', 'Trovão de Cinzas', 'eletrico') },
     { id: 'vulcanejo', nome: 'Vulcanejo', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.2, raridade: 'rara', golpes: h(['Pedra Quente', 'fogo'], ['Rolada de Lava', 'fogo'], 'Casco Vulcânico', 'Descarga de Magma', 'eletrico') },
     { id: 'algazinho', nome: 'Algazinho', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.92, cg: 0.95, raridade: 'comum', golpes: h(['Gosma', 'agua'], ['Chicote de Alga', 'agua'], 'Véu de Limo', 'Pedras do Fundo', 'terra') },
     { id: 'coraline', nome: 'Coraline', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.08, cg: 1.12, raridade: 'rara', golpes: h(['Bolha Rosa', 'agua'], ['Galhada de Coral', 'agua'], 'Recife Vivo', 'Esfera do Recife', 'terra') },
@@ -198,6 +204,14 @@
     { id: 'taupino', nome: 'Taupino', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.12, raridade: 'comum', golpes: h(['Cavada', 'terra'], ['Garra Barrenta', 'terra'], 'Toca Funda', 'Lava da Toca', 'fogo') },
     { id: 'pipinha', nome: 'Pipinha', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.88, cg: 0.85, raridade: 'rara', golpes: h(['Rabiola', 'ar'], ['Puxão de Vento', 'ar'], 'Fita Balançante', 'Garoa Súbita', 'agua') },
     { id: 'lampiro', nome: 'Lampiro', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.83, cg: 0.75, raridade: 'rara', golpes: h(['Pisca-Pisca', 'eletrico'], ['Luz Cegante', 'eletrico'], 'Brilho de Escudo', 'Ventania de Asas', 'ar') },
+    { id: 'brasoleta', nome: 'Brasoleta', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.87, cg: 0.82, raridade: 'comum', golpes: h(['Faísca Alada', 'fogo'], ['Rasante Ardente', 'fogo'], 'Asas de Brasa', 'Enxame de Centelhas', 'eletrico') },
+    { id: 'besourao', nome: 'Besourão', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.13, cg: 1.22, raridade: 'comum', golpes: h(['Chifrada Curta', 'terra'], ['Investida de Chifre', 'terra'], 'Carapaça Dura', 'Chifre Incandescente', 'fogo') },
+    { id: 'casulucia', nome: 'Casulúcia', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.91, cg: 0.9, raridade: 'incomum', golpes: h(['Pó de Asa', 'ar'], ['Vendaval de Asas', 'ar'], 'Casulo de Seda', 'Chuva de Pólen', 'agua') },
+    { id: 'tesloura', nome: 'Tesloura', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.84, cg: 0.78, raridade: 'incomum', golpes: h(['Pinça Elétrica', 'eletrico'], ['Tesoura Relâmpago', 'eletrico'], 'Casco Condutor', 'Ciclone das Pinças', 'ar') },
+    { id: 'rochilo', nome: 'Rochilo', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.06, cg: 1.14, raridade: 'comum', golpes: h(['Arranhão de Pedra', 'terra'], ['Queda de Gárgula', 'terra'], 'Pele de Granito', 'Cinzas de Rocha', 'fogo') },
+    { id: 'cristalino', nome: 'Cristalino', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.96, cg: 0.92, raridade: 'incomum', golpes: h(['Estilhaço', 'eletrico'], ['Prisma Trovejante', 'eletrico'], 'Cristal Refletor', 'Tempestade de Cristais', 'ar') },
+    { id: 'texugao', nome: 'Texugão', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.09, cg: 1.1, raridade: 'comum', golpes: h(['Unhada', 'terra'], ['Escavada Furiosa', 'terra'], 'Toca Rápida', 'Fogueira do Texugo', 'fogo') },
+    { id: 'lontrinha', nome: 'Lontrinha', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.89, cg: 0.87, raridade: 'comum', golpes: h(['Respingo', 'agua'], ['Mergulho da Lontra', 'agua'], 'Concha Protetora', 'Pedra do Rio', 'terra') },
   ];
 
   // Poder do ultimate (PLANO-poderes.md): regra própria na luta, mais um visual próprio na arena. Sem poder = o ultimate padrão (golpe grande).
@@ -205,11 +219,11 @@
   // Evoluções herdam pelo spread de `golpes`.
   const PODER_DE = {
     feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao'],
-    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha'],
-    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo'],
-    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo'],
-    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho'],
-    disco: ['ventinho', 'redemoinha', 'algazinho', 'pingolino'],
+    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha', 'tesloura'],
+    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo', 'besourao', 'texugao', 'pingolino'],
+    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo', 'rochilo', 'brasoleta', 'lontrinha'],
+    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho', 'cristalino'],
+    disco: ['ventinho', 'redemoinha', 'algazinho', 'casulucia'],
   };
   Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { const m = MONSTROS.find((x) => x.id === id); m.golpes.ultimate.poder = p; if (p === 'esfera') m.golpes.ultimate.tipo = m.tipo; })); // a esfera gigante é do elemento do próprio monstro (sem cobrir a fraqueza como o ultimate comum), senão o golpe enorme vira o jogo contra quem tem vantagem
   // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
@@ -221,27 +235,41 @@
   // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
   // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
   const FX_FORTE = {
-    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante'],
-    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro'],
+    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante', 'lontrinha', 'casulucia'],
+    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro', 'cristalino', 'rochilo', 'tesloura', 'brasoleta', 'texugao'],
   };
   // Forma do golpe rápido: investida (padrão), 'garra' (investida e arranhões no alvo) ou 'rajada' (fica parado e dispara 3 tiros miúdos)
   const FX_RAPIDO = {
-    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo'],
-    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho'],
+    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo', 'besourao', 'texugao', 'rochilo', 'lontrinha'],
+    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho', 'brasoleta', 'tesloura', 'casulucia'],
   };
   Object.keys(FX_RAPIDO).forEach((fx) => FX_RAPIDO[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.rapido.fx = fx; }));
   Object.keys(FX_FORTE).forEach((fx) => FX_FORTE[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.forte.fx = fx; }));
   MONSTROS.forEach((m) => { m.hp =Math.round(60 * EL[m.tipo].hp); m.dano = EL[m.tipo].dano; m.raridade = m.raridade || 'comum'; });
-  ['chamuscao', 'pingolino', 'musgarra', 'nuvelino', 'trovinho'].forEach((id) => { MONSTROS.find((m) => m.id === id).raridade = 'incomum'; }); // B1: o segundo de cada elemento é incomum
+  ['chamuscao', 'pingolino', 'musgarra', 'nuvelino', 'trovinho'].forEach((id) => { MONSTROS.find((m) => m.id === id).raridade = 'incomum'; }); // (as espécies novas já trazem a raridade nos dados) // B1: o segundo de cada elemento é incomum
+  // T1 (PLANO-tipos-e-novos-pixmon.md): FAMÍLIA = o que o pixmon é (o elemento diz como ele luta). Não muda o dano; os traços e sinergias vêm na T2.
+  const FAMILIAS = {
+    fera: { nome: 'Fera', cor: '#e0a060' }, ave: { nome: 'Ave', cor: '#9fd0f0' }, inseto: { nome: 'Inseto', cor: '#b8d848' }, planta: { nome: 'Planta', cor: '#6fd66f' },
+    pedra: { nome: 'Pedra', cor: '#a8a8b0' }, dragao: { nome: 'Dragão', cor: '#c860d8' }, psiquico: { nome: 'Psíquico', cor: '#e890c8' }, aquatico: { nome: 'Aquático', cor: '#60b8e8' },
+  };
+  Object.assign(FAMILIAS.fera, { traco: 'Garras: +' + Math.round(TRACO.fera * 100) + ' pontos de chance de crítico' }); Object.assign(FAMILIAS.ave, { traco: 'Voo: +' + Math.round(TRACO.ave * 100) + ' pontos de chance de esquiva' });
+  Object.assign(FAMILIAS.inseto, { traco: 'Enxame: o ataque rápido causa +' + Math.round((TRACO.inseto - 1) * 100) + '% de dano' }); Object.assign(FAMILIAS.planta, { traco: 'Raízes: recupera ' + String(+(TRACO.planta * 100).toFixed(2)).replace('.', ',') + '% da vida por segundo' });
+  Object.assign(FAMILIAS.pedra, { traco: 'Casca: ' + Math.round((1 - TRACO.pedra.dano) * 100) + '% menos dano recebido e ' + Math.round((TRACO.pedra.cd - 1) * 100) + '% mais recarga' }); Object.assign(FAMILIAS.dragao, { traco: 'Escamas: ' + Math.round((1 - TRACO.dragao.forte) * 100) + '% menos dano de golpes fortes e +' + Math.round((TRACO.dragao.ult - 1) * 100) + '% no ultimate' });
+  Object.assign(FAMILIAS.psiquico, { traco: 'Mente: os status duram ' + Math.round((1 - TRACO.psiquico) * 100) + '% menos nele' }); Object.assign(FAMILIAS.aquatico, { traco: 'Fluido: +' + Math.round((TRACO.aquatico - 1) * 100) + '% de vida' });
+  const FAMILIA_DE = {
+    fera: ['fagulhao', 'chamuscao', 'faiscao', 'trovinho', 'zapinho', 'pavio', 'taupino', 'texugao', 'lontrinha'], ave: ['ventinho', 'plumelho', 'raiomante'], inseto: ['lampiro', 'brasoleta', 'besourao', 'casulucia', 'tesloura'], planta: ['brotinho', 'musgarra', 'algazinho', 'tatufungo'],
+    pedra: ['vulcanejo', 'pedrinho', 'rochilo', 'cristalino'], dragao: ['brasinha'], psiquico: ['nuvelino', 'redemoinha', 'pipinha'], aquatico: ['mareal', 'pingolino', 'coraline', 'bolhudo'],
+  };
+  Object.entries(FAMILIA_DE).forEach(([f, ids]) => ids.forEach((id) => { MONSTROS.find((m) => m.id === id).familia = f; })); // as formas evoluídas herdam (evoluida copia o monstro)
   const PESO_RARIDADE = { comum: 1, incomum: 0.6, rara: 0.3, lendaria: 0.05 }; // chance relativa de aparecer como selvagem no mundo
   const CAPTURA_RARIDADE = { comum: 1, incomum: 0.9, rara: 0.75, lendaria: 0.5 }; // multiplica a chance da esfera
   // B1 (PLANO-balanceamento.md): cada área pertence a uma região; o selvagem sai de um pool por região, não de "tudo, com o elemento 3x".
   // Pool: 72% do elemento da região (comuns e incomuns), 22% de um elemento vizinho, 3% de raros da região e 3% dos outros elementos. 'inicio' = só comuns e incomuns, todos os elementos; 'andarilhos' = tudo, só aqui sai o lendário.
   const REGIOES = {
-    inicio: { nome: 'Sem clã' }, andarilhos: { nome: 'Andarilhos', todos: true, camisas: ['#6a6a78', '#7a4ab8'] },
-    brasa: { nome: 'Brasa', el: 'fogo', viz: 'terra', raros: ['vulcanejo'], camisas: ['#c0392b', '#e0503a'] }, mare: { nome: 'Maré', el: 'agua', viz: 'ar', raros: ['coraline'], camisas: ['#2f78a8', '#4aa3d8'] },
-    brisa: { nome: 'Brisa', el: 'ar', viz: 'agua', raros: ['redemoinha', 'pipinha'], camisas: ['#d8ecf6', '#6fd6ff'] },
-    rocha: { nome: 'Rocha', el: 'terra', viz: 'fogo', raros: ['tatufungo'], camisas: ['#8a5a2b', '#6a4a2a'] }, faisca: { nome: 'Faísca', el: 'eletrico', viz: 'ar', raros: ['lampiro'], camisas: ['#f0d048', '#e8b830'] }, // B3: cada região é um clã; o uniforme é a cor da camisa (2 tons)
+    inicio: { nome: 'Sem clã' }, andarilhos: { nome: 'Andarilhos', todos: true, fam: ['dragao', 'psiquico'], camisas: ['#6a6a78', '#7a4ab8'] },
+    brasa: { nome: 'Brasa', el: 'fogo', viz: 'terra', fam: ['fera', 'dragao'], raros: ['vulcanejo', 'brasinha'], camisas: ['#c0392b', '#e0503a'] }, mare: { nome: 'Maré', el: 'agua', viz: 'ar', fam: ['aquatico', 'planta'], raros: ['coraline'], camisas: ['#2f78a8', '#4aa3d8'] },
+    brisa: { nome: 'Brisa', el: 'ar', viz: 'agua', fam: ['ave', 'inseto'], raros: ['redemoinha', 'pipinha'], camisas: ['#d8ecf6', '#6fd6ff'] },
+    rocha: { nome: 'Rocha', el: 'terra', viz: 'fogo', fam: ['planta', 'pedra', 'inseto'], raros: ['tatufungo'], camisas: ['#8a5a2b', '#6a4a2a'] }, faisca: { nome: 'Faísca', el: 'eletrico', viz: 'ar', fam: ['pedra', 'inseto'], raros: ['lampiro'], camisas: ['#f0d048', '#e8b830'] }, // B3: cada região é um clã; o uniforme é a cor da camisa (2 tons)
   };
   // B4: nível FIXO do treinador por área (não depende mais do nível do jogador): base da área + ajuste do posto; líderes têm nível próprio.
   // O posto vem do `nivel` do treinador (1 aprendiz, 2 membro, 3 veterano, 4 e 5 elite); os cinco líderes são sempre 'lider'.
@@ -254,7 +282,7 @@
   const REGIAO_DA_AREA = { vila: 'inicio', rota1: 'inicio', fazenda: 'brasa', lago: 'mare', lago2: 'mare', vilaagua: 'mare', praia: 'mare', bosque: 'brisa', bosquel: 'brisa', vilavento: 'brisa', farol: 'brisa', montanha2: 'brisa', escondida: 'rocha', bosquen: 'rocha', pedra: 'rocha', vilaraio: 'faisca', montanha: 'faisca', oculta: 'andarilhos', castelo: 'andarilhos' };
   function pesosSelvagem(area, soEvo) { // pesos (somam 1) na ordem de MONSTROS; soEvo: só espécies que têm evolução
     const g = REGIOES[REGIAO_DA_AREA[area]] || REGIOES.inicio, cm = (m) => m.raridade === 'comum' || m.raridade === 'incomum';
-    const sel = (f) => MONSTROS.map((m) => (soEvo && !EVOLUI(m.id) ? 0 : f(m) ? PESO_RARIDADE[m.raridade] : 0));
+    const sel = (f) => MONSTROS.map((m) => (soEvo && !EVOLUI(m.id) ? 0 : f(m) ? PESO_RARIDADE[m.raridade] * (g.fam && g.fam.includes(m.familia) ? 2 : 1) : 0)); // T3: a região favorece (2x) as famílias dela
     const norm = (v, alvo) => { const s = v.reduce((a, b) => a + b, 0); return v.map((x) => (s ? (x / s) * alvo : 0)); };
     const partes = g.todos ? [norm(sel(() => true), 1)] : !g.el ? [norm(sel(cm), 1)] : [norm(sel((m) => cm(m) && m.tipo === g.el), 0.72), norm(sel((m) => g.raros.includes(m.id)), 0.03), norm(sel((m) => cm(m) && m.tipo === g.viz), 0.22), norm(sel((m) => cm(m) && m.tipo !== g.el && m.tipo !== g.viz), 0.03)];
     const w = MONSTROS.map((_, i) => partes.reduce((a, p) => a + p[i], 0)), s = w.reduce((a, b) => a + b, 0);
@@ -284,8 +312,8 @@
 
   function novoLado(m, tal = null, tt = new Set(), hpFrac = 1) {
     const tals = new Set([].concat(tal || [])), cdTotal = {}, cd = {};
-    if (tals.has('pele_grossa')) m = { ...m, hp: Math.round(m.hp * PELE_GROSSA) };
-    for (const s of SLOTS) { cdTotal[s] = cdDe(m, s) * (s === 'ultimate' ? (tt.has('recarga') ? RECARGA_MULT : 1) * (tt.has('ult_poder') ? ULT_PODER_CD : 1) : s === 'forte' && tals.has('golpe_pesado') ? PESADO_CD : 1); cd[s] = s === 'ultimate' ? cdTotal[s] * (tt.has('ultimate') ? ULT_TAL_INICIO : ULT_INICIO) : 0; }
+    if (tals.has('pele_grossa') || m.familia === 'aquatico') m = { ...m, hp: Math.round(m.hp * (tals.has('pele_grossa') ? PELE_GROSSA : 1) * (m.familia === 'aquatico' ? TRACO.aquatico : 1)) };
+    for (const s of SLOTS) { cdTotal[s] = cdDe(m, s) * (m.familia === 'pedra' ? TRACO.pedra.cd : 1) * (s === 'ultimate' ? (tt.has('recarga') ? RECARGA_MULT : 1) * (tt.has('ult_poder') ? ULT_PODER_CD : 1) : s === 'forte' && tals.has('golpe_pesado') ? PESADO_CD : 1); cd[s] = s === 'ultimate' ? cdTotal[s] * (tt.has('ultimate') ? ULT_TAL_INICIO : ULT_INICIO) : 0; }
     return { m, tals, combo: 0, protAte: 0, rapidos: 0, abriu: false, hp: Math.max(0, m.hp * hpFrac), cd, cdTotal, acao: null, defesaAte: 0, st: {}, imuneAte: 0, entraAte: 0 }; // cd = ms que faltam; acao = ataque em carga; defesaAte = ms (relógio da luta)
   }
   // a e b: um monstro ou um time (lista de 1 a 3). bt.lados[i] é sempre o monstro em campo do lado i (aponta para bt.times[i][ativo[i]]).
@@ -295,7 +323,7 @@
     const lista = [a, b].map((t) => (Array.isArray(t) ? t : [t]));
     const talentos = lista.map((t, i) => normalizarTalentos(tal && tal[i], t.length)), tt = talentos.map((x) => new Set(x.time));
     const times = lista.map((t, i) => t.map((m, k) => novoLado(m, talentos[i].mon[k], tt[i], hp0 && hp0[i] && hp0[i][k] != null ? hp0[i][k] : 1)));
-    const sin = lista.map((t) => { const n = {}; t.forEach((m) => { n[m.tipo] = (n[m.tipo] || 0) + 1; }); return { dupla: new Set(Object.keys(n).filter((e) => n[e] >= 2)), arco: Object.keys(n).length === 3 }; });
+    const sin = lista.map((t) => { const n = {}, f = {}; t.forEach((m) => { n[m.tipo] = (n[m.tipo] || 0) + 1; f[m.familia] = (f[m.familia] || 0) + 1; }); return { dupla: new Set(Object.keys(n).filter((e) => n[e] >= 2)), arco: Object.keys(n).length === 3, fam: new Set(Object.keys(f).filter((e) => f[e] >= 2)), misto: Object.keys(f).length === 3 }; });
     return {
       t: 0, // relógio da luta, em ms
       bioma, times, talentos, tt, sin, agenda: [], ativo: times.map((t) => Math.max(0, t.findIndex((l) => l.hp > 0))), lados: times.map((t) => t[Math.max(0, t.findIndex((l) => l.hp > 0))]), trocaCd: [0, 0], pendente: [null, null], regra: [null, null], // regra: texto da regra do modo automático que causou a próxima ação (para a tela)
@@ -339,7 +367,7 @@
     if (nome === 'lento' && l.tals.has('sem_lento')) return null;
     if (nome === 'veneno' && l.tals.has('antidoto')) return null;
     if ((nome === 'paralisia' || nome === 'stun') && l.tals.has('casca') && !l.cascaUsada) { l.cascaUsada = true; aviso(bt, i, 'Casca grossa'); return null; }
-    const dur = durFixa || DURACAO[nome];
+    const dur = (durFixa || DURACAO[nome]) * (l.m.familia === 'psiquico' ? TRACO.psiquico : 1);
     l.st[nome] = { ate: bt.t + dur, dur, prox: bt.t + 1000 };
     if (nome === 'paralisia' || nome === 'stun') l.imuneAte = bt.t + dur + IMUNE_MS;
     let cancelou = false;
@@ -367,12 +395,14 @@
     const mult = multiplicador(g.tipo, df.m.tipo);
     // sempre 3 sorteios por golpe: a mesma semente repete a luta
     const aereo = !!(df.acao && df.acao.slot === 'ultimate' && df.m.golpes.ultimate.poder === 'pulo' && bt.t - df.acao.inicio >= df.acao.dur * PODERES.pulo.subida); // o alvo está no ar (super pulo): o golpe erra
-    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE + (at.tals.has('critico') ? CRIT_FINO : 0), esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
+    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE + (at.tals.has('critico') ? CRIT_FINO : 0) + (at.m.familia === 'fera' ? TRACO.fera : 0), esquiva = (rng() < ESQUIVA_CHANCE + (df.m.familia === 'ave' ? TRACO.ave : 0) && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
     let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (g.poder === 'esfera' ? PODERES.esfera.dano : 1) * (g.poder === 'disco' ? PODERES.disco.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
       * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tals.has('ultimo') && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tals.has('res_' + g.tipo) ? RESIST_MULT : 1)
       * (bt.tt[i].has('foco') && df.hp < df.m.hp * 0.5 ? FOCO_MULT : 1) * (a.slot === 'forte' && bt.tt[i].has('combo') && at.combo >= 3 ? COMBO_MULT : 1) * (a.slot === 'ultimate' && bt.tt[i].has('ult_poder') ? ULT_PODER_DANO : 1) * (a.slot === 'forte' && at.tals.has('golpe_pesado') ? PESADO_DANO : 1)
-      * (bt.tt[1 - i].has('escudo_ini') && bt.t < ESCUDO_MS ? ESCUDO_MULT : 1) * (bt.tt[1 - i].has('muralha') && df.protAte > bt.t ? MURALHA_MULT : 1);
+      * (bt.tt[1 - i].has('escudo_ini') && bt.t < ESCUDO_MS ? ESCUDO_MULT : 1) * (bt.tt[1 - i].has('muralha') && df.protAte > bt.t ? MURALHA_MULT : 1)
+      * (df.m.familia === 'pedra' ? TRACO.pedra.dano : 1) * (df.m.familia === 'dragao' && a.slot === 'forte' ? TRACO.dragao.forte : 1) * (at.m.familia === 'dragao' && a.slot === 'ultimate' ? TRACO.dragao.ult : 1) * (at.m.familia === 'inseto' && a.slot === 'rapido' ? TRACO.inseto : 1)
+      * (bt.tt[i].has('lacos') && bt.sin[i].fam.has(at.m.familia) ? LACOS_MULT : 1) * (bt.tt[1 - i].has('misto') && bt.sin[1 - i].misto ? MISTO_MULT : 1);
     if (a.slot === 'rapido') at.combo++; else if (a.slot === 'forte') at.combo = 0;
     if (a.slot === 'ultimate' && bt.tt[i].has('ult_dupla')) bt.times[i].forEach((l) => { if (l !== at && l.hp > 0) l.cd.ultimate = Math.max(0, l.cd.ultimate - l.cdTotal.ultimate * ULT_DUPLA_PCT); });
     if (bt.tt[i].has('abertura') && !at.abriu) aviso(bt, i, 'Abertura');
@@ -435,6 +465,7 @@
     bt.eventos = []; // o que aconteceu neste passo, para a tela animar
     bt.t += dt;
     bt.trocaCd = bt.trocaCd.map((v) => Math.max(0, v - dt));
+    for (const i of [0, 1]) { const l = bt.lados[i]; if (l.hp > 0 && l.m.familia === 'planta') l.hp = Math.min(l.m.hp, l.hp + l.m.hp * TRACO.planta * dt / 1000); } // traço da Planta: Raízes
     for (const i of [0, 1]) if (bt.tt[i].has('reserva')) bt.times[i].forEach((l, k) => { if (k !== bt.ativo[i] && l.hp > 0) l.hp = Math.min(l.m.hp, l.hp + l.m.hp * RESERVA_PCT * dt / 1000); });
     for (const l of bt.lados) {
       const v = (ativo(bt, l, 'lento') ? 0.7 : 1) * (ativo(bt, l, 'frenesi') ? PODERES.frenesi.ritmo : 1);
@@ -524,11 +555,15 @@
     chamuscao: { id: 'carvaoreal', nome: 'Carvão Real', nv: 16 }, pingolino: { id: 'pingueiroimperial', nome: 'Pingueiro Imperial', nv: 16 }, musgarra: { id: 'musgarrao', nome: 'Musgarrão', nv: 16 },
     ventinho: { id: 'vendaval', nome: 'Vendaval', nv: 16 }, nuvelino: { id: 'cumulonio', nome: 'Cumulônio', nv: 16 }, trovinho: { id: 'trovaodourado', nome: 'Trovão Dourado', nv: 16 },
     brasinha: { id: 'brasalisco', nome: 'Brasalisco', nv: 16 }, vulcanejo: { id: 'magmadilo', nome: 'Magmadilo', nv: 16 }, algazinho: { id: 'algamar', nome: 'Algamar', nv: 16 }, coraline: { id: 'recifante', nome: 'Recifante', nv: 16 }, pedrinho: { id: 'rochedao', nome: 'Rochedão', nv: 16 }, tatufungo: { id: 'esporao', nome: 'Esporão', nv: 16 }, plumelho: { id: 'plumareu', nome: 'Plumaréu', nv: 16 }, redemoinha: { id: 'ciclonara', nome: 'Ciclonara', nv: 16 }, zapinho: { id: 'zapotrao', nome: 'Zapotrão', nv: 16 }, raiomante: { id: 'tempestauro', nome: 'Tempestauro', nv: 16 },
+    brasoleta: { id: 'brasadeira', nome: 'Brasadeira', nv: 16 }, besourao: { id: 'besourei', nome: 'Besourei', nv: 16 }, casulucia: { id: 'lagartucia', nome: 'Lagartúcia', nv: 10 }, lagartucia: { id: 'papelucia', nome: 'Papelúcia', nv: 20 }, // linha de 3 estágios: Casulúcia, Lagartúcia, Papelúcia (a forma final é a borboleta)
+     tesloura: { id: 'teslorrao', nome: 'Teslorrão', nv: 16 },
+    rochilo: { id: 'gargolo', nome: 'Gárgolo', nv: 16 }, cristalino: { id: 'cristalao', nome: 'Cristalão', nv: 16 }, texugao: { id: 'texugarra', nome: 'Texugarra', nv: 16 }, lontrinha: { id: 'lontrao', nome: 'Lontrão', nv: 16 },
   };
   const BONUS_EVO = { hp: 1.25, atk: 1.15 };
   // B2: a forma evoluída destas espécies é só do líder (o jogador captura a base, mas ela não evolui)
   const EVO_EXCLUSIVA = { vulcanejo: 'dan', coraline: 'tati', redemoinha: 'laura', raiomante: 'du', tatufungo: 'guto' };
   const EVOLUI = (id) => !!EVOLUCOES[id] && !EVO_EXCLUSIVA[id]; // o jogador pode evoluir?
+  const evoluidaN = (m, n) => { let x = m; for (let i = 0; i < n; i++) x = evoluida(x); return x; }; // n estágios de evolução (a linha da borboleta tem 2; as outras, 1)
   const evoluida = (m) => { const e = EVOLUCOES[m.id]; return e ? { ...m, id: e.id, nome: e.nome, hp: Math.round(m.hp * BONUS_EVO.hp), atk: +(m.atk * BONUS_EVO.atk).toFixed(2) } : m; };
   const PONTOS_TREINADOR = { primeira: (nivel) => 10 * nivel, revanche: 3 }; // primeira vitória: 10 x nível; repetir a vitória: 3 pontos
   const NIVEL_TREINADOR = [{ ia: { reacao: 0.03, ritmo: 0.10 } }, { ia: { reacao: 0.05, ritmo: 0.15 } }, { ia: { reacao: 0.09, ritmo: 0.22 } }, { ia: { reacao: 0.11, ritmo: 0.27 } }, { ia: { reacao: 0.15, ritmo: 0.35 } }];
@@ -595,16 +630,16 @@
     // W6 (PLANO-fases.md; PROPOSTOS): Praia, Farol e Ginásio da Pedra (Guto, 4º ginásio). Nomes de até 5 letras.
     { id: 'dani', nome: 'Treinadora Dani', nivel: 4, time: ['bolhudo', 'algazinho', 'pipinha'], frase: 'O mar traz de tudo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'lipe', nome: 'Treinador Lipe', nivel: 4, time: ['coraline', 'pingolino', 'plumelho'], frase: 'Pega onda ou pega areia.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
-    { id: 'rosa', nome: 'Treinadora Rosa', nivel: 4, time: ['mareal', 'taupino', 'bolhudo'], frase: 'Cuidado com os caranguejos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'rosa', nome: 'Treinadora Rosa', nivel: 4, time: ['mareal', 'taupino', 'bolhudo'], frase: 'Cuidado com os caranguejos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, null, 'folego'] } },
     { id: 'edu', nome: 'Treinador Edu', nivel: 4, time: ['coraline', 'mareal', 'pedrinho'], frase: 'Maré cheia!', pol: POL('equilibrado', 'forte', 'pronto', true, 0), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'jair', nome: 'Treinador Jair', nivel: 4, time: ['ventinho', 'nuvelino', 'algazinho'], frase: 'Sou o guardião da luz.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'moa', nome: 'Treinadora Moa', nivel: 5, time: ['nuvelino', 'redemoinha', 'lampiro'], frase: 'A luz guia os perdidos.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'teo', nome: 'Treinador Teo', nivel: 4, time: ['plumelho', 'nuvelino', 'pedrinho'], frase: 'Quem acende, apaga.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'olga', nome: 'Treinadora Olga', nivel: 5, time: ['pedrinho', 'tatufungo', 'chamuscao'], frase: 'Pedra que rola não cria limo.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
     { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['taupino', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
-    { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['tatufungo'], time: ['pedrinho', 'musgarra', 'tatufungo'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['pe', 'arco'], mon: [null, null, 'espinhos'] } },
+    { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['tatufungo'], time: ['pedrinho', 'brotinho', 'tatufungo'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', false, 0), tal: { time: [], mon: [null, null, null] } },
     // Floresta Oculta: andam pela clareira, times só de evoluídos (por isso nível 5 e dois talentos de time)
-    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'combo'], mon: ['ultimo', 'critico', 'folego'] } },
+    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'escudo_ini', 'recarga'], mon: ['ultimo', 'pele_grossa', 'espinhos'] } },
     { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'aurora', nome: 'Mestra Aurora', nivel: 5, time: ['faiscao', 'mareal', 'brotinho'], frase: 'Mostre o que aprendeu.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate'], mon: ['espinhos', 'corpo', 'folego'] } },
@@ -705,7 +740,7 @@
   }
 
   const api = {
-    EVOLUCOES, BONUS_EVO, evoluida, TAL_TATICA, TATICA_BASE, politicaEfetiva, taticaNoOrcamento, ARVORE, NV_DEGRAU, custoNo, validarArvore, pontosTalento, migrarTal, NIVEL_AREA, NIVEL_LIDER, OFFSET_POSTO, postoDe, nivelNoMundo, EVO_EXCLUSIVA, EVOLUI, PESO_RARIDADE, CAPTURA_RARIDADE, REGIOES, REGIAO_DA_AREA, pesosSelvagem, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
+    EVOLUCOES, BONUS_EVO, evoluida, evoluidaN, FAMILIAS, TRACO, TAL_TATICA, TATICA_BASE, politicaEfetiva, taticaNoOrcamento, ARVORE, NV_DEGRAU, custoNo, validarArvore, pontosTalento, migrarTal, NIVEL_AREA, NIVEL_LIDER, OFFSET_POSTO, postoDe, nivelNoMundo, EVO_EXCLUSIVA, EVOLUI, PESO_RARIDADE, CAPTURA_RARIDADE, REGIOES, REGIAO_DA_AREA, pesosSelvagem, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
     TORNEIO, adversariosTorneio, talentosAdversario, iaAdversario,
     POLITICA_PADRAO, ESTILOS, OPCOES_POLITICA, iaPolitica,
     TAL_TIME, TAL_MON, ORCAMENTO, custoTalentos, normalizarTalentos, sortearTalentos, ABERTURA_MULT, RESIST_MULT,

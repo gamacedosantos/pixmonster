@@ -38,6 +38,11 @@
   // Mais 5 espécies (2026-11-19): uma de cada elemento
   Object.assign(PL_ARQ, { pavio: 'pavio-teste.png', bolhudo: 'bolhudo-teste.png', taupino: 'taupino-teste.png', pipinha: 'pipinha-teste.png', lampiro: 'lampiro-teste.png' });
   Object.assign(ALT_PL, { pavio: ALT_MON, bolhudo: ALT_MON, taupino: ALT_MON, pipinha: ALT_MON, lampiro: ALT_MON });
+  // T3 (onda 1): 8 espécies novas (inseto, pedra, fera) e as formas evoluídas delas
+  const T3 = { brasoleta: 'brasadeira', besourao: 'besourei', tesloura: 'teslorrao', rochilo: 'gargolo', cristalino: 'cristalao', texugao: 'texugarra', lontrinha: 'lontrao' };
+  Object.entries(T3).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 38; });
+  // linha da borboleta (3 estágios): casulo, lagarta e a borboleta final
+  Object.assign(PL_ARQ, { casulucia: 'casulucia-teste.png', lagartucia: 'lagartucia-teste.png', papelucia: 'papelucia-teste.png' }); Object.assign(ALT_PL, { casulucia: ALT_MON, lagartucia: 36, papelucia: 40 });
   // Recorta a silhueta (pixels com alfa) para a sprite ser centralizada pela base
   function plCaixa(im) {
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
@@ -501,7 +506,7 @@
     chanfro(g, x + 29, y + 29, 14, 14, PAL.uiWood); px(g, x + 31, y + 31, 10, 10, k.d); desenharIcone(g, m.tipo, x + 36, y + 36); // medalhão do elemento no canto da foto
     g.font = '700 11px "Pixelify Sans", monospace'; g.textBaseline = 'top'; g.fillStyle = '#3b2616';
     g.textAlign = 'left'; g.fillText(m.nome, x + 46, y + 5);
-    g.font = '700 9px "Pixelify Sans", monospace'; g.fillStyle = '#8a6a3a'; g.fillText('Nv ' + (m.nivel || 10), x + 46, y + 17);
+    g.font = '700 9px "Pixelify Sans", monospace'; g.fillStyle = '#8a6a3a'; g.fillText('Nv ' + (m.nivel || 10) + (B.FAMILIAS[m.familia] ? ' · ' + B.FAMILIAS[m.familia].nome : ''), x + 46, y + 17);
     g.font = '700 11px "Pixelify Sans", monospace'; g.fillStyle = baixa && pulso ? '#c8383a' : '#3b2616';
     g.textAlign = 'right'; g.fillText(Math.max(0, Math.round(hp)) + '/' + m.hp, x + w - 7, y + 5);
     // barra de vida: cor que desliza de verde a vermelho, faixa de dano, brilho que corre, piscada no golpe e pulso quando está no fim

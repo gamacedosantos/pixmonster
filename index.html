@@ -313,7 +313,7 @@
       <div class="cartao">
         <section class="ficha">
           <div class="cab"><h3 id="fNome"></h3><span id="fNum"></span></div>
-          <span id="fTipo" class="pill"></span>
+          <span id="fTipo" class="pill"></span> <span id="fFamilia" class="pill"></span>
           <div class="barra"><span>Ps</span><div class="trilho"><i id="bPs"></i></div><b id="vPs"></b></div>
           <div class="barra"><span>Atq</span><div class="trilho"><i id="bAtq"></i></div><b id="vAtq"></b></div>
           <div class="barra"><span>Vel</span><div class="trilho"><i id="bVel"></i></div><b id="vVel"></b></div>
@@ -435,8 +435,10 @@
   let bt = null, rng = null, ultimoT = 0, noMundo = false, selvagem = 0;
   // forma evoluída por monstro do time (índice da espécie base), escolhida na aba Time; vale para luta rápida, torneio e treino (o mundo usa a evolução de verdade do jogador)
   let evoSel = new Set(); try { evoSel = new Set(JSON.parse(localStorage.getItem('pixmon-evo') || '[]')); } catch (e) { /* ok */ }
-  const salvarEvo = () => { try { localStorage.setItem('pixmon-evo', JSON.stringify([...evoSel])); } catch (e) { /* ok */ } };
-  const monDe = (i) => (evoSel.has(i) && B.EVOLUI(B.MONSTROS[i].id) ? B.evoluida(B.MONSTROS[i]) : B.MONSTROS[i]);
+  let evoSel2 = new Set(); try { evoSel2 = new Set(JSON.parse(localStorage.getItem('pixmon-evo2') || '[]')); } catch (e) { /* ok */ } // evoSel2: quem está na 2ª evolução (linha de 3 estágios)
+  const salvarEvo = () => { try { localStorage.setItem('pixmon-evo', JSON.stringify([...evoSel])); localStorage.setItem('pixmon-evo2', JSON.stringify([...evoSel2])); } catch (e) { /* ok */ } };
+  const temEst2 = (id) => !!B.EVOLUCOES[B.evoluida(B.MONSTROS.find((m) => m.id === id)).id];
+  const monDe = (i) => (evoSel.has(i) && B.EVOLUI(B.MONSTROS[i].id) ? B.evoluidaN(B.MONSTROS[i], evoSel2.has(i) ? 2 : 1) : B.MONSTROS[i]);
   let treino = false; // área de treino: alvo com vida infinita que não ataca (não é salvo)
   let sel = 0, cena = 'sorteio', ultimoBioma = null, time = [], ultimoTime = null; // time: índices dos monstros escolhidos (até 3)
   const ORC_LIVRE = B.pontosTalento(1000, 5); // luta rápida: todos os pontos liberados (26); no Explorar valem só os que o jogo já deu (pontosMundo)
@@ -675,9 +677,9 @@
     for (let k = 0; k < 3; k++) {
       const i = time[k], d = document.createElement('div');
       if (i != null && B.EVOLUI(B.MONSTROS[i].id)) {
-        const b = document.createElement('button'), evo = evoSel.has(i); b.className = 'formaBtn' + (evo ? ' evo' : ''); b.disabled = timeTravado();
-        b.textContent = evo ? 'Evoluído: ' + B.EVOLUCOES[B.MONSTROS[i].id].nome : 'Forma base (tocar para evoluir)';
-        b.onclick = () => { if (evo) evoSel.delete(i); else evoSel.add(i); salvarEvo(); S.tocar('toque'); marcarTime(); };
+        const b = document.createElement('button'), evo = evoSel.has(i), est2 = evoSel2.has(i), id = B.MONSTROS[i].id; b.className = 'formaBtn' + (evo ? ' evo' : ''); b.disabled = timeTravado();
+        b.textContent = est2 ? 'Evoluído: ' + B.evoluidaN(B.MONSTROS[i], 2).nome : evo ? 'Evoluído: ' + B.EVOLUCOES[id].nome : 'Forma base (tocar para evoluir)';
+        b.onclick = () => { if (!evo) evoSel.add(i); else if (!est2 && temEst2(id)) evoSel2.add(i); else { evoSel.delete(i); evoSel2.delete(i); } salvarEvo(); S.tocar('toque'); marcarTime(); }; // base, 1ª evolução, (2ª evolução), base
         d.appendChild(b);
       }
       el.appendChild(d);
@@ -793,6 +795,7 @@
     document.getElementById('fNum').textContent = 'Nv ' + m.nivel + '  ·  Nº ' + String(sel + 1).padStart(4, '0');
     const tipo = document.getElementById('fTipo');
     tipo.textContent = NOMES[m.tipo]; tipo.style.background = cor.c;
+    const fam = document.getElementById('fFamilia'), F = B.FAMILIAS[m.familia]; fam.textContent = F ? F.nome : ''; fam.style.background = F ? F.cor : ''; fam.hidden = !F; // T1: a família ao lado do elemento
     document.getElementById('bPs').style.width = Math.round((m.hp / MAX_HP) * 100) + '%';
     document.getElementById('vPs').textContent = m.hp;
     document.getElementById('bAtq').style.width = Math.round((m.atk / MAX_ATK) * 100) + '%';
@@ -802,6 +805,7 @@
     const fraco = Object.keys(B.VENCE).find((e) => B.VENCE[e] === m.tipo);
     const casa = Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === m.tipo);
     document.getElementById('fTexto').textContent = 'Vantagem contra ' + NOMES[B.VENCE[m.tipo]] + '. Fraco contra ' + NOMES[fraco] + '. Dano x' + B.EL[m.tipo].dano + ', vida x' + B.EL[m.tipo].hp + (casa.length ? '. Mais forte em: ' + casa.join(', ') + '.' : '.');
+    { const F = B.FAMILIAS[m.familia]; if (F) document.getElementById('fTexto').textContent += ' Família ' + F.nome + ' (' + F.traco + ').'; document.getElementById('fFamilia').title = F ? F.traco : ''; } // T2: o traço da família
     const golpes = document.getElementById('golpes');
     golpes.innerHTML = '';
     ['rapido', 'forte', 'defesa', 'ultimate'].forEach((slot) => {
@@ -852,7 +856,7 @@
   const idxDe = (id) => B.MONSTROS.findIndex((m) => m.id === id);
   const fator = (nv) => 1 + 0.05 * (nv - 10); // nível 10 = status base
   const escalar = (m, nv) => ({ ...m, nivel: nv, hp: Math.round(m.hp * fator(nv)), atk: +(m.atk * fator(nv)).toFixed(2) });
-  const forma = (id) => { const i = idxDe(id), m = B.MONSTROS[i]; return jogo.col[id] && jogo.col[id].evo && B.EVOLUI(id) ? B.evoluida(m) : m; }; // forma atual (base ou evoluída)
+  const forma = (id) => { const i = idxDe(id), m = B.MONSTROS[i]; return jogo.col[id] && jogo.col[id].evo && B.EVOLUI(id) ? B.evoluidaN(m, jogo.col[id].evo === 2 ? 2 : 1) : m; }; // forma atual (base ou evoluída)
   const monDoMundo = (i) => escalar(forma(B.MONSTROS[i].id), jogo.col[B.MONSTROS[i].id].nv);
   // texto de XP: devolve a frase de subida de nível ou de evolução (ou null)
   function sortearSelvagem(area, soEvo) { // sorteio pelo pool da região da área (B.pesosSelvagem); soEvo: só espécies que têm evolução
@@ -877,6 +881,7 @@
     const c = jogo.col[id], nomeAntes = forma(id).nome, nvAntes = c.nv, subiu = ganhaXp(id, xp), E = B.EVOLUI(id) ? B.EVOLUCOES[id] : null;
     if (!subiu) return null;
     if (E && !c.evo && c.nv >= E.nv) { c.evo = true; return nomeAntes + ' evoluiu para ' + E.nome + '!'; }
+    { const E2 = E && B.EVOLUCOES[E.id]; if (E2 && c.evo && c.evo !== 2 && c.nv >= E2.nv) { c.evo = 2; return nomeAntes + ' evoluiu de novo para ' + E2.nome + '!'; } } // linha de 3 estágios
     return nomeAntes + ' subiu para Nv ' + c.nv + '!';
   }
   function ganhaXp(id, xp) { // devolve true se subiu de nível
