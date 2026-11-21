@@ -151,7 +151,7 @@
   window.PixmonMundo6 = {
     desenhar, RES,
     area: { nome: 'Fazenda', largura: W, bioma: 'campo', elemento: 'terra', v2: true, T, res: RES, mapa, bloq, desenhar,
-      npcs: [{ id: 'otto', nome: 'Otto', pele: '#c98a5e', c: 13, r: 21, dir: 'baixo', vis: 2, cor: '#34231b', camisa: '#c0763a', cab: '#3a2a1a' }],
+      npcs: [{ id: 'otto', nome: 'Otto', pele: '#c98a5e', c: 13, r: 21, dir: 'baixo', vis: 2, cor: '#34231b', camisa: '#c0392b', cab: '#3a2a1a' }],
       portais: { '<': { area: 'vila', c: 37, r: 34 }, '>': { area: 'bosquel', c: 2, r: 60 } } },
   };
 })();

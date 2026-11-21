@@ -317,7 +317,8 @@
     if (!MENU.includes(querida)) { const lista = MENU.filter((k) => k !== ultimoMenu); ultimoMenu = lista[Math.floor(Math.random() * lista.length)]; }
     trilha(ultimoMenu);
   }
-  function mundo(area) { trilha(area === 'vila' ? 'vila' : area === 'oculta' ? 'caverna1' : 'rota'); } // exploração: Vila = PokéMart Memories, Rota = Hidden Trail Whispers
+  const MUSICA_AREA = { vila: 'vila', vilaagua: 'vila', vilavento: 'vila', vilaraio: 'vila', oculta: 'caverna1', escondida: 'caverna2', castelo: 'caverna3', montanha: 'caverna4', montanha2: 'caverna4' }; // W8: faixas que já existem, por região
+  function mundo(area) { trilha(MUSICA_AREA[area] || 'rota'); } // exploração: Vila = PokéMart Memories, Rota = Hidden Trail Whispers
   function loja(ligar) { if (ligar) trilha('loja'); }
   function caverna() { const lista = CAVERNA.filter((k) => k !== ultimaCaverna); ultimaCaverna = lista[Math.floor(Math.random() * lista.length)]; trilha(ultimaCaverna); } // ainda sem área de caverna no mundo
   function intensidade(n) { nivel = Math.max(0, Math.min(3, n)); }

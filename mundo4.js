@@ -138,7 +138,7 @@
   window.PixmonMundo4 = {
     desenhar, RES,
     area: { nome: 'Bosque', largura: W, bioma: 'floresta', elemento: 'ar', v2: true, T, res: RES, mapa, bloq, desenhar,
-      npcs: [{ id: 'davi', nome: 'Iuri', pele: '#f0c8a0', c: 14, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#6a3aa8', cab: '#ffd35a' }],
+      npcs: [{ id: 'davi', nome: 'Iuri', pele: '#f0c8a0', c: 14, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#d8ecf6', cab: '#ffd35a' }],
       portais: { v: { area: 'rota1', c: 13, r: 2 }, '^': { area: 'oculta', c: 12, r: 61 }, '<': { area: 'escondida', c: 57, r: 30 } } },
   };
 })();

@@ -18,10 +18,10 @@ window.PixmonMundo18 = window.PixmonBase.criar({
     for (let k = 0; k < 60; k++) { const c = 3 + (k * 37) % 54, r = 3 + (k * 53) % 104; if (grade[r][c] === '.' && grade[r][c + 1] === '.') pr('pedra', c, r); } // rochas espalhadas
   },
   npcs: [
-    { id: 'dani', nome: 'Dani', pele: '#e8c090', c: 35, r: 90, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#4aa3d8', cab: '#ffd35a' },
-    { id: 'lipe', nome: 'Lipe', pele: '#c89a70', c: 35, r: 30, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#f0d048', cab: '#ffffff' },
-    { id: 'rosa', nome: 'Rosa', pele: '#f0c8a0', c: 46, r: 61, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#c8508a', cab: '#ffd35a' },
-    { id: 'edu', nome: 'Edu', pele: '#d8a878', c: 35, r: 15, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#2f78a8', cab: '#f4f0e8' },
+    { id: 'dani', nome: 'Dani', pele: '#e8c090', c: 35, r: 90, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#2f78a8', cab: '#ffd35a' },
+    { id: 'lipe', nome: 'Lipe', pele: '#c89a70', c: 35, r: 30, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#4aa3d8', cab: '#ffffff' },
+    { id: 'rosa', nome: 'Rosa', pele: '#f0c8a0', c: 46, r: 61, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#2f78a8', cab: '#ffd35a' },
+    { id: 'edu', nome: 'Edu', pele: '#d8a878', c: 35, r: 15, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#4aa3d8', cab: '#f4f0e8' },
   ],
   portais: { '>': { area: 'vilaagua', c: 2, r: 38 }, '^': { area: 'farol', c: 34, r: 106 } },
 });

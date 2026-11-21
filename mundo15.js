@@ -17,9 +17,9 @@ window.PixmonMundo15 = window.PixmonBase.criar({
     for (let k = 0; k < 90; k++) { const c = 3 + (k * 37) % 54, r = 3 + (k * 53) % 104; if (grade[r][c] === '.' && grade[r][c + 1] === '.') pr('pedra', c, r); } // rochas espalhadas pelo chao
   },
   npcs: [
-    { id: 'elis', nome: 'Elis', pele: '#f6d3bb', c: 20, r: 95, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#bfe0f0', cab: '#ffffff' },
-    { id: 'maru', nome: 'Maru', pele: '#e8c090', c: 9, r: 78, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#8a8a98', cab: '#c8508a' },
-    { id: 'dino', nome: 'Dino', pele: '#d8a878', c: 30, r: 59, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#4a67b8', cab: '#fff2a0' },
+    { id: 'elis', nome: 'Elis', pele: '#f6d3bb', c: 20, r: 95, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#d8ecf6', cab: '#ffffff' },
+    { id: 'maru', nome: 'Maru', pele: '#e8c090', c: 9, r: 78, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#6fd6ff', cab: '#c8508a' },
+    { id: 'dino', nome: 'Dino', pele: '#d8a878', c: 30, r: 59, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#d8ecf6', cab: '#fff2a0' },
     { id: 'ney', nome: 'Ney', pele: '#c89a70', c: 50, r: 44, dir: 'esq', vis: 3, cor: '#3a2a18', camisa: '#6fd6ff', cab: '#ffd35a' },
   ],
   portais: { v: { area: 'montanha', c: 29, r: 2 }, '^': { area: 'vilavento', c: 29, r: 106 } },

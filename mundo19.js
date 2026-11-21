@@ -22,9 +22,9 @@ window.PixmonMundo19 = window.PixmonBase.criar({
   predios: [['farol', 45, 12, 3, 6]],
   props: ({ pr }) => { pr('placa', 37, 104); pr('tronco_reto', 14, 20, 2); },
   npcs: [
-    { id: 'jair', nome: 'Jair', pele: '#d8a878', c: 35, r: 70, dir: 'esq', vis: 3, cor: '#3a2a18', camisa: '#f4f0e8', cab: '#d83a2a' },
-    { id: 'moa', nome: 'Moa', pele: '#f6d3bb', c: 48, r: 19, dir: 'cima', vis: 3, cor: '#1b1410', camisa: '#ffe27a', cab: '#2f78a8' },
-    { id: 'teo', nome: 'Teo', pele: '#c89a70', c: 20, r: 41, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#e0703a', cab: '#ffd35a' },
+    { id: 'jair', nome: 'Jair', pele: '#d8a878', c: 35, r: 70, dir: 'esq', vis: 3, cor: '#3a2a18', camisa: '#d8ecf6', cab: '#d83a2a' },
+    { id: 'moa', nome: 'Moa', pele: '#f6d3bb', c: 48, r: 19, dir: 'cima', vis: 3, cor: '#1b1410', camisa: '#6fd6ff', cab: '#2f78a8' },
+    { id: 'teo', nome: 'Teo', pele: '#c89a70', c: 20, r: 41, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#d8ecf6', cab: '#ffd35a' },
   ],
   portais: { v: { area: 'praia', c: 34, r: 2 }, '^': { area: 'pedra', c: 8, r: 106 } },
 });

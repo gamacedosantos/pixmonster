@@ -17,10 +17,10 @@ window.PixmonMundo14 = window.PixmonBase.criar({
     for (let k = 0; k < 90; k++) { const c = 3 + (k * 37) % 54, r = 3 + (k * 53) % 104; if (grade[r][c] === '.' && grade[r][c + 1] === '.') pr('pedra', c, r); } // rochas espalhadas pelo chao
   },
   npcs: [
-    { id: 'tito', nome: 'Tito', pele: '#d8a878', c: 20, r: 91, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#8a8a98', cab: '#f0d048' },
-    { id: 'leo', nome: 'Leo', pele: '#f0c8a0', c: 41, r: 80, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#f0d048', cab: '#6fd6ff' },
-    { id: 'sofi', nome: 'Sofi', pele: '#f6d3bb', c: 30, r: 71, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#a8793f', cab: '#ffffff' },
-    { id: 'gil', nome: 'Gil', pele: '#c89a70', c: 46, r: 38, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#4a67b8', cab: '#e0703a' },
+    { id: 'tito', nome: 'Tito', pele: '#d8a878', c: 20, r: 91, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#f0d048', cab: '#f0d048' },
+    { id: 'leo', nome: 'Leo', pele: '#f0c8a0', c: 41, r: 80, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#e8b830', cab: '#6fd6ff' },
+    { id: 'sofi', nome: 'Sofi', pele: '#f6d3bb', c: 30, r: 71, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#f0d048', cab: '#ffffff' },
+    { id: 'gil', nome: 'Gil', pele: '#c89a70', c: 46, r: 38, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#e8b830', cab: '#e0703a' },
   ],
   portais: { '<': { area: 'bosquel', c: 57, r: 30 }, '^': { area: 'montanha2', c: 29, r: 106 } },
 });

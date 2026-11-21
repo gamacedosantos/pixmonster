@@ -28,8 +28,8 @@ window.PixmonMundo9 = window.PixmonBase.criar({
     [[9, 37], [36, 37], [9, 90], [36, 90]].forEach(([c, r]) => pr('correio_manual', c, r));
   },
   npcs: [
-    { id: 'lia', nome: 'Lia', pele: '#f6d3bb', c: 24, r: 39, dir: 'cima', vis: 3, cor: '#6a3a1a', camisa: '#7fd0e8', cab: '#ffffff' },
-    { id: 'beto', nome: 'Beto', pele: '#d8a878', c: 30, r: 24, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#2f78a8', cab: '#ffd35a' },
+    { id: 'lia', nome: 'Lia', pele: '#f6d3bb', c: 24, r: 39, dir: 'cima', vis: 3, cor: '#6a3a1a', camisa: '#2f78a8', cab: '#ffffff' },
+    { id: 'beto', nome: 'Beto', pele: '#d8a878', c: 30, r: 24, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#4aa3d8', cab: '#ffd35a' },
   ],
   ginasios: { G: 'tati' },
   portais: { '>': { area: 'lago2', c: 2, r: 60 }, '<': { area: 'praia', c: 57, r: 60 } },

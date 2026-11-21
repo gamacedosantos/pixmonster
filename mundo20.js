@@ -18,8 +18,8 @@ window.PixmonMundo20 = window.PixmonBase.criar({
     for (let k = 0; k < 130; k++) { const c = 3 + (k * 37) % 54, r = 3 + (k * 53) % 104; if (grade[r][c] === '.' && grade[r][c + 1] === '.') pr('pedra', c, r); } // rochas espalhadas
   },
   npcs: [
-    { id: 'ivan', nome: 'Ivan', pele: '#d8a878', c: 20, r: 99, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#8a8a98', cab: '#a8793f' },
-    { id: 'olga', nome: 'Olga', pele: '#f6d3bb', c: 30, r: 70, dir: 'esq', vis: 3, cor: '#6a6a78', camisa: '#a8793f', cab: '#1b1410' },
+    { id: 'ivan', nome: 'Ivan', pele: '#d8a878', c: 20, r: 99, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#8a5a2b', cab: '#a8793f' },
+    { id: 'olga', nome: 'Olga', pele: '#f6d3bb', c: 30, r: 70, dir: 'esq', vis: 3, cor: '#6a6a78', camisa: '#6a4a2a', cab: '#1b1410' },
   ],
   ginasios: { G: 'guto' },
   portais: { v: { area: 'farol', c: 8, r: 2 } },

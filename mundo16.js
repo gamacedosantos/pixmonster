@@ -13,10 +13,10 @@ window.PixmonMundo16 = window.PixmonBase.criar({
   },
   props: ({ pr }) => { pr('placa', 32, 104); pr('tronco_reto', 20, 94, 2); pr('tronco_reto', 42, 50, 2); pr('tronco_reto', 6, 50, 2); pr('monolito', 29, 12, 2); },
   npcs: [
-    { id: 'alex', nome: 'Alex', pele: '#e8c090', c: 20, r: 89, dir: 'cima', vis: 3, cor: '#2a1a10', camisa: '#e0703a', cab: '#ffd35a' },
-    { id: 'vini', nome: 'Vini', pele: '#f0c8a0', c: 13, r: 75, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#4aa3d8', cab: '#f4f9fc' },
-    { id: 'cida', nome: 'Cida', pele: '#c89a70', c: 30, r: 59, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#a8793f', cab: '#3a9a4a' },
-    { id: 'raul', nome: 'Raul', pele: '#d8a878', c: 47, r: 45, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#5a8a3a', cab: '#ffffff' },
+    { id: 'alex', nome: 'Alex', pele: '#e8c090', c: 20, r: 89, dir: 'cima', vis: 3, cor: '#2a1a10', camisa: '#8a5a2b', cab: '#ffd35a' },
+    { id: 'vini', nome: 'Vini', pele: '#f0c8a0', c: 13, r: 75, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#6a4a2a', cab: '#f4f9fc' },
+    { id: 'cida', nome: 'Cida', pele: '#c89a70', c: 30, r: 59, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#8a5a2b', cab: '#3a9a4a' },
+    { id: 'raul', nome: 'Raul', pele: '#d8a878', c: 47, r: 45, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#6a4a2a', cab: '#ffffff' },
   ],
   portais: { v: { area: 'vilavento', c: 46, r: 2 }, '^': { area: 'castelo', c: 29, r: 106 } },
 });

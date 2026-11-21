@@ -15,9 +15,9 @@ window.PixmonMundo7 = window.PixmonBase.criar({
   },
   props: ({ pr }) => { pr('placa', 14, 58); pr('monolito', 17, 12, 2); pr('tronco_reto', 14, 30, 2); pr('tronco_reto', 20, 44, 2); pr('tronco_reto', 3, 40, 2); },
   npcs: [
-    { id: 'ryu', nome: 'Ryu', pele: '#f0c8a0', c: 8, r: 10, dir: 'baixo', vis: 4, cor: '#1b1410', camisa: '#f4f0e8', cab: '#d83a2a',
+    { id: 'ryu', nome: 'Ryu', pele: '#f0c8a0', c: 8, r: 10, dir: 'baixo', vis: 4, cor: '#1b1410', camisa: '#6a6a78', cab: '#d83a2a',
       paradas: [{ c: 8, r: 10, espera: [900, 2200] }, { c: 20, r: 10, espera: [900, 2200] }, { c: 20, r: 18, espera: [900, 2200] }, { c: 8, r: 18, espera: [900, 2200] }] },
-    { id: 'lee', nome: 'Lee', pele: '#e8c090', c: 27, r: 12, dir: 'esq', vis: 4, cor: '#0e0e12', camisa: '#ffd35a', cab: '#1b1410',
+    { id: 'lee', nome: 'Lee', pele: '#e8c090', c: 27, r: 12, dir: 'esq', vis: 4, cor: '#0e0e12', camisa: '#7a4ab8', cab: '#1b1410',
       paradas: [{ c: 27, r: 12, espera: [800, 2000] }, { c: 13, r: 15, espera: [800, 2000] }, { c: 27, r: 19, espera: [800, 2000] }, { c: 11, r: 10, espera: [800, 2000] }] },
   ],
   portais: { v: { area: 'bosque', c: 12, r: 2 }, '^': { area: 'vilaraio', c: 29, r: 106 } },

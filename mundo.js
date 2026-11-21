@@ -515,7 +515,7 @@
       const mv = npcMov[n.id], q = mv ? Math.min(1, mv.t / DUR_PASSO) : 0; let nx = p.c * T + T / 2, ny = (p.r + 1) * T - 1;
       if (mv) { nx = mv.fc * T + T / 2 + (p.c - mv.fc) * T * q; ny = (mv.fr + 1) * T - 1 + (p.r - mv.fr) * T * q; }
       jogador(g, nx, ny, p.dir, 0, !!mv, { cor: n.cor, cab: n.cab, pele: n.pele, camisa: n.camisa, matiz: n.matiz, frac: mv ? q : null, passo: mv ? mv.passo : 0 });
-      etiqueta(g, nx, ny - 30, n.nome);
+      etiqueta(g, nx, ny - 30, n.nome + (cb.rotuloNpc ? cb.rotuloNpc(n.id) : ''));
       if (des && des.id === n.id && des.fase === 'ex') { g.fillStyle = '#1b1020'; g.fillRect(p.c * T + 4, p.r * T - 20, 8, 12); g.fillStyle = '#ffd35a'; g.font = '8px "Press Start 2P", monospace'; g.textAlign = 'center'; g.fillText('!', p.c * T + 8, p.r * T - 10); }
     } }); });
     extras.push({ y: py, f: () => jogador(g, px, py - 1, dir, quadro, !!alvo) });
@@ -567,7 +567,7 @@
     }));
     (A.npcs || []).forEach((n) => { const p = npcPos[n.id]; objs.push({ y: (p.r + 1) * T, f: () => {
       jogador(g, p.c * T + T / 2, (p.r + 1) * T - 2, p.dir, 0, false, { cor: n.cor, cab: n.cab, matiz: n.matiz });
-      etiqueta(g, p.c * T + T / 2, (p.r + 1) * T - 50, n.nome);
+      etiqueta(g, p.c * T + T / 2, (p.r + 1) * T - 50, n.nome + (cb.rotuloNpc ? cb.rotuloNpc(n.id) : ''));
       if (des && des.id === n.id && des.fase === 'ex') { g.fillStyle = '#1b1020'; g.fillRect(p.c * T + 10, p.r * T - 22, 12, 18); g.fillStyle = '#ffd35a'; g.font = '14px "Press Start 2P", monospace'; g.textAlign = 'center'; g.fillText('!', p.c * T + 16, p.r * T - 7); }
     } }); });
     objs.push({ y: py, f: () => jogador(g, px, py - 2, dir, quadro, !!alvo) });

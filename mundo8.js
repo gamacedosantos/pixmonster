@@ -19,9 +19,9 @@ window.PixmonMundo8 = window.PixmonBase.criar({
   npcs: [
     { id: 'caio', nome: 'Caio', pele: '#e8c090', c: 36, r: 97, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#2f78a8', cab: '#f4f0e8' },
     { id: 'duda', nome: 'Duda', pele: '#f0c8a0', c: 53, r: 60, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#4aa3d8', cab: '#ffd35a' },
-    { id: 'nico', nome: 'Nico', pele: '#c89a70', c: 7, r: 70, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#f0d048', cab: '#6fd6ff' },
-    { id: 'bela', nome: 'Bela', pele: '#f6d3bb', c: 22, r: 22, dir: 'baixo', vis: 4, cor: '#7a3a1a', camisa: '#5a8a3a', cab: '#a8793f' },
-    { id: 'rafa', nome: 'Rafa', pele: '#e8c090', c: 36, r: 18, dir: 'esq', vis: 4, cor: '#2a1a10', camisa: '#e0703a', cab: '#ffffff',
+    { id: 'nico', nome: 'Nico', pele: '#c89a70', c: 7, r: 70, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#2f78a8', cab: '#6fd6ff' },
+    { id: 'bela', nome: 'Bela', pele: '#f6d3bb', c: 22, r: 22, dir: 'baixo', vis: 4, cor: '#7a3a1a', camisa: '#4aa3d8', cab: '#a8793f' },
+    { id: 'rafa', nome: 'Rafa', pele: '#e8c090', c: 36, r: 18, dir: 'esq', vis: 4, cor: '#2a1a10', camisa: '#2f78a8', cab: '#ffffff',
       paradas: [{ c: 36, r: 18, espera: [900, 2200] }, { c: 36, r: 28, espera: [900, 2200] }, { c: 20, r: 28, espera: [900, 2200] }, { c: 20, r: 18, espera: [900, 2200] }] },
   ],
   portais: { '>': { area: 'lago', c: 2, r: 26 }, '<': { area: 'vilaagua', c: 57, r: 60 }, '^': { area: 'escondida', c: 29, r: 106 } },

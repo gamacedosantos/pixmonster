@@ -13,9 +13,9 @@ window.PixmonMundo10 = window.PixmonBase.criar({
   },
   props: ({ pr }) => { pr('placa', 32, 104); pr('tronco_reto', 20, 92, 2); pr('tronco_reto', 38, 50, 2); pr('tronco_reto', 13, 52, 2); },
   npcs: [
-    { id: 'dora', nome: 'Dora', pele: '#f0c8a0', c: 20, r: 95, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#5a8a3a', cab: '#a8793f' },
-    { id: 'kaio', nome: 'Kaio', pele: '#c89a70', c: 11, r: 80, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#7fd0e8', cab: '#f4f9fc' },
-    { id: 'maya', nome: 'Maya', pele: '#e8c090', c: 40, r: 69, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#c8508a', cab: '#ffd35a' },
+    { id: 'dora', nome: 'Dora', pele: '#f0c8a0', c: 20, r: 95, dir: 'cima', vis: 3, cor: '#3a2a18', camisa: '#8a5a2b', cab: '#a8793f' },
+    { id: 'kaio', nome: 'Kaio', pele: '#c89a70', c: 11, r: 80, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#6a4a2a', cab: '#f4f9fc' },
+    { id: 'maya', nome: 'Maya', pele: '#e8c090', c: 40, r: 69, dir: 'cima', vis: 3, cor: '#7a3a1a', camisa: '#8a5a2b', cab: '#ffd35a' },
     { id: 'zeca', nome: 'Zeca', pele: '#f6d3bb', c: 48, r: 50, dir: 'esq', vis: 3, cor: '#2a1a10', camisa: '#6a4a2a', cab: '#3a9a4a' },
   ],
   portais: { v: { area: 'lago2', c: 29, r: 2 }, '>': { area: 'bosque', c: 2, r: 44 } },

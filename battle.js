@@ -44,8 +44,11 @@
   // ---------- Talentos (antes da luta): o time gasta ORCAMENTO pontos em talentos do time, e cada monstro leva 1 talento próprio (grátis).
   const ORCAMENTO = 8;
   const NOME_EL = { fogo: 'fogo', agua: 'água', terra: 'terra', ar: 'ar', eletrico: 'eletricidade' };
-  const CADEIA_PCT = 0.025, FOLEGO_PCT = 0.04, ULT_TAL_INICIO = 0.25, ABERTURA_MULT = 1.2, ULTIMO_MULT = 1.15, ULTIMO_LIMITE = 0.25, RESIST_MULT = 0.9;
+  const CADEIA_PCT = 0.022, FOLEGO_PCT = 0.04, ULT_TAL_INICIO = 0.25, ABERTURA_MULT = 1.2, ULTIMO_MULT = 1.15, ULTIMO_LIMITE = 0.25, RESIST_MULT = 0.9;
   const DUPLA_MULT = 1.1, ARCO_MULT = 0.94, RESERVA_PCT = 0.008, SEDE_MS = 1000, PE_BONUS = 1.35, ESPINHOS_PCT = 0.05, CORPO_CH = 0.25, VENENO_EXTRA = 2000;
+  // B5: talentos novos da árvore (PLANO-balanceamento.md seção 6)
+  const COMBO_MULT = 1.25, FOCO_MULT = 1.08, ESCUDO_MULT = 0.85, ESCUDO_MS = 5000, MURALHA_MULT = 0.7, MURALHA_MS = 5000, RECARGA_MULT = 0.85, ULT_PODER_DANO = 1.12, ULT_PODER_CD = 1.15, ULT_DUPLA_PCT = 0.10;
+  const PELE_GROSSA = 1.08, CRIT_FINO = 0.05, PESADO_DANO = 1.16, PESADO_CD = 1.10, PARALISIA_EXTRA = 1500;
   const SORTE_OTIMO = 0.3, SORTE_DESFAZ = 0.5, TROCA_AGIL_CD = 3000;
   const TAL_TIME = {
     cura_cadeia: { nome: 'Cura em cadeia', custo: 3, desc: 'a cada 3 ataques rápidos de quem está em campo, o time todo recupera ' + Math.round(CADEIA_PCT * 100) + '% da vida' },
@@ -58,6 +61,13 @@
     sede: { nome: 'Sede de ultimate', custo: 2, desc: 'cada golpe crítico adianta o ultimate em ' + (SEDE_MS / 1000) + ' s' },
     demolidor: { nome: 'Demolidor', custo: 1, desc: 'investidas, projéteis e impactos quebram objetos de mais longe (50% a mais)' },
     pe: { nome: 'Pé no chão', custo: 1, desc: 'o bônus do cenário para os monstros do elemento favorecido sobe de +' + Math.round((BONUS_BIOMA - 1) * 100) + '% para +' + Math.round((PE_BONUS - 1) * 100) + '%' },
+    combo: { nome: 'Combo', custo: 3, desc: '3 ataques rápidos seguidos do mesmo monstro dão +' + Math.round((COMBO_MULT - 1) * 100) + '% de dano no próximo golpe forte' },
+    foco: { nome: 'Foco', custo: 3, desc: '+' + Math.round((FOCO_MULT - 1) * 100) + '% de dano contra um alvo com menos de 50% de vida' },
+    escudo_ini: { nome: 'Escudo inicial', custo: 2, desc: 'o time recebe ' + Math.round((1 - ESCUDO_MULT) * 100) + '% menos dano nos primeiros ' + ESCUDO_MS / 1000 + ' s da luta' },
+    muralha: { nome: 'Muralha', custo: 3, desc: 'quem entra no lugar de um caído recebe ' + Math.round((1 - MURALHA_MULT) * 100) + '% menos dano por ' + MURALHA_MS / 1000 + ' s' },
+    recarga: { nome: 'Recarga rápida', custo: 2, desc: 'a recarga do ultimate cai ' + Math.round((1 - RECARGA_MULT) * 100) + '%' },
+    ult_dupla: { nome: 'Ult em dupla', custo: 3, desc: 'cada ultimate que um monstro solta adianta em ' + Math.round(ULT_DUPLA_PCT * 100) + '% o ultimate dos outros do time' },
+    ult_poder: { nome: 'Ult poderoso', custo: 3, desc: 'o ultimate causa +' + Math.round((ULT_PODER_DANO - 1) * 100) + '% de dano, mas leva +' + Math.round((ULT_PODER_CD - 1) * 100) + '% de recarga' },
     abertura: { nome: 'Abertura', custo: 2, desc: 'o primeiro golpe de cada monstro causa +' + Math.round((ABERTURA_MULT - 1) * 100) + '% de dano' },
   };
   const TAL_MON = {
@@ -65,16 +75,86 @@
     espinhos: { nome: 'Espinhos', desc: 'devolve ' + Math.round(ESPINHOS_PCT * 100) + '% do dano que recebe a quem atacou' },
     casca: { nome: 'Casca grossa', desc: 'o primeiro stun ou paralisia da luta não pega' },
     corpo: { nome: 'Corpo fechado', desc: Math.round(CORPO_CH * 100) + '% de chance de ignorar um status que ia pegar' },
+    pele_grossa: { nome: 'Pele grossa', desc: '+' + Math.round((PELE_GROSSA - 1) * 100) + '% de vida' },
+    critico: { nome: 'Crítico fino', desc: '+' + Math.round(CRIT_FINO * 100) + ' pontos de chance de crítico' },
+    golpe_pesado: { nome: 'Golpe pesado', desc: 'o golpe forte causa +' + Math.round((PESADO_DANO - 1) * 100) + '% de dano e leva +' + Math.round((PESADO_CD - 1) * 100) + '% de recarga' },
+    paralisia_longa: { nome: 'Paralisia longa', desc: 'a paralisia que ele aplica dura ' + PARALISIA_EXTRA / 1000 + ' s a mais' },
+    antidoto: { nome: 'Antídoto', desc: 'imune a veneno' },
     veneno_pot: { nome: 'Veneno potente', desc: 'o veneno que ele aplica dura ' + (VENENO_EXTRA / 1000) + ' s a mais' },
     sem_lento: { nome: 'Pés firmes', desc: 'imune a lentidão' },
     ultimo: { nome: 'Último suspiro', desc: 'com menos de ' + Math.round(ULTIMO_LIMITE * 100) + '% de vida, +' + Math.round((ULTIMO_MULT - 1) * 100) + '% de dano' },
   };
   Object.keys(EL).forEach((t) => { TAL_MON['res_' + t] = { nome: 'Pele contra ' + NOME_EL[t], desc: 'recebe ' + Math.round((1 - RESIST_MULT) * 100) + '% menos dano de golpes de ' + NOME_EL[t] }; });
+  // B5: a ÁRVORE de talentos (PLANO-balanceamento.md seção 6). Cada nó: arvore ('time' | 'mon'), ramo, degrau (1 a 3), pre (todos exigidos), preAlg (basta um), ou (escolhe um dos dois: não vale ter os dois).
+  // Time: o degrau 3 exige um nó do degrau 2 do ramo. Monstro: o degrau libera pelo nível do monstro (NV_DEGRAU). Os talentos continuam em TAL_TIME / TAL_MON; aqui só a estrutura.
+  const NV_DEGRAU = [5, 10, 16];
+  const ARVORE = {
+    abertura: { arvore: 'time', ramo: 'ataque', degrau: 1 }, dupla: { arvore: 'time', ramo: 'ataque', degrau: 2, pre: ['abertura'] }, sede: { arvore: 'time', ramo: 'ataque', degrau: 2, pre: ['abertura'] },
+    combo: { arvore: 'time', ramo: 'ataque', degrau: 3, preAlg: ['dupla', 'sede'], ou: 'foco' }, foco: { arvore: 'time', ramo: 'ataque', degrau: 3, preAlg: ['dupla', 'sede'], ou: 'combo' },
+    arco: { arvore: 'time', ramo: 'defesa', degrau: 1 }, reserva: { arvore: 'time', ramo: 'defesa', degrau: 2, pre: ['arco'] }, cura_cadeia: { arvore: 'time', ramo: 'defesa', degrau: 2, pre: ['arco'] },
+    escudo_ini: { arvore: 'time', ramo: 'defesa', degrau: 3, preAlg: ['reserva', 'cura_cadeia'], ou: 'muralha' }, muralha: { arvore: 'time', ramo: 'defesa', degrau: 3, preAlg: ['reserva', 'cura_cadeia'], ou: 'escudo_ini' },
+    ultimate: { arvore: 'time', ramo: 'ultimate', degrau: 1 }, recarga: { arvore: 'time', ramo: 'ultimate', degrau: 2, pre: ['ultimate'] },
+    ult_dupla: { arvore: 'time', ramo: 'ultimate', degrau: 3, pre: ['recarga'], ou: 'ult_poder' }, ult_poder: { arvore: 'time', ramo: 'ultimate', degrau: 3, pre: ['recarga'], ou: 'ult_dupla' },
+    demolidor: { arvore: 'time', ramo: 'mundo', degrau: 1 }, pe: { arvore: 'time', ramo: 'mundo', degrau: 1 }, sorte: { arvore: 'time', ramo: 'mundo', degrau: 2, preAlg: ['demolidor', 'pe'] }, troca: { arvore: 'time', ramo: 'mundo', degrau: 2, preAlg: ['demolidor', 'pe'] },
+    pele_grossa: { arvore: 'mon', ramo: 'corpo', degrau: 1 }, folego: { arvore: 'mon', ramo: 'corpo', degrau: 1 }, casca: { arvore: 'mon', ramo: 'corpo', degrau: 2 }, corpo: { arvore: 'mon', ramo: 'corpo', degrau: 2 },
+    critico: { arvore: 'mon', ramo: 'ataque', degrau: 1 }, ultimo: { arvore: 'mon', ramo: 'ataque', degrau: 2 }, espinhos: { arvore: 'mon', ramo: 'ataque', degrau: 2 }, golpe_pesado: { arvore: 'mon', ramo: 'ataque', degrau: 3 },
+    veneno_pot: { arvore: 'mon', ramo: 'status', degrau: 1 }, sem_lento: { arvore: 'mon', ramo: 'status', degrau: 1 }, antidoto: { arvore: 'mon', ramo: 'status', degrau: 2 }, paralisia_longa: { arvore: 'mon', ramo: 'status', degrau: 2 },
+  };
+  // B7: a árvore TÁTICA. Cada talento destrava opções das regras de luta (POLITICA); sem nenhum, o time luta no padrão da tática (TATICA_BASE).
+  const TAL_TATICA = {
+    t_estilo: { nome: 'Estilo de luta', custo: 1, desc: 'destrava os estilos agressivo e defensivo', libera: { estilo: ['agressivo', 'defensivo'] } },
+    t_defesa: { nome: 'Defender na hora certa', custo: 1, desc: 'destrava "defender só do ultimate" e "nunca defender"', libera: { defesa: ['ultimate', 'nunca'] } },
+    t_ult: { nome: 'Ultimate esperto', custo: 2, desc: 'destrava soltar o ultimate só com vantagem de elemento ou adversário abaixo de 50%', libera: { ultimate: ['vantagem'] } },
+    t_troca: { nome: 'Troca por vantagem', custo: 2, desc: 'destrava trocar de monstro quando o adversário tem vantagem de elemento', libera: { trocaDesv: ['true'] } },
+    t_final: { nome: 'Finalizador', custo: 3, desc: 'destrava guardar o ultimate para quando o adversário estiver abaixo de 50%', libera: { ultimate: ['finalizar'] } },
+    t_vida: { nome: 'Troca por vida', custo: 3, desc: 'destrava trocar de monstro com a vida baixa (20, 30 ou 40%)', libera: { trocaVida: ['20', '30', '40'] } },
+    t_rotacao: { nome: 'Rotação', custo: 2, desc: 'destrava escolher quem entra depois de um nocaute: na ordem ou o com mais vida', libera: { proximo: ['ordem', 'vida'] } },
+  };
+  const TATICA_BASE = { estilo: 'equilibrado', defesa: 'forte', ultimate: 'pronto', trocaDesv: false, trocaVida: 0, proximo: 'melhor' };
+  Object.assign(ARVORE, {
+    t_estilo: { arvore: 'tatica', ramo: 'tatica', degrau: 1 }, t_defesa: { arvore: 'tatica', ramo: 'tatica', degrau: 1 },
+    t_ult: { arvore: 'tatica', ramo: 'tatica', degrau: 2, preAlg: ['t_estilo', 't_defesa'] }, t_troca: { arvore: 'tatica', ramo: 'tatica', degrau: 2, preAlg: ['t_estilo', 't_defesa'] },
+    t_final: { arvore: 'tatica', ramo: 'tatica', degrau: 3, pre: ['t_ult'] }, t_vida: { arvore: 'tatica', ramo: 'tatica', degrau: 3, pre: ['t_troca'] }, t_rotacao: { arvore: 'tatica', ramo: 'tatica', degrau: 3, pre: ['t_troca'] },
+  });
+  // A regra escolhida só vale se o talento dela foi comprado; senão volta ao padrão da tática. ids = talentos táticos que valem.
+  function politicaEfetiva(pol, ids) {
+    const out = { ...pol };
+    for (const campo of Object.keys(TATICA_BASE)) {
+      const v = String(pol[campo]); if (v === String(TATICA_BASE[campo])) continue;
+      if (!ids.some((id) => TAL_TATICA[id] && (TAL_TATICA[id].libera[campo] || []).includes(v))) out[campo] = TATICA_BASE[campo];
+    }
+    return out;
+  }
+  // Táticos que cabem no orçamento depois dos talentos do time (ordem de compra; o que passa do orçamento fica de fora).
+  function taticaNoOrcamento(timeIds, taticaIds, orc) {
+    let gasto = custoTalentos(normalizarTalentos({ time: timeIds }, 3, orc).time); const out = [];
+    for (const id of taticaIds) { const t = TAL_TATICA[id]; if (t && gasto + t.custo <= orc) { out.push(id); gasto += t.custo; } }
+    return out;
+  }
+  Object.keys(EL).forEach((t) => { ARVORE['res_' + t] = { arvore: 'mon', ramo: 'corpo', degrau: 2 }; });
+  const custoNo = (id) => (TAL_TIME[id] ? TAL_TIME[id].custo : TAL_TATICA[id] ? TAL_TATICA[id].custo : ARVORE[id] ? ARVORE[id].degrau : 0); // time: custo do talento; monstro: custo = degrau
+  // Confere uma escolha na árvore. tipo 'time': ids do time; tipo 'mon': ids de UM monstro, com o nível dele. Devolve a lista de problemas (vazia = válida).
+  function validarArvore(tipo, ids, nivel = 99) {
+    const erros = [], tem = new Set(ids);
+    for (const id of ids) {
+      const n = ARVORE[id]; if (!n || n.arvore !== tipo) { erros.push(id + ': não existe na árvore ' + tipo); continue; }
+      if ((n.pre || []).some((p) => !tem.has(p))) erros.push(id + ': falta ' + n.pre.filter((p) => !tem.has(p)).join(', '));
+      if (n.preAlg && !n.preAlg.some((p) => tem.has(p))) erros.push(id + ': falta um de ' + n.preAlg.join(', '));
+      if (n.ou && tem.has(n.ou)) erros.push(id + ': escolha só um entre ' + id + ' e ' + n.ou);
+      if (tipo === 'mon' && nivel < NV_DEGRAU[n.degrau - 1]) erros.push(id + ': pede nível ' + NV_DEGRAU[n.degrau - 1]);
+    }
+    if (tipo === 'mon') for (const d of [1, 2, 3]) { const k = ids.filter((id) => ARVORE[id] && ARVORE[id].degrau === d); if (k.length > 1) erros.push('degrau ' + d + ': só um talento (' + k.join(', ') + ')'); }
+    return erros;
+  }
+  // Pontos de talento (decisão do George: crescem com o jogo): 4 no começo, +1 a cada 5 batalhas com treinadores (até +12), +2 por insígnia de líder (até 5).
+  const pontosTalento = (lutas = 0, insignias = 0) => 4 + Math.min(12, Math.floor(lutas / 5)) + 2 * Math.min(5, insignias);
+  // Migração do save antigo (pixmon-tal: { time: [ids], mon: { idMonstro: 'talento' } }) para o formato da árvore (monstro com lista; tatica vem na B7).
+  const migrarTal = (v) => ({ time: Array.isArray(v && v.time) ? v.time.slice() : [], mon: Object.fromEntries(Object.entries((v && v.mon) || {}).map(([k, x]) => [k, Array.isArray(x) ? x.slice() : x ? [x] : []])), tatica: Array.isArray(v && v.tatica) ? v.tatica.slice() : [] });
   const custoTalentos = (ids) => ids.reduce((a, id) => a + (TAL_TIME[id] ? TAL_TIME[id].custo : 0), 0);
   // Limpa uma escolha: só ids válidos, sem repetir, dentro do orçamento (corta do fim); mon sempre com n posições (null = sem talento)
   function normalizarTalentos(t, n = 3, orc = ORCAMENTO) {
     const time = []; for (const id of (t && t.time) || []) if (TAL_TIME[id] && !time.includes(id) && custoTalentos([...time, id]) <= orc) time.push(id);
-    const mon = []; for (let k = 0; k < n; k++) { const id = t && t.mon && t.mon[k]; mon.push(TAL_MON[id] ? id : null); }
+    const mon = []; for (let k = 0; k < n; k++) { const v = t && t.mon && t.mon[k]; mon.push(Array.isArray(v) ? [...new Set(v.filter((x) => TAL_MON[x]))] : TAL_MON[v] ? v : null); }
     return { time, mon };
   }
   // Escolha aleatória válida (para o adversário e para o simulador): talentos do time até estourar o orçamento e 1 talento por monstro
@@ -152,7 +232,34 @@
   Object.keys(FX_RAPIDO).forEach((fx) => FX_RAPIDO[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.rapido.fx = fx; }));
   Object.keys(FX_FORTE).forEach((fx) => FX_FORTE[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.forte.fx = fx; }));
   MONSTROS.forEach((m) => { m.hp =Math.round(60 * EL[m.tipo].hp); m.dano = EL[m.tipo].dano; m.raridade = m.raridade || 'comum'; });
-  const PESO_RARIDADE = { comum: 1, rara: 0.4, lendaria: 0.1 }; // chance relativa de aparecer como selvagem no mundo
+  ['chamuscao', 'pingolino', 'musgarra', 'nuvelino', 'trovinho'].forEach((id) => { MONSTROS.find((m) => m.id === id).raridade = 'incomum'; }); // B1: o segundo de cada elemento é incomum
+  const PESO_RARIDADE = { comum: 1, incomum: 0.6, rara: 0.3, lendaria: 0.05 }; // chance relativa de aparecer como selvagem no mundo
+  const CAPTURA_RARIDADE = { comum: 1, incomum: 0.9, rara: 0.75, lendaria: 0.5 }; // multiplica a chance da esfera
+  // B1 (PLANO-balanceamento.md): cada área pertence a uma região; o selvagem sai de um pool por região, não de "tudo, com o elemento 3x".
+  // Pool: 72% do elemento da região (comuns e incomuns), 22% de um elemento vizinho, 3% de raros da região e 3% dos outros elementos. 'inicio' = só comuns e incomuns, todos os elementos; 'andarilhos' = tudo, só aqui sai o lendário.
+  const REGIOES = {
+    inicio: { nome: 'Sem clã' }, andarilhos: { nome: 'Andarilhos', todos: true, camisas: ['#6a6a78', '#7a4ab8'] },
+    brasa: { nome: 'Brasa', el: 'fogo', viz: 'terra', raros: ['vulcanejo'], camisas: ['#c0392b', '#e0503a'] }, mare: { nome: 'Maré', el: 'agua', viz: 'ar', raros: ['coraline'], camisas: ['#2f78a8', '#4aa3d8'] },
+    brisa: { nome: 'Brisa', el: 'ar', viz: 'agua', raros: ['redemoinha', 'pipinha'], camisas: ['#d8ecf6', '#6fd6ff'] },
+    rocha: { nome: 'Rocha', el: 'terra', viz: 'fogo', raros: ['tatufungo'], camisas: ['#8a5a2b', '#6a4a2a'] }, faisca: { nome: 'Faísca', el: 'eletrico', viz: 'ar', raros: ['lampiro'], camisas: ['#f0d048', '#e8b830'] }, // B3: cada região é um clã; o uniforme é a cor da camisa (2 tons)
+  };
+  // B4: nível FIXO do treinador por área (não depende mais do nível do jogador): base da área + ajuste do posto; líderes têm nível próprio.
+  // O posto vem do `nivel` do treinador (1 aprendiz, 2 membro, 3 veterano, 4 e 5 elite); os cinco líderes são sempre 'lider'.
+  const NIVEL_AREA = { vila: 5, rota1: 5, fazenda: 6, lago: 7, bosque: 7, lago2: 9, vilaagua: 10, escondida: 10, praia: 11, bosquel: 11, vilavento: 13, farol: 13, montanha: 14, vilaraio: 15, montanha2: 16, bosquen: 16, pedra: 18, castelo: 20, oculta: 22 };
+  const OFFSET_POSTO = { aprendiz: -1, membro: 0, veterano: 1, elite: 2, lider: 3 };
+  const NIVEL_LIDER = { tati: 13, laura: 16, du: 16, guto: 22, dan: 25 };
+  const POSTOS = ['aprendiz', 'membro', 'veterano', 'elite', 'elite'];
+  const postoDe = (t) => (NIVEL_LIDER[t.id] ? 'lider' : POSTOS[t.nivel - 1] || 'membro');
+  const nivelNoMundo = (t, area) => NIVEL_LIDER[t.id] || Math.max(2, Math.min(30, (NIVEL_AREA[area] || 5) + OFFSET_POSTO[postoDe(t)]));
+  const REGIAO_DA_AREA = { vila: 'inicio', rota1: 'inicio', fazenda: 'brasa', lago: 'mare', lago2: 'mare', vilaagua: 'mare', praia: 'mare', bosque: 'brisa', bosquel: 'brisa', vilavento: 'brisa', farol: 'brisa', montanha2: 'brisa', escondida: 'rocha', bosquen: 'rocha', pedra: 'rocha', vilaraio: 'faisca', montanha: 'faisca', oculta: 'andarilhos', castelo: 'andarilhos' };
+  function pesosSelvagem(area, soEvo) { // pesos (somam 1) na ordem de MONSTROS; soEvo: só espécies que têm evolução
+    const g = REGIOES[REGIAO_DA_AREA[area]] || REGIOES.inicio, cm = (m) => m.raridade === 'comum' || m.raridade === 'incomum';
+    const sel = (f) => MONSTROS.map((m) => (soEvo && !EVOLUI(m.id) ? 0 : f(m) ? PESO_RARIDADE[m.raridade] : 0));
+    const norm = (v, alvo) => { const s = v.reduce((a, b) => a + b, 0); return v.map((x) => (s ? (x / s) * alvo : 0)); };
+    const partes = g.todos ? [norm(sel(() => true), 1)] : !g.el ? [norm(sel(cm), 1)] : [norm(sel((m) => cm(m) && m.tipo === g.el), 0.72), norm(sel((m) => g.raros.includes(m.id)), 0.03), norm(sel((m) => cm(m) && m.tipo === g.viz), 0.22), norm(sel((m) => cm(m) && m.tipo !== g.el && m.tipo !== g.viz), 0.03)];
+    const w = MONSTROS.map((_, i) => partes.reduce((a, p) => a + p[i], 0)), s = w.reduce((a, b) => a + b, 0);
+    return w.map((x) => x / s); // grupo vazio (soEvo) devolve a sua parte aos outros
+  }
 
   const cdDe = (m, slot) => BASE[slot].cd * m.rc * (slot === 'ultimate' && m.golpes.ultimate.poder === 'esfera' ? PODERES.esfera.cd : 1);          // recarga efetiva (ms)
   const cargaDe = (m, slot) => BASE[slot].carga * m.cg * (slot === 'ultimate' && m.golpes.ultimate.poder === 'esfera' ? PODERES.esfera.carga : 1);    // tempo de carga efetivo (ms)
@@ -176,9 +283,10 @@
   }
 
   function novoLado(m, tal = null, tt = new Set(), hpFrac = 1) {
-    const cdTotal = {}, cd = {};
-    for (const s of SLOTS) { cdTotal[s] = cdDe(m, s); cd[s] = s === 'ultimate' ? cdTotal[s] * (tt.has('ultimate') ? ULT_TAL_INICIO : ULT_INICIO) : 0; }
-    return { m, tal, rapidos: 0, abriu: false, hp: Math.max(0, m.hp * hpFrac), cd, cdTotal, acao: null, defesaAte: 0, st: {}, imuneAte: 0, entraAte: 0 }; // cd = ms que faltam; acao = ataque em carga; defesaAte = ms (relógio da luta)
+    const tals = new Set([].concat(tal || [])), cdTotal = {}, cd = {};
+    if (tals.has('pele_grossa')) m = { ...m, hp: Math.round(m.hp * PELE_GROSSA) };
+    for (const s of SLOTS) { cdTotal[s] = cdDe(m, s) * (s === 'ultimate' ? (tt.has('recarga') ? RECARGA_MULT : 1) * (tt.has('ult_poder') ? ULT_PODER_CD : 1) : s === 'forte' && tals.has('golpe_pesado') ? PESADO_CD : 1); cd[s] = s === 'ultimate' ? cdTotal[s] * (tt.has('ultimate') ? ULT_TAL_INICIO : ULT_INICIO) : 0; }
+    return { m, tals, combo: 0, protAte: 0, rapidos: 0, abriu: false, hp: Math.max(0, m.hp * hpFrac), cd, cdTotal, acao: null, defesaAte: 0, st: {}, imuneAte: 0, entraAte: 0 }; // cd = ms que faltam; acao = ataque em carga; defesaAte = ms (relógio da luta)
   }
   // a e b: um monstro ou um time (lista de 1 a 3). bt.lados[i] é sempre o monstro em campo do lado i (aponta para bt.times[i][ativo[i]]).
   // tal: [talentos do lado 0, do lado 1], cada um { time: [ids], mon: [id por monstro do time] } (opcional)
@@ -228,8 +336,9 @@
   function aplicar(bt, i, nome, tipo, durFixa) {
     const l = bt.lados[i];
     if ((nome === 'paralisia' || nome === 'stun') && (travado(bt, l) || bt.t < l.imuneAte)) return null;
-    if (nome === 'lento' && l.tal === 'sem_lento') return null;
-    if ((nome === 'paralisia' || nome === 'stun') && l.tal === 'casca' && !l.cascaUsada) { l.cascaUsada = true; aviso(bt, i, 'Casca grossa'); return null; }
+    if (nome === 'lento' && l.tals.has('sem_lento')) return null;
+    if (nome === 'veneno' && l.tals.has('antidoto')) return null;
+    if ((nome === 'paralisia' || nome === 'stun') && l.tals.has('casca') && !l.cascaUsada) { l.cascaUsada = true; aviso(bt, i, 'Casca grossa'); return null; }
     const dur = durFixa || DURACAO[nome];
     l.st[nome] = { ate: bt.t + dur, dur, prox: bt.t + 1000 };
     if (nome === 'paralisia' || nome === 'stun') l.imuneAte = bt.t + dur + IMUNE_MS;
@@ -258,12 +367,16 @@
     const mult = multiplicador(g.tipo, df.m.tipo);
     // sempre 3 sorteios por golpe: a mesma semente repete a luta
     const aereo = !!(df.acao && df.acao.slot === 'ultimate' && df.m.golpes.ultimate.poder === 'pulo' && bt.t - df.acao.inicio >= df.acao.dur * PODERES.pulo.subida); // o alvo está no ar (super pulo): o golpe erra
-    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE, esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
+    const variacao = 0.85 + 0.3 * rng(), critico = rng() < CRIT_CHANCE + (at.tals.has('critico') ? CRIT_FINO : 0), esquiva = (rng() < ESQUIVA_CHANCE && g.poder !== 'pulo' && g.poder !== 'nova') || aereo, sorteioSt = rng();
     let dano = danoBase(at.m, a.slot) * mult * variacao * (critico ? CRIT_MULT : 1) * (ativo(bt, at, 'forca') ? FORCA_MULT : 1) * (ativo(bt, at, 'frenesi') ? PODERES.frenesi.dano : 1) * (g.poder === 'pulo' ? PODERES.pulo.dano : 1) * (g.poder === 'nova' ? PODERES.nova.dano : 1) * (g.poder === 'esfera' ? PODERES.esfera.dano : 1) * (g.poder === 'disco' ? PODERES.disco.dano : 1) * (bt.bioma && BIOMA_ELEMENTO[bt.bioma] === at.m.tipo ? (bt.tt[i].has('pe') ? PE_BONUS : BONUS_BIOMA) : 1)
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
-      * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tal === 'res_' + g.tipo ? RESIST_MULT : 1);
+      * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tals.has('ultimo') && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tals.has('res_' + g.tipo) ? RESIST_MULT : 1)
+      * (bt.tt[i].has('foco') && df.hp < df.m.hp * 0.5 ? FOCO_MULT : 1) * (a.slot === 'forte' && bt.tt[i].has('combo') && at.combo >= 3 ? COMBO_MULT : 1) * (a.slot === 'ultimate' && bt.tt[i].has('ult_poder') ? ULT_PODER_DANO : 1) * (a.slot === 'forte' && at.tals.has('golpe_pesado') ? PESADO_DANO : 1)
+      * (bt.tt[1 - i].has('escudo_ini') && bt.t < ESCUDO_MS ? ESCUDO_MULT : 1) * (bt.tt[1 - i].has('muralha') && df.protAte > bt.t ? MURALHA_MULT : 1);
+    if (a.slot === 'rapido') at.combo++; else if (a.slot === 'forte') at.combo = 0;
+    if (a.slot === 'ultimate' && bt.tt[i].has('ult_dupla')) bt.times[i].forEach((l) => { if (l !== at && l.hp > 0) l.cd.ultimate = Math.max(0, l.cd.ultimate - l.cdTotal.ultimate * ULT_DUPLA_PCT); });
     if (bt.tt[i].has('abertura') && !at.abriu) aviso(bt, i, 'Abertura');
-    if (at.tal === 'ultimo' && at.hp < at.m.hp * ULTIMO_LIMITE && !at.ultAvisou) { at.ultAvisou = true; aviso(bt, i, 'Último suspiro'); }
+    if (at.tals.has('ultimo') && at.hp < at.m.hp * ULTIMO_LIMITE && !at.ultAvisou) { at.ultAvisou = true; aviso(bt, i, 'Último suspiro'); }
     at.abriu = true;
     const atravessou = (g.poder === 'nova' || g.poder === 'esfera') && df.defesaAte > bt.t; // a supernova e a esfera gigante partem a defesa e deixam passar parte do dano
     const bloqueado = df.defesaAte > bt.t && !atravessou; // a defesa evita este ataque e se desfaz
@@ -276,14 +389,14 @@
     else if (dano > 0 && df.hp > 0 && !(g.poder === 'disco' && !a.parte)) { // acertou: talvez aplique um status (o disco só no segundo acerto)
       const ef = (EFEITO[g.tipo] || {})[a.slot === 'ultimate' ? 'forte' : a.slot], chance = a.slot === 'ultimate' ? ULT_STATUS_CHANCE : ef && ef[1];
       if (ef && sorteioSt < chance) {
-        if (df.tal === 'corpo' && rng() < CORPO_CH) aviso(bt, 1 - i, 'Corpo fechado');
-        else status = aplicar(bt, 1 - i, ef[0], g.tipo, at.tal === 'veneno_pot' && ef[0] === 'veneno' ? DURACAO.veneno + VENENO_EXTRA : undefined);
+        if (df.tals.has('corpo') && rng() < CORPO_CH) aviso(bt, 1 - i, 'Corpo fechado');
+        else status = aplicar(bt, 1 - i, ef[0], g.tipo, ef[0] === 'veneno' && at.tals.has('veneno_pot') ? DURACAO.veneno + VENENO_EXTRA : ef[0] === 'paralisia' && at.tals.has('paralisia_longa') ? DURACAO.paralisia + PARALISIA_EXTRA : undefined);
       }
     }
     if (dano > 0 && critico && bt.tt[i].has('sede')) { at.cd.ultimate = Math.max(0, at.cd.ultimate - SEDE_MS); aviso(bt, i, 'Sede de ultimate'); }
-    if (dano > 0 && df.tal === 'espinhos') { const volta = dano * ESPINHOS_PCT; at.hp -= volta; bt.eventos.push({ ev: 'dot', i, dano: volta, hpApos: Math.max(0, at.hp), fonte: 'Espinhos' }); }
+    if (dano > 0 && df.tals.has('espinhos')) { const volta = dano * ESPINHOS_PCT; at.hp -= volta; bt.eventos.push({ ev: 'dot', i, dano: volta, hpApos: Math.max(0, at.hp), fonte: 'Espinhos' }); }
     if (a.slot === 'rapido' && ++at.rapidos % 3 === 0 && at.hp > 0) { // a cada 3 ataques rápidos
-      if (at.tal === 'folego') curar(bt, i, [bt.ativo[i]], FOLEGO_PCT, 'Fôlego');
+      if (at.tals.has('folego')) curar(bt, i, [bt.ativo[i]], FOLEGO_PCT, 'Fôlego');
       if (bt.tt[i].has('cura_cadeia')) curar(bt, i, bt.times[i].map((l, k) => k).filter((k) => bt.times[i][k].hp > 0), CADEIA_PCT, 'Cura em cadeia');
     }
     if (g.poder === 'disco' && !a.parte) bt.agenda.push({ t: bt.t + PODERES.disco.volta, i, lado: at, acao: { slot: 'ultimate', parte: 2 } });
@@ -310,7 +423,7 @@
     const de = bt.ativo[i];
     l.acao = null; l.defesaAte = 0;
     bt.ativo[i] = idx; bt.lados[i] = novo; bt.pendente[i] = null; bt.trocaCd[i] = forcada ? Math.min(bt.trocaCd[i], 2000) : (bt.tt[i].has('troca') ? TROCA_AGIL_CD : TROCA_CD);
-    novo.entraAte = bt.t + (bt.tt[i].has('troca') ? 0 : ENTRA_MS);
+    novo.entraAte = bt.t + (bt.tt[i].has('troca') ? 0 : ENTRA_MS); if (forcada) novo.protAte = bt.t + MURALHA_MS;
     bt.log.push(`${novo.m.nome} entra no lugar de ${l.m.nome}`);
     bt.pre.push({ ev: 'troca', i, de, para: idx, forcada, regra: bt.regra[i] }); bt.regra[i] = null;
     return true;
@@ -413,6 +526,9 @@
     brasinha: { id: 'brasalisco', nome: 'Brasalisco', nv: 16 }, vulcanejo: { id: 'magmadilo', nome: 'Magmadilo', nv: 16 }, algazinho: { id: 'algamar', nome: 'Algamar', nv: 16 }, coraline: { id: 'recifante', nome: 'Recifante', nv: 16 }, pedrinho: { id: 'rochedao', nome: 'Rochedão', nv: 16 }, tatufungo: { id: 'esporao', nome: 'Esporão', nv: 16 }, plumelho: { id: 'plumareu', nome: 'Plumaréu', nv: 16 }, redemoinha: { id: 'ciclonara', nome: 'Ciclonara', nv: 16 }, zapinho: { id: 'zapotrao', nome: 'Zapotrão', nv: 16 }, raiomante: { id: 'tempestauro', nome: 'Tempestauro', nv: 16 },
   };
   const BONUS_EVO = { hp: 1.25, atk: 1.15 };
+  // B2: a forma evoluída destas espécies é só do líder (o jogador captura a base, mas ela não evolui)
+  const EVO_EXCLUSIVA = { vulcanejo: 'dan', coraline: 'tati', redemoinha: 'laura', raiomante: 'du', tatufungo: 'guto' };
+  const EVOLUI = (id) => !!EVOLUCOES[id] && !EVO_EXCLUSIVA[id]; // o jogador pode evoluir?
   const evoluida = (m) => { const e = EVOLUCOES[m.id]; return e ? { ...m, id: e.id, nome: e.nome, hp: Math.round(m.hp * BONUS_EVO.hp), atk: +(m.atk * BONUS_EVO.atk).toFixed(2) } : m; };
   const PONTOS_TREINADOR = { primeira: (nivel) => 10 * nivel, revanche: 3 }; // primeira vitória: 10 x nível; repetir a vitória: 3 pontos
   const NIVEL_TREINADOR = [{ ia: { reacao: 0.03, ritmo: 0.10 } }, { ia: { reacao: 0.05, ritmo: 0.15 } }, { ia: { reacao: 0.09, ritmo: 0.22 } }, { ia: { reacao: 0.11, ritmo: 0.27 } }, { ia: { reacao: 0.15, ritmo: 0.35 } }];
@@ -423,9 +539,9 @@
     { id: 'lucia', nome: 'Treinadora Luh', nivel: 1, time: ['ventinho', 'nuvelino', 'faiscao'], frase: 'Rápido demais para você!', pol: POL('equilibrado'), tal: { time: ['abertura'], mon: [] } },
     { id: 'tomas', nome: 'Treinador Tomy', nivel: 2, time: ['fagulhao', 'chamuscao', 'brotinho'], frase: 'Vou queimar a sua estratégia.', pol: POL('agressivo', 'forte', 'pronto', true), tal: { time: ['abertura'], mon: ['veneno_pot', null, null] } },
     { id: 'nina', nome: 'Treinadora Nina', nivel: 2, time: ['faiscao', 'trovinho', 'mareal'], frase: 'Sinta a corrente!', pol: POL('equilibrado', 'forte', 'vantagem'), tal: { time: ['ultimate'], mon: [] } },
-    { id: 'otto', nome: 'Treinador Otto', nivel: 2, time: ['musgarra', 'brotinho', 'trovinho'], frase: 'Quem espera, vence.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['reserva'], mon: ['espinhos', null, null] } },
-    { id: 'vera', nome: 'Treinadora Bia', nivel: 3, time: ['mareal', 'pingolino', 'chamuscao'], frase: 'A maré virou.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['cura_cadeia'], mon: [] } },
-    { id: 'davi', nome: 'Treinador Iuri', nivel: 3, time: ['ventinho', 'nuvelino', 'musgarra'], frase: 'Nem me viu passar.', pol: POL('agressivo', 'nunca', 'pronto', true), tal: { time: ['sede'], mon: ['sem_lento', null, null] } },
+    { id: 'otto', nome: 'Treinador Otto', nivel: 2, time: ['chamuscao', 'fagulhao', 'trovinho'], frase: 'Quem espera, vence.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['abertura'], mon: [null, null, 'ultimo'] } },
+    { id: 'vera', nome: 'Treinadora Bia', nivel: 3, time: ['mareal', 'pingolino', 'chamuscao'], frase: 'A maré virou.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'davi', nome: 'Treinador Iuri', nivel: 3, time: ['ventinho', 'nuvelino', 'musgarra'], frase: 'Nem me viu passar.', pol: POL('agressivo', 'nunca', 'pronto', true), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'agata', nome: 'Treinadora Mel', nivel: 3, time: ['chamuscao', 'fagulhao', 'ventinho'], frase: 'Cinzas é o que sobra.', pol: POL('agressivo', 'forte', 'finalizar'), tal: { time: ['abertura', 'dupla'], mon: [] } },
     { id: 'felix', nome: 'Treinador Félix', nivel: 4, time: ['trovinho', 'faiscao', 'nuvelino'], frase: 'Prepare-se para o choque.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [] } },
     { id: 'selma', nome: 'Treinadora Selma', nivel: 4, time: ['musgarra', 'brotinho', 'pingolino'], frase: 'Raízes fundas, vitória certa.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['reserva'], mon: [] } },
@@ -433,68 +549,68 @@
     { id: 'yara', nome: 'Treinadora Yara', nivel: 5, time: ['ventinho', 'nuvelino', 'chamuscao'], frase: 'O vento decide.', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'abertura'], mon: ['folego', null, null] } },
     { id: 'magno', nome: 'Treinador Magno', nivel: 5, time: ['chamuscao', 'fagulhao', 'musgarra'], frase: 'Eu sou a erupção.', pol: POL('agressivo', 'forte', 'finalizar', true, 20), tal: { time: ['dupla', 'sede'], mon: ['espinhos', null, null] } },
     // W1 (PLANO-fases.md, aprovados pelo George): Lago 2, Vila da Água e a líder do 1º ginásio (Tati). Nomes de até 5 letras.
-    { id: 'caio', nome: 'Treinador Caio', nivel: 2, time: ['mareal', 'pingolino', 'nuvelino'], frase: 'Quem pesca, tem paciência.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['casca', null, null] } },
-    { id: 'duda', nome: 'Treinadora Duda', nivel: 2, time: ['pingolino', 'ventinho', 'mareal'], frase: 'Mergulha comigo!', pol: POL('equilibrado'), tal: { time: ['abertura'], mon: [] } },
-    { id: 'nico', nome: 'Treinador Nico', nivel: 2, time: ['faiscao', 'trovinho', 'pingolino'], frase: 'Choque na água é perigoso!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: [], mon: [null, 'corpo', null] } },
-    { id: 'bela', nome: 'Treinadora Bela', nivel: 3, time: ['brotinho', 'musgarra', 'mareal'], frase: 'Raiz firme na margem.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['espinhos', null, null] } },
-    { id: 'rafa', nome: 'Treinador Rafa', nivel: 3, time: ['mareal', 'nuvelino', 'chamuscao'], frase: 'Pega a onda!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: [null, null, 'veneno_pot'] } },
-    { id: 'lia', nome: 'Treinadora Lia', nivel: 3, time: ['ventinho', 'nuvelino', 'pingolino'], frase: 'O vento sopra a favor.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
-    { id: 'beto', nome: 'Treinador Beto', nivel: 3, time: ['pingolino', 'mareal', 'brotinho'], frase: 'A Tati não perde para quem tem pressa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['reserva'], mon: [null, 'casca', null] } },
-    { id: 'tati', nome: 'Líder Tati', nivel: 3, time: ['algazinho', 'coraline', 'mareal'], frase: 'A maré leva quem hesita.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: ['folego', 'res_agua', 'casca'] } },
+    { id: 'caio', nome: 'Treinador Caio', nivel: 2, time: ['mareal', 'pingolino', 'nuvelino'], frase: 'Quem pesca, tem paciência.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, null, 'folego'] } },
+    { id: 'duda', nome: 'Treinadora Duda', nivel: 2, time: ['pingolino', 'ventinho', 'mareal'], frase: 'Mergulha comigo!', pol: POL('equilibrado'), tal: { time: ['arco'], mon: [null, null, 'folego'] } },
+    { id: 'nico', nome: 'Treinador Nico', nivel: 2, time: ['algazinho', 'trovinho', 'pingolino'], frase: 'Choque na água é perigoso!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['arco'], mon: [null, null, 'folego'] } },
+    { id: 'bela', nome: 'Treinadora Bela', nivel: 3, time: ['bolhudo', 'musgarra', 'mareal'], frase: 'Raiz firme na margem.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'rafa', nome: 'Treinador Rafa', nivel: 3, time: ['mareal', 'bolhudo', 'chamuscao'], frase: 'Pega a onda!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'lia', nome: 'Treinadora Lia', nivel: 3, time: ['algazinho', 'nuvelino', 'pingolino'], frase: 'O vento sopra a favor.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'beto', nome: 'Treinador Beto', nivel: 3, time: ['pingolino', 'mareal', 'brotinho'], frase: 'A Tati não perde para quem tem pressa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'tati', nome: 'Líder Tati', nivel: 3, evo: ['coraline'], time: ['mareal', 'algazinho', 'coraline'], frase: 'A maré leva quem hesita.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: [null, null, null] } },
     // W2 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Floresta Escondida e Bosque leste. Nomes de até 5 letras.
-    { id: 'dora', nome: 'Treinadora Dora', nivel: 2, time: ['brotinho', 'musgarra', 'ventinho'], frase: 'A mata guarda segredos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['casca', null, null] } },
-    { id: 'kaio', nome: 'Treinador Kaio', nivel: 2, time: ['ventinho', 'nuvelino', 'brotinho'], frase: 'Rápido como o vento!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['abertura'], mon: [] } },
-    { id: 'maya', nome: 'Treinadora Maya', nivel: 3, time: ['musgarra', 'pingolino', 'nuvelino'], frase: 'Cada folha é um sinal.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
-    { id: 'zeca', nome: 'Treinador Zeca', nivel: 3, time: ['brotinho', 'faiscao', 'musgarra'], frase: 'Silêncio... eles ouvem.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: [], mon: [null, 'corpo', null] } },
-    { id: 'gabi', nome: 'Treinadora Gabi', nivel: 3, time: ['ventinho', 'nuvelino', 'faiscao'], frase: 'Segura que o vento vem forte!', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura'], mon: [] } },
-    { id: 'toni', nome: 'Treinador Toni', nivel: 3, time: ['musgarra', 'brotinho', 'chamuscao'], frase: 'Tronco forte, raiz profunda.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: [], mon: ['espinhos', null, null] } },
-    { id: 'cris', nome: 'Treinadora Cris', nivel: 4, time: ['nuvelino', 'ventinho', 'trovinho'], frase: 'Tempestade a caminho!', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate'], mon: ['veneno_pot', null, null] } },
-    { id: 'joca', nome: 'Treinador Joca', nivel: 4, time: ['musgarra', 'chamuscao', 'faiscao'], frase: 'Quem não arrisca, não petisca.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['sede'], mon: [null, 'ultimo', null] } },
-    { id: 'fabi', nome: 'Treinadora Fabi', nivel: 3, time: ['trovinho', 'ventinho', 'musgarra'], frase: 'Não me subestime.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['reserva'], mon: [null, null, 'casca'] } },
+    { id: 'dora', nome: 'Treinadora Dora', nivel: 2, time: ['brotinho', 'musgarra', 'ventinho'], frase: 'A mata guarda segredos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['pe'], mon: [null, null, 'espinhos'] } },
+    { id: 'kaio', nome: 'Treinador Kaio', nivel: 2, time: ['taupino', 'nuvelino', 'brotinho'], frase: 'Rápido como o vento!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['pe'], mon: [null, null, 'espinhos'] } },
+    { id: 'maya', nome: 'Treinadora Maya', nivel: 3, time: ['musgarra', 'brotinho', 'nuvelino'], frase: 'Cada folha é um sinal.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'zeca', nome: 'Treinador Zeca', nivel: 3, time: ['brotinho', 'faiscao', 'musgarra'], frase: 'Silêncio... eles ouvem.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'gabi', nome: 'Treinadora Gabi', nivel: 3, time: ['ventinho', 'nuvelino', 'faiscao'], frase: 'Segura que o vento vem forte!', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'toni', nome: 'Treinador Toni', nivel: 3, time: ['nuvelino', 'plumelho', 'chamuscao'], frase: 'Tronco forte, raiz profunda.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'cris', nome: 'Treinadora Cris', nivel: 4, time: ['nuvelino', 'ventinho', 'trovinho'], frase: 'Tempestade a caminho!', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'joca', nome: 'Treinador Joca', nivel: 4, time: ['nuvelino', 'plumelho', 'faiscao'], frase: 'Quem não arrisca, não petisca.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'fabi', nome: 'Treinadora Fabi', nivel: 3, time: ['nuvelino', 'ventinho', 'musgarra'], frase: 'Não me subestime.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
     // W3 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Vila do Vento (Laura, 2º ginásio) e Vila do Raio (Du, 3º ginásio). Nomes de até 5 letras.
-    { id: 'rui', nome: 'Treinador Rui', nivel: 3, time: ['ventinho', 'plumelho', 'nuvelino'], frase: 'Aqui o vento nunca para.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: [] } },
-    { id: 'nana', nome: 'Treinadora Nana', nivel: 3, time: ['pipinha', 'ventinho', 'brotinho'], frase: 'Solte a pipa, solte o medo!', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
-    { id: 'laura', nome: 'Líder Laura', nivel: 4, time: ['redemoinha', 'nuvelino', 'ventinho'], frase: 'O vento escolhe quem sobe.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'sede'], mon: ['veneno_pot', 'ultimo', 'casca'] } },
-    { id: 'pedro', nome: 'Treinador Pedro', nivel: 4, time: ['faiscao', 'zapinho', 'lampiro'], frase: 'Choque de realidade!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['sede'], mon: [null, 'veneno_pot', null] } },
-    { id: 'lara', nome: 'Treinadora Lara', nivel: 4, time: ['trovinho', 'faiscao', 'pipinha'], frase: 'Já sentiu um raio cair?', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura'], mon: ['espinhos', null, null] } },
-    { id: 'du', nome: 'Líder Du', nivel: 4, time: ['zapinho', 'lampiro', 'trovinho'], frase: 'Sente a corrente?', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['abertura', 'sede'], mon: ['veneno_pot', 'res_eletrico', 'corpo'] } },
+    { id: 'rui', nome: 'Treinador Rui', nivel: 3, time: ['ventinho', 'plumelho', 'bolhudo'], frase: 'Aqui o vento nunca para.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'nana', nome: 'Treinadora Nana', nivel: 3, time: ['pipinha', 'ventinho', 'brotinho'], frase: 'Solte a pipa, solte o medo!', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'laura', nome: 'Líder Laura', nivel: 4, evo: ['redemoinha'], time: ['ventinho', 'nuvelino', 'redemoinha'], frase: 'O vento escolhe quem sobe.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura', 'recarga'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'pedro', nome: 'Treinador Pedro', nivel: 4, time: ['faiscao', 'zapinho', 'ventinho'], frase: 'Choque de realidade!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'lara', nome: 'Treinadora Lara', nivel: 4, time: ['trovinho', 'faiscao', 'pipinha'], frase: 'Já sentiu um raio cair?', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'du', nome: 'Líder Du', nivel: 4, evo: ['raiomante'], time: ['zapinho', 'trovinho', 'raiomante'], frase: 'Sente a corrente?', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'sede'], mon: ['veneno_pot', 'paralisia_longa', 'critico'] } },
     // W4 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Montanha, Montanha 2 e Bosque norte. Nomes de até 5 letras.
-    { id: 'tito', nome: 'Treinador Tito', nivel: 3, time: ['pedrinho', 'musgarra', 'taupino'], frase: 'Pedra sobre pedra.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['casca', null, null] } },
-    { id: 'leo', nome: 'Treinador Leo', nivel: 3, time: ['faiscao', 'pedrinho', 'zapinho'], frase: 'Quer ver faísca?', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['abertura'], mon: [] } },
-    { id: 'sofi', nome: 'Treinadora Sofi', nivel: 4, time: ['tatufungo', 'trovinho', 'musgarra'], frase: 'Cuidado onde pisa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
-    { id: 'gil', nome: 'Treinador Gil', nivel: 4, time: ['taupino', 'lampiro', 'pedrinho'], frase: 'Cavei fundo para te achar.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['reserva'], mon: [null, null, 'espinhos'] } },
-    { id: 'elis', nome: 'Treinadora Elis', nivel: 4, time: ['pipinha', 'plumelho', 'redemoinha'], frase: 'Aqui em cima o ar é fino.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura'], mon: [] } },
-    { id: 'maru', nome: 'Treinadora Maru', nivel: 4, time: ['pedrinho', 'tatufungo', 'pipinha'], frase: 'Firme como a rocha.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: [], mon: ['casca', null, 'corpo'] } },
-    { id: 'dino', nome: 'Treinador Dino', nivel: 4, time: ['trovinho', 'zapinho', 'redemoinha'], frase: 'A tempestade chegou.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['sede'], mon: [null, 'veneno_pot', null] } },
-    { id: 'ney', nome: 'Treinador Ney', nivel: 4, time: ['musgarra', 'lampiro', 'plumelho'], frase: 'Não olhe para baixo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['ultimo', null, null] } },
-    { id: 'alex', nome: 'Treinador Alex', nivel: 4, time: ['vulcanejo', 'pavio', 'brasinha'], frase: 'Fogo na mata!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: ['veneno_pot', null, null] } },
-    { id: 'vini', nome: 'Treinador Vini', nivel: 4, time: ['bolhudo', 'coraline', 'tatufungo'], frase: 'A mata bebe a chuva.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, 'casca'] } },
-    { id: 'cida', nome: 'Treinadora Cida', nivel: 4, time: ['taupino', 'pipinha', 'vulcanejo'], frase: 'Quem entra na mata não sai igual.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate'], mon: [] } },
-    { id: 'raul', nome: 'Treinador Raul', nivel: 4, time: ['algazinho', 'musgarra', 'pavio'], frase: 'Quem avisa, amigo é.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: [null, 'espinhos', null] } },
+    { id: 'tito', nome: 'Treinador Tito', nivel: 3, time: ['trovinho', 'faiscao', 'taupino'], frase: 'Pedra sobre pedra.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'leo', nome: 'Treinador Leo', nivel: 3, time: ['faiscao', 'pedrinho', 'zapinho'], frase: 'Quer ver faísca?', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'sofi', nome: 'Treinadora Sofi', nivel: 4, time: ['lampiro', 'trovinho', 'musgarra'], frase: 'Cuidado onde pisa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'gil', nome: 'Treinador Gil', nivel: 4, time: ['trovinho', 'lampiro', 'pedrinho'], frase: 'Cavei fundo para te achar.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'elis', nome: 'Treinadora Elis', nivel: 4, time: ['pipinha', 'plumelho', 'mareal'], frase: 'Aqui em cima o ar é fino.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'maru', nome: 'Treinadora Maru', nivel: 4, time: ['nuvelino', 'tatufungo', 'pipinha'], frase: 'Firme como a rocha.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'dino', nome: 'Treinador Dino', nivel: 4, time: ['nuvelino', 'zapinho', 'redemoinha'], frase: 'A tempestade chegou.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'ney', nome: 'Treinador Ney', nivel: 4, time: ['nuvelino', 'lampiro', 'plumelho'], frase: 'Não olhe para baixo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'alex', nome: 'Treinador Alex', nivel: 4, time: ['pedrinho', 'brotinho', 'brasinha'], frase: 'Fogo na mata!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'vini', nome: 'Treinador Vini', nivel: 4, time: ['brotinho', 'coraline', 'tatufungo'], frase: 'A mata bebe a chuva.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'cida', nome: 'Treinadora Cida', nivel: 4, time: ['taupino', 'tatufungo', 'vulcanejo'], frase: 'Quem entra na mata não sai igual.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'raul', nome: 'Treinador Raul', nivel: 4, time: ['brotinho', 'musgarra', 'pavio'], frase: 'Quem avisa, amigo é.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
     // W5 (PLANO-fases.md; PROPOSTOS): Castelo. Vlad guarda a chave e tem o time inteiro evoluído (como Ryu e Lee). Nomes de até 5 letras.
-    { id: 'odin', nome: 'Treinador Odin', nivel: 4, time: ['coraline', 'tatufungo', 'lampiro'], frase: 'Ninguém entra sem se anunciar.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['reserva'], mon: [null, 'casca', null] } },
-    { id: 'kira', nome: 'Treinadora Kira', nivel: 4, time: ['redemoinha', 'pavio', 'pedrinho'], frase: 'A guarda não dorme.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: ['veneno_pot', null, null] } },
-    { id: 'hans', nome: 'Treinador Hans', nivel: 5, time: ['raiomante', 'zapinho', 'taupino'], frase: 'O portão se fecha atrás de você.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: ['espinhos', null, 'casca'] } },
-    { id: 'vlad', nome: 'Treinador Vlad', nivel: 5, evo: true, time: ['fagulhao', 'mareal', 'brotinho'], frase: 'A chave tem dono.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'sede'], mon: ['ultimo', null, 'veneno_pot'] } },
+    { id: 'odin', nome: 'Treinador Odin', nivel: 4, time: ['coraline', 'tatufungo', 'lampiro'], frase: 'Ninguém entra sem se anunciar.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
+    { id: 'kira', nome: 'Treinadora Kira', nivel: 4, time: ['redemoinha', 'pavio', 'pedrinho'], frase: 'A guarda não dorme.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
+    { id: 'hans', nome: 'Treinador Hans', nivel: 5, time: ['raiomante', 'zapinho', 'taupino'], frase: 'O portão se fecha atrás de você.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
+    { id: 'vlad', nome: 'Treinador Vlad', nivel: 5, evo: true, time: ['fagulhao', 'mareal', 'brotinho'], frase: 'A chave tem dono.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     // W6 (PLANO-fases.md; PROPOSTOS): Praia, Farol e Ginásio da Pedra (Guto, 4º ginásio). Nomes de até 5 letras.
-    { id: 'dani', nome: 'Treinadora Dani', nivel: 4, time: ['bolhudo', 'algazinho', 'pipinha'], frase: 'O mar traz de tudo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['folego', null, null] } },
-    { id: 'lipe', nome: 'Treinador Lipe', nivel: 4, time: ['coraline', 'pingolino', 'plumelho'], frase: 'Pega onda ou pega areia.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: [] } },
-    { id: 'rosa', nome: 'Treinadora Rosa', nivel: 4, time: ['tatufungo', 'taupino', 'bolhudo'], frase: 'Cuidado com os caranguejos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['casca', null, null] } },
-    { id: 'edu', nome: 'Treinador Edu', nivel: 4, time: ['redemoinha', 'mareal', 'pedrinho'], frase: 'Maré cheia!', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['reserva'], mon: [null, 'res_agua', null] } },
-    { id: 'jair', nome: 'Treinador Jair', nivel: 4, time: ['ventinho', 'nuvelino', 'algazinho'], frase: 'Sou o guardião da luz.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['ultimo', null, null] } },
-    { id: 'moa', nome: 'Treinadora Moa', nivel: 5, time: ['coraline', 'redemoinha', 'lampiro'], frase: 'A luz guia os perdidos.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: ['folego', null, 'corpo'] } },
-    { id: 'teo', nome: 'Treinador Teo', nivel: 4, time: ['pavio', 'vulcanejo', 'pedrinho'], frase: 'Quem acende, apaga.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['sede'], mon: ['veneno_pot', null, null] } },
-    { id: 'olga', nome: 'Treinadora Olga', nivel: 5, time: ['pedrinho', 'tatufungo', 'musgarra'], frase: 'Pedra que rola não cria limo.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: [], mon: ['espinhos', 'casca', null] } },
-    { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['taupino', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['abertura'], mon: [null, null, 'veneno_pot'] } },
-    { id: 'guto', nome: 'Líder Guto', nivel: 5, time: ['pedrinho', 'tatufungo', 'trovinho'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: ['espinhos', null, null] } },
+    { id: 'dani', nome: 'Treinadora Dani', nivel: 4, time: ['bolhudo', 'algazinho', 'pipinha'], frase: 'O mar traz de tudo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'lipe', nome: 'Treinador Lipe', nivel: 4, time: ['coraline', 'pingolino', 'plumelho'], frase: 'Pega onda ou pega areia.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'rosa', nome: 'Treinadora Rosa', nivel: 4, time: ['mareal', 'taupino', 'bolhudo'], frase: 'Cuidado com os caranguejos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'edu', nome: 'Treinador Edu', nivel: 4, time: ['coraline', 'mareal', 'pedrinho'], frase: 'Maré cheia!', pol: POL('equilibrado', 'forte', 'pronto', true, 0), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'jair', nome: 'Treinador Jair', nivel: 4, time: ['ventinho', 'nuvelino', 'algazinho'], frase: 'Sou o guardião da luz.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'moa', nome: 'Treinadora Moa', nivel: 5, time: ['nuvelino', 'redemoinha', 'lampiro'], frase: 'A luz guia os perdidos.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'teo', nome: 'Treinador Teo', nivel: 4, time: ['plumelho', 'nuvelino', 'pedrinho'], frase: 'Quem acende, apaga.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'olga', nome: 'Treinadora Olga', nivel: 5, time: ['pedrinho', 'tatufungo', 'chamuscao'], frase: 'Pedra que rola não cria limo.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['taupino', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['tatufungo'], time: ['pedrinho', 'musgarra', 'tatufungo'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['pe', 'arco'], mon: [null, null, 'espinhos'] } },
     // Floresta Oculta: andam pela clareira, times só de evoluídos (por isso nível 5 e dois talentos de time)
-    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate', 'dupla'], mon: ['espinhos', 'corpo', 'folego'] } },
-    { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'sede'], mon: ['ultimo', null, 'veneno_pot'] } },
-    { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'dupla'], mon: ['folego', 'casca', null] } },
+    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'combo'], mon: ['ultimo', 'critico', 'folego'] } },
+    { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
+    { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'aurora', nome: 'Mestra Aurora', nivel: 5, time: ['faiscao', 'mareal', 'brotinho'], frase: 'Mostre o que aprendeu.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate'], mon: ['espinhos', 'corpo', 'folego'] } },
   ];
   const treinadorPorId = (id) => TREINADORES.find((t) => t.id === id);
-  const timeDoTreinador = (t) => t.time.map((id) => { const m = MONSTROS.find((x) => x.id === id); return t.evo ? evoluida(m) : m; }); // evo: o time inteiro já vem evoluído
+  const timeDoTreinador = (t) => t.time.map((id) => { const m = MONSTROS.find((x) => x.id === id); return t.evo === true || (Array.isArray(t.evo) && t.evo.includes(id)) ? evoluida(m) : m; }); // evo: true = o time inteiro já vem evoluído; lista = só esses monstros
   const talentosTreinador = (t) => normalizarTalentos(t.tal, t.time.length);
   const iaTreinador = (t) => NIVEL_TREINADOR[t.nivel - 1].ia;
 
@@ -589,7 +705,7 @@
   }
 
   const api = {
-    EVOLUCOES, BONUS_EVO, evoluida, PESO_RARIDADE, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
+    EVOLUCOES, BONUS_EVO, evoluida, TAL_TATICA, TATICA_BASE, politicaEfetiva, taticaNoOrcamento, ARVORE, NV_DEGRAU, custoNo, validarArvore, pontosTalento, migrarTal, NIVEL_AREA, NIVEL_LIDER, OFFSET_POSTO, postoDe, nivelNoMundo, EVO_EXCLUSIVA, EVOLUI, PESO_RARIDADE, CAPTURA_RARIDADE, REGIOES, REGIAO_DA_AREA, pesosSelvagem, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
     TORNEIO, adversariosTorneio, talentosAdversario, iaAdversario,
     POLITICA_PADRAO, ESTILOS, OPCOES_POLITICA, iaPolitica,
     TAL_TIME, TAL_MON, ORCAMENTO, custoTalentos, normalizarTalentos, sortearTalentos, ABERTURA_MULT, RESIST_MULT,

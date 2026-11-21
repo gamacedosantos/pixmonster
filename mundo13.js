@@ -26,7 +26,7 @@ window.PixmonMundo13 = window.PixmonBase.criar({
   },
   npcs: [
     { id: 'pedro', nome: 'Pedro', pele: '#e8c090', c: 14, r: 89, dir: 'cima', vis: 3, cor: '#2a1a10', camisa: '#f0d048', cab: '#6fd6ff' },
-    { id: 'lara', nome: 'Lara', pele: '#f0c8a0', c: 30, r: 48, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#4a67b8', cab: '#fff2a0' },
+    { id: 'lara', nome: 'Lara', pele: '#f0c8a0', c: 30, r: 48, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#e8b830', cab: '#fff2a0' },
   ],
   ginasios: { G: 'du' },
   portais: { v: { area: 'oculta', c: 12, r: 2 } },

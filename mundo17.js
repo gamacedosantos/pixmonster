@@ -20,10 +20,10 @@ window.PixmonMundo17 = window.PixmonBase.criar({
   predios: [['fonte', 28, 90, 4, 3]],
   props: ({ pr }) => { [76, 84, 96, 102, 46, 54, 62].forEach((r) => { pr('poste', 24, r); pr('poste', 35, r); }); },
   npcs: [
-    { id: 'odin', nome: 'Odin', pele: '#e8c090', c: 26, r: 98, dir: 'dir', vis: 4, cor: '#6a6a78', camisa: '#8a8ea8', cab: '#d8b878' },
-    { id: 'kira', nome: 'Kira', pele: '#f0c8a0', c: 35, r: 60, dir: 'esq', vis: 6, cor: '#1b1410', camisa: '#c8508a', cab: '#ffd35a' },
-    { id: 'hans', nome: 'Hans', pele: '#d8a878', c: 31, r: 40, dir: 'esq', vis: 2, cor: '#3a2a18', camisa: '#4a67b8', cab: '#f0d048' },
-    { id: 'vlad', nome: 'Vlad', pele: '#f6d3bb', c: 52, r: 9, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#7a2a2a', cab: '#1b1020' },
+    { id: 'odin', nome: 'Odin', pele: '#e8c090', c: 26, r: 98, dir: 'dir', vis: 4, cor: '#6a6a78', camisa: '#6a6a78', cab: '#d8b878' },
+    { id: 'kira', nome: 'Kira', pele: '#f0c8a0', c: 35, r: 60, dir: 'esq', vis: 6, cor: '#1b1410', camisa: '#7a4ab8', cab: '#ffd35a' },
+    { id: 'hans', nome: 'Hans', pele: '#d8a878', c: 31, r: 40, dir: 'esq', vis: 2, cor: '#3a2a18', camisa: '#6a6a78', cab: '#f0d048' },
+    { id: 'vlad', nome: 'Vlad', pele: '#f6d3bb', c: 52, r: 9, dir: 'cima', vis: 3, cor: '#0e0e12', camisa: '#7a4ab8', cab: '#1b1020' },
   ],
   portais: { v: { area: 'bosquen', c: 29, r: 2 }, X: { area: 'vilaraio', c: 29, r: 100 } },
 });

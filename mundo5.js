@@ -142,7 +142,7 @@
   window.PixmonMundo5 = {
     desenhar, RES,
     area: { nome: 'Lago', largura: W, bioma: 'lago', elemento: 'agua', v2: true, T, res: RES, mapa, bloq, desenhar,
-      npcs: [{ id: 'vera', nome: 'Bia', pele: '#e0ac84', c: 15, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#3a8ac8', cab: '#1b1020' }],
+      npcs: [{ id: 'vera', nome: 'Bia', pele: '#e0ac84', c: 15, r: 12, dir: 'baixo', vis: 3, cor: '#34231b', camisa: '#2f78a8', cab: '#1b1020' }],
       portais: { '>': { area: 'vila', c: 2, r: 34 }, '<': { area: 'lago2', c: 57, r: 96 } } },
   };
 })();

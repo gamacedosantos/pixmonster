@@ -13,12 +13,12 @@ window.PixmonMundo11 = window.PixmonBase.criar({
   },
   props: ({ pr }) => { pr('placa', 4, 58); pr('tronco_reto', 24, 58, 2); pr('tronco_reto', 44, 58, 2); pr('tronco_reto', 40, 92, 2); },
   npcs: [
-    { id: 'gabi', nome: 'Gabi', pele: '#f6d3bb', c: 24, r: 61, dir: 'cima', vis: 3, cor: '#1b1410', camisa: '#bfe0f0', cab: '#d83a2a' },
-    { id: 'toni', nome: 'Toni', pele: '#d8a878', c: 31, r: 45, dir: 'esq', vis: 3, cor: '#3a2a18', camisa: '#a8793f', cab: '#5a3a1a' },
-    { id: 'cris', nome: 'Cris', pele: '#e8c090', c: 44, r: 31, dir: 'cima', vis: 3, cor: '#6a3a1a', camisa: '#6fd6ff', cab: '#f0d048' },
-    { id: 'joca', nome: 'Joca', pele: '#c89a70', c: 48, r: 14, dir: 'baixo', vis: 4, cor: '#0e0e12', camisa: '#e0703a', cab: '#ffffff',
+    { id: 'gabi', nome: 'Gabi', pele: '#f6d3bb', c: 24, r: 61, dir: 'cima', vis: 3, cor: '#1b1410', camisa: '#d8ecf6', cab: '#d83a2a' },
+    { id: 'toni', nome: 'Toni', pele: '#d8a878', c: 31, r: 45, dir: 'esq', vis: 3, cor: '#3a2a18', camisa: '#6fd6ff', cab: '#5a3a1a' },
+    { id: 'cris', nome: 'Cris', pele: '#e8c090', c: 44, r: 31, dir: 'cima', vis: 3, cor: '#6a3a1a', camisa: '#d8ecf6', cab: '#f0d048' },
+    { id: 'joca', nome: 'Joca', pele: '#c89a70', c: 48, r: 14, dir: 'baixo', vis: 4, cor: '#0e0e12', camisa: '#6fd6ff', cab: '#ffffff',
       paradas: [{ c: 48, r: 14, espera: [900, 2200] }, { c: 54, r: 14, espera: [900, 2200] }, { c: 54, r: 8, espera: [900, 2200] }, { c: 42, r: 8, espera: [900, 2200] }] },
-    { id: 'fabi', nome: 'Fabi', pele: '#f0c8a0', c: 15, r: 80, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#f0d048', cab: '#2f78a8' },
+    { id: 'fabi', nome: 'Fabi', pele: '#f0c8a0', c: 15, r: 80, dir: 'esq', vis: 3, cor: '#7a3a1a', camisa: '#d8ecf6', cab: '#2f78a8' },
   ],
   portais: { '<': { area: 'fazenda', c: 37, r: 22 }, '>': { area: 'montanha', c: 2, r: 90 } },
 });

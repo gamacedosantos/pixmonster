@@ -322,8 +322,12 @@
         </section>
       </div>
       <div class="cartao">
-        <h3 id="tituloTal">Talentos do time</h3>
+        <h3 id="tituloTal">Talentos do time</h3><p class="nota" id="talInfo" style="margin:0 0 6px"></p><button class="linkbtn" id="talZerar" style="margin-bottom:6px">Zerar talentos (refazer a árvore)</button>
         <div id="talTime"></div>
+      </div>
+      <div class="cartao">
+        <h3>Tática (regras de luta)</h3><p class="nota" id="talTaticaInfo" style="margin:0 0 6px"></p>
+        <div id="talTatica"></div>
       </div>
       <div class="cartao">
         <h3>Talento de cada monstro</h3>
@@ -365,7 +369,8 @@
       <button id="mundoSair">Menu</button><button id="mundoEq">Equipe</button>
       <div id="inicial" class="sobre" hidden><h3>Escolha seu primeiro monstro</h3><div class="lista" id="inicialLista"></div></div>
       <div id="loja" class="sobre loja" hidden><h3>Mercado do Vovô</h3><p id="lojaFala" style="font-size:13px;margin:0 0 4px"></p><p id="lojaMoedas" style="font-size:14px;color:#ffd35a;margin:0 0 8px"></p><div id="lojaLista"></div><button id="lojaFechar" style="margin-top:6px">Fechar</button></div>
-      <div id="caixa" class="sobre" hidden><h3>Equipe e caixa</h3><p style="font-size:12px;margin:0 0 8px">Toque para pôr ou tirar da equipe (de 1 a 3).</p><div class="lista" id="caixaLista"></div><button id="caixaFechar" style="margin-top:10px">Fechar</button></div>
+      <div id="caixa" class="sobre" hidden><h3>Equipe e caixa</h3><p style="font-size:12px;margin:0 0 8px">Toque para pôr ou tirar da equipe (de 1 a 3).</p><div class="lista" id="caixaLista"></div><button id="caixaMapa" style="margin-top:10px">Mapa e viagem rápida</button> <button id="caixaFechar" style="margin-top:10px">Fechar</button></div>
+      <div id="mapaV" class="sobre" hidden><h3>Mapa</h3><p style="font-size:12px;margin:0 0 8px">Toque numa área já visitada para ir até a entrada dela.</p><div class="lista" id="mapaLista"></div><button id="mapaFechar" style="margin-top:10px">Voltar</button></div>
       <div id="mundoDica"></div>
     </div>
   </div>
@@ -431,12 +436,14 @@
   // forma evoluída por monstro do time (índice da espécie base), escolhida na aba Time; vale para luta rápida, torneio e treino (o mundo usa a evolução de verdade do jogador)
   let evoSel = new Set(); try { evoSel = new Set(JSON.parse(localStorage.getItem('pixmon-evo') || '[]')); } catch (e) { /* ok */ }
   const salvarEvo = () => { try { localStorage.setItem('pixmon-evo', JSON.stringify([...evoSel])); } catch (e) { /* ok */ } };
-  const monDe = (i) => (evoSel.has(i) && B.EVOLUCOES[B.MONSTROS[i].id] ? B.evoluida(B.MONSTROS[i]) : B.MONSTROS[i]);
+  const monDe = (i) => (evoSel.has(i) && B.EVOLUI(B.MONSTROS[i].id) ? B.evoluida(B.MONSTROS[i]) : B.MONSTROS[i]);
   let treino = false; // área de treino: alvo com vida infinita que não ataca (não é salvo)
   let sel = 0, cena = 'sorteio', ultimoBioma = null, time = [], ultimoTime = null; // time: índices dos monstros escolhidos (até 3)
+  const ORC_LIVRE = B.pontosTalento(1000, 5); // luta rápida: todos os pontos liberados (26); no Explorar valem só os que o jogo já deu (pontosMundo)
+  const pontosMundo = () => { try { return B.pontosTalento(jogo.lutas, jogo.ins.length); } catch (e) { return B.pontosTalento(0, 0); } }; // jogo só existe depois; no começo, 4
   // Talentos escolhidos (lembrados no navegador): time = ids dos talentos do time; mon = talento por id de monstro
-  let tal = { time: [], mon: {} }; try { tal = Object.assign(tal, JSON.parse(localStorage.getItem('pixmon-tal'))); } catch (e) { /* ok */ }
-  tal.time = B.normalizarTalentos({ time: tal.time }).time;
+  let tal = B.migrarTal(null); try { tal = B.migrarTal(JSON.parse(localStorage.getItem('pixmon-tal'))); } catch (e) { /* ok */ } // B6: mon = lista de talentos por monstro (um por degrau da árvore)
+  tal.time = B.normalizarTalentos({ time: tal.time }, 3, ORC_LIVRE).time;
   // Regras da luta (o jogo é só automático); lembradas no navegador
   let pol = Object.assign({}, B.POLITICA_PADRAO); try { pol = Object.assign(pol, JSON.parse(localStorage.getItem('pixmon-pol'))); } catch (e) { /* ok */ }
   // Torneio: 5 lutas, 2 vidas, talentos travados que se destravam com prêmios (regras em B.TORNEIO). Persistido no navegador.
@@ -447,12 +454,13 @@
   const salvarT = () => { try { localStorage.setItem('pixmon-torneio', JSON.stringify(torneio)); localStorage.setItem('pixmon-stat', JSON.stringify(stat)); localStorage.setItem('pixmon-modo', modo); } catch (e) { /* ok */ } };
   const novoTorneio = (dif = 'normal') => ({ fase: 1, vidas: TORN.dificuldades[dif].vidas, dif, time: null, dt: [...TORN.iniciais.time], dm: [...TORN.iniciais.mon], bonus: 0, hp: [1, 1, 1], hpIni: [1, 1, 1] });
   const emTorneio = () => modo === 'torneio' && !!torneio;
-  const orcAtual = () => (emTorneio() ? TORN.orcBase + torneio.bonus : B.ORCAMENTO);
+  const orcAtual = () => (emTorneio() ? TORN.orcBase + torneio.bonus : noMundo ? pontosMundo() : ORC_LIVRE);
   const liberadoTime = (id) => !emTorneio() || torneio.dt.includes(id), liberadoMon = (id) => !emTorneio() || torneio.dm.includes(id);
   const timeTravado = () => emTorneio() && !!torneio.time; // depois da primeira luta o time do torneio não muda
   // talentos que valem de verdade na luta: só os liberados e dentro do orçamento
   function talEfetivo(meuTime) {
-    const t = { time: tal.time.filter(liberadoTime), mon: meuTime.map((i) => { const id = tal.mon[B.MONSTROS[i].id]; return id && liberadoMon(id) ? id : null; }) };
+    const nvDe = (i) => (noMundo && jogo.col[B.MONSTROS[i].id] ? jogo.col[B.MONSTROS[i].id].nv : 99); // no Explorar, o degrau do talento do monstro pede o nível dele
+    const t = { time: tal.time.filter(liberadoTime), mon: meuTime.map((i) => { const ids = (tal.mon[B.MONSTROS[i].id] || []).filter((x) => liberadoMon(x) && nvDe(i) >= B.NV_DEGRAU[B.ARVORE[x].degrau - 1]); return emTorneio() ? ids.slice(0, 1) : ids; }) }; // torneio: 1 por monstro, como antes
     return B.normalizarTalentos(t, meuTime.length, orcAtual());
   }
   // Treinadores: pontos, insígnias compradas e vitórias por treinador (persistido). treinadorSel = treinador escolhido para desafiar.
@@ -539,13 +547,13 @@
     if (dt <= 0) return;
     if (treino) { // área de treino: o ultimate volta a ficar pronto em 1,5 s e é usado sempre; o alvo não age e a vida dele nunca acaba
       const L = bt.lados[0]; L.cd.ultimate = Math.min(L.cd.ultimate, 1500);
-      B.passo(bt, rng, dt, [B.iaPolitica(bt, 0, rng, dt, Object.assign({}, pol, { ultimate: 'pronto' })), null]);
+      B.passo(bt, rng, dt, [B.iaPolitica(bt, 0, rng, dt, Object.assign({}, polJogo(), { ultimate: 'pronto' })), null]);
       const alvo = bt.lados[1]; alvo.hp = alvo.m.hp; bt.fim = null;
       A.eventos(bt.eventos);
       return;
     }
-    const cmd = B.iaPolitica(bt, 0, rng, dt, pol); // o jogo é só automático: o monstro do jogador luta sozinho, pelas regras escolhidas
-    { const tr = B.iaTroca(bt, 0, rng, dt, pol); if (tr != null) B.trocar(bt, 0, tr); }
+    const pj = polJogo(), cmd = B.iaPolitica(bt, 0, rng, dt, pj); // o jogo é só automático: o monstro do jogador luta sozinho, pelas regras escolhidas
+    { const tr = B.iaTroca(bt, 0, rng, dt, pj); if (tr != null) B.trocar(bt, 0, tr); }
     { const tr = B.iaTroca(bt, 1, rng, dt, polAdv); if (tr != null) B.trocar(bt, 1, tr); }
     B.passo(bt, rng, dt, [cmd, polAdv ? B.iaPolitica(bt, 1, rng, dt, polAdv, iaAdv) : B.ia(bt, 1, rng, dt, iaAdv.reacao, iaAdv.ritmo)]);
     A.eventos(bt.eventos);
@@ -596,7 +604,7 @@
     document.getElementById('resultado').hidden = true; stats.crit = stats.st = 0; ultimoBioma = bioma;
     montarTime();
     capt = false; evoTentou = new Set(); itensEl.hidden = !noMundo; esferaBtn.hidden = esferaFBtn.hidden = !!trMundo; pocaoT = -1e9; atualizarEsfera(); // treinador não se captura
-    if (noMundo && trMundo) mostrarIntro({ f: trMundo.nivel >= 2 ? 'LÍDER DO GINÁSIO' : 'TREINADOR', n: trMundo.nome, q: trMundo.frase, chefe: trMundo.nivel >= 2 });
+    if (noMundo && trMundo) mostrarIntro({ f: ORDEM_GINASIOS.includes(trMundo.id) ? 'LÍDER DO GINÁSIO' : 'TREINADOR', n: trMundo.nome, q: trMundo.frase, chefe: ORDEM_GINASIOS.includes(trMundo.id) });
     A.iniciar(cv, bt, bioma);
   }
 
@@ -666,7 +674,7 @@
     const el = document.getElementById('formaTime'); el.innerHTML = '';
     for (let k = 0; k < 3; k++) {
       const i = time[k], d = document.createElement('div');
-      if (i != null && B.EVOLUCOES[B.MONSTROS[i].id]) {
+      if (i != null && B.EVOLUI(B.MONSTROS[i].id)) {
         const b = document.createElement('button'), evo = evoSel.has(i); b.className = 'formaBtn' + (evo ? ' evo' : ''); b.disabled = timeTravado();
         b.textContent = evo ? 'Evoluído: ' + B.EVOLUCOES[B.MONSTROS[i].id].nome : 'Forma base (tocar para evoluir)';
         b.onclick = () => { if (evo) evoSel.delete(i); else evoSel.add(i); salvarEvo(); S.tocar('toque'); marcarTime(); };
@@ -675,6 +683,8 @@
       el.appendChild(d);
     }
   }
+  // B7: no Explorar a regra escolhida só vale se o talento tático dela foi comprado (Tática); na luta rápida, no treino e no torneio valem todas
+  const polJogo = () => (noMundo && !emTorneio() ? B.politicaEfetiva(pol, B.taticaNoOrcamento(tal.time.filter(liberadoTime), tal.tatica, orcAtual())) : pol);
   const salvarPol = () => { try { localStorage.setItem('pixmon-pol', JSON.stringify(pol)); } catch (e) { /* ok */ } };
   const ROT_REGRA = { estilo: 'Estilo de luta', defesa: 'Defesa', ultimate: 'Ultimate', trocaDesv: 'Trocar quando o adversário tem vantagem', trocaVida: 'Trocar por vida baixa', proximo: 'Quem entra depois de um nocaute' };
   function montarRegras() {
@@ -683,7 +693,7 @@
     Object.keys(ROT_REGRA).forEach((campo) => {
       const d = document.createElement('div'), l = document.createElement('span'), sel = document.createElement('select');
       d.className = 'regra'; l.textContent = ROT_REGRA[campo];
-      Object.entries(opcoes[campo]).forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); });
+      Object.entries(opcoes[campo]).forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; const lib = String(v) === String(B.TATICA_BASE[campo]) || tal.tatica.some((id) => (B.TAL_TATICA[id].libera[campo] || []).includes(String(v))); o.textContent = t + (lib || emTorneio() ? '' : ' 🔒 Explorar'); sel.appendChild(o); });
       sel.value = String(pol[campo]);
       sel.onchange = () => { pol[campo] = campo === 'trocaDesv' ? sel.value === 'true' : campo === 'trocaVida' ? Number(sel.value) : sel.value; salvarPol(); S.tocar('toque'); };
       d.appendChild(l); d.appendChild(sel); el.appendChild(d);
@@ -691,36 +701,67 @@
   }
   montarRegras();
   const salvarTal = () => { try { localStorage.setItem('pixmon-tal', JSON.stringify(tal)); } catch (e) { /* ok */ } };
+  const RAMO = { ataque: 'Ataque', defesa: 'Defesa', ultimate: 'Ultimate', mundo: 'Mundo', corpo: 'Corpo', status: 'Status' };
+  // B6: árvore. Time: o degrau 2 e o 3 pedem o nó de baixo (e o 3 é "um ou outro"); tirar um nó tira os que dependem dele. Fora do torneio.
+  const limparArvore = (ids, tipo = 'time') => { let cur = ids.slice(); for (let k = 0; k < 6; k++) { const prox = cur.filter((id) => !B.validarArvore(tipo, cur).some((e) => e.startsWith(id + ':'))); if (prox.length === cur.length) break; cur = prox; } return cur; };
+  const motivoTime = (id) => { // por que o nó está trancado (texto) ou ''
+    const n = B.ARVORE[id]; if (!n || emTorneio()) return '';
+    const e = B.validarArvore('time', [...tal.time.filter((x) => x !== id), id]).find((x) => x.startsWith(id + ':'));
+    return e ? e.slice(id.length + 2).replace('falta um de ', 'exige um de: ').replace('falta ', 'exige: ').replace(/escolha só um entre \S+ e /, 'exclui: ') : '';
+  };
+  const nomeNos = (txt) => txt.replace(/[a-z_]+/g, (w) => (B.TAL_TIME[w] ? B.TAL_TIME[w].nome : w));
   function renderTal() {
-    const orc = orcAtual(), usados = B.custoTalentos(tal.time.filter(liberadoTime)), tt = document.getElementById('talTime'), tm = document.getElementById('talMon');
+    const orc = orcAtual(), usadosT = B.custoTalentos(tal.time.filter(liberadoTime)), usadosTat = emTorneio() ? 0 : tal.tatica.reduce((a, id) => a + (B.TAL_TATICA[id] ? B.TAL_TATICA[id].custo : 0), 0), usados = usadosT + usadosTat, tt = document.getElementById('talTime'), tm = document.getElementById('talMon');
     document.getElementById('tituloTal').textContent = 'Talentos do time (' + usados + '/' + orc + ' pontos)' + (emTorneio() ? ' · travados ganham-se vencendo' : '');
+    document.getElementById('talInfo').textContent = emTorneio() ? 'Torneio: sem árvore, 1 talento por monstro.' : 'Árvore: o degrau de cima pede o de baixo. Explorar: valem ' + pontosMundo() + ' pontos agora (4 no começo, +1 a cada 5 batalhas com treinadores, +2 por insígnia de líder, até ' + ORC_LIVRE + ').';
     tt.innerHTML = ''; tt.className = 'talgrid';
-    const GRUPO = { cura_cadeia: 'cura', reserva: 'cura', sorte: 'sorte', demolidor: 'sorte', ultimate: 'ritmo', troca: 'ritmo', sede: 'ritmo', abertura: 'ataque', dupla: 'ataque', arco: 'defesa', pe: 'defesa' };
-    Object.entries(B.TAL_TIME).forEach(([id, t]) => {
-      const lib = liberadoTime(id), b = document.createElement('button'), sel = lib && tal.time.includes(id);
-      b.className = 'tcard' + (sel ? ' sel' : '') + (lib ? '' : ' trava'); b.dataset.g = GRUPO[id] || 'defesa'; b.disabled = !lib || (!sel && usados + t.custo > orc);
+    const GRUPO = { ataque: 'ataque', defesa: 'defesa', ultimate: 'ritmo', mundo: 'sorte' };
+    Object.entries(B.TAL_TIME).sort((x, y) => { const p = B.ARVORE[x[0]], q = B.ARVORE[y[0]]; return (p.ramo === q.ramo ? 0 : Object.keys(GRUPO).indexOf(p.ramo) - Object.keys(GRUPO).indexOf(q.ramo)) || p.degrau - q.degrau; }).forEach(([id, t]) => {
+      const lib = liberadoTime(id), n = B.ARVORE[id], b = document.createElement('button'), sel = lib && tal.time.includes(id), mot = sel ? '' : motivoTime(id);
+      b.className = 'tcard' + (sel ? ' sel' : '') + (lib && !mot ? '' : ' trava'); b.dataset.g = GRUPO[n.ramo] || 'defesa'; b.disabled = !lib || (!sel && (usados + t.custo > orc || !!mot)); // usados conta também a Tática
       b.innerHTML = '<div class="timg"><img alt=""></div><b class="tnome"></b><span class="tdesc"></span><span class="tcusto"></span>';
-      b.querySelector('img').src = window.PixmonIcones.talento(id); b.querySelector('.tnome').textContent = t.nome; b.querySelector('.tdesc').textContent = t.desc; b.querySelector('.tcusto').textContent = t.custo + ' pt' + (t.custo > 1 ? 's' : '');
-      b.onclick = () => { tal.time = sel ? tal.time.filter((x) => x !== id) : [...tal.time, id]; salvarTal(); S.tocar('toque'); renderTal(); };
+      b.querySelector('img').src = window.PixmonIcones.talento(id); b.querySelector('.tnome').textContent = (mot ? '🔒 ' : '') + t.nome;
+      b.querySelector('.tdesc').textContent = t.desc + (emTorneio() ? '' : ' · ' + RAMO[n.ramo] + ' ' + n.degrau + (mot ? ' · ' + nomeNos(mot) : ''));
+      b.querySelector('.tcusto').textContent = t.custo + ' pt' + (t.custo > 1 ? 's' : '');
+      b.onclick = () => { tal.time = sel ? (emTorneio() ? tal.time.filter((x) => x !== id) : limparArvore(tal.time.filter((x) => x !== id))) : [...tal.time, id]; salvarTal(); S.tocar('toque'); renderTal(); };
       tt.appendChild(b);
     });
     tm.innerHTML = '';
     time.forEach((i) => {
-      const m = B.MONSTROS[i], r = document.createElement('div'), atual = liberadoMon(tal.mon[m.id]) ? tal.mon[m.id] : null;
+      const m = B.MONSTROS[i], r = document.createElement('div'), atual = (tal.mon[m.id] || []).filter(liberadoMon);
       r.className = 'talm'; r.innerHTML = '<div class="th"><span></span><small></small></div><div class="mgrid"></div><div class="desc"></div>';
-      r.querySelector('.th span').textContent = m.nome; r.querySelector('.th small').textContent = atual ? B.TAL_MON[atual].nome : 'nenhum';
-      r.querySelector('.desc').textContent = atual ? B.TAL_MON[atual].desc : 'Toque num talento para escolher (toque de novo para tirar).';
+      r.querySelector('.th span').textContent = m.nome; r.querySelector('.th small').textContent = atual.length ? atual.map((x) => B.TAL_MON[x].nome).join(' · ') : 'nenhum';
+      r.querySelector('.desc').textContent = emTorneio() ? 'Torneio: 1 talento por monstro (toque de novo para tirar).' : 'Um talento por degrau (nível ' + B.NV_DEGRAU.join(' / ') + ' no Explorar; toque de novo para tirar).';
       const grid = r.querySelector('.mgrid');
-      Object.entries(B.TAL_MON).forEach(([id, t]) => {
-        const lib = liberadoMon(id), c = document.createElement('button');
-        c.className = 'mchip' + (atual === id ? ' sel' : '') + (lib ? '' : ' trava'); c.disabled = !lib; c.title = t.desc;
-        c.innerHTML = '<img alt=""><span></span>'; c.querySelector('img').src = window.PixmonIcones.talento(id); c.querySelector('span').textContent = (lib ? '' : '🔒 ') + t.nome;
-        c.onclick = () => { tal.mon[m.id] = atual === id ? null : id; salvarTal(); S.tocar('toque'); renderTal(); };
+      Object.entries(B.TAL_MON).sort((x, y) => B.ARVORE[x[0]].degrau - B.ARVORE[y[0]].degrau).forEach(([id, t]) => {
+        const n = B.ARVORE[id], lib = liberadoMon(id), c = document.createElement('button'); // o nível do degrau só tranca no Explorar (talEfetivo); no menu ele aparece no nome
+        c.className = 'mchip' + (atual.includes(id) ? ' sel' : '') + (lib ? '' : ' trava'); c.disabled = !lib; c.title = t.desc + ' (degrau ' + n.degrau + ', nível ' + B.NV_DEGRAU[n.degrau - 1] + ')';
+        c.innerHTML = '<img alt=""><span></span>'; c.querySelector('img').src = window.PixmonIcones.talento(id); c.querySelector('span').textContent = (lib ? '' : '🔒 ') + t.nome + ' ' + n.degrau;
+        c.onclick = () => { let nova = atual.includes(id) ? atual.filter((x) => x !== id) : emTorneio() ? [id] : [...atual.filter((x) => B.ARVORE[x].degrau !== n.degrau), id]; tal.mon[m.id] = nova; salvarTal(); S.tocar('toque'); renderTal(); };
         grid.appendChild(c);
       });
       tm.appendChild(r);
     });
+    renderTatica(); montarRegras();
   }
+  function renderTatica() { // B7: talentos que destravam as regras de luta
+    const orc = orcAtual(), tat = document.getElementById('talTatica'), info = document.getElementById('talTaticaInfo');
+    tat.innerHTML = ''; tat.className = 'talgrid';
+    const usados = B.custoTalentos(tal.time.filter(liberadoTime)) + tal.tatica.reduce((a, id) => a + (B.TAL_TATICA[id] ? B.TAL_TATICA[id].custo : 0), 0);
+    if (emTorneio()) { info.textContent = 'Torneio: todas as regras de luta estão livres.'; return; }
+    info.textContent = 'Cada talento destrava opções em "Regras da luta" (no Explorar só valem as destravadas; na luta rápida valem todas). Dividem os pontos com os talentos do time.';
+    Object.entries(B.TAL_TATICA).sort((x, y) => B.ARVORE[x[0]].degrau - B.ARVORE[y[0]].degrau).forEach(([id, t]) => {
+      const n = B.ARVORE[id], sel = tal.tatica.includes(id), b = document.createElement('button'), e = B.validarArvore('tatica', [...tal.tatica.filter((x) => x !== id), id]).find((x) => x.startsWith(id + ':')), mot = sel || !e ? '' : e.slice(id.length + 2).replace('falta um de ', 'exige um de: ').replace('falta ', 'exige: ');
+      b.className = 'tcard' + (sel ? ' sel' : '') + (mot ? ' trava' : ''); b.dataset.g = 'ritmo'; b.disabled = !sel && (usados + t.custo > orc || !!mot);
+      b.innerHTML = '<div class="timg"><img alt=""></div><b class="tnome"></b><span class="tdesc"></span><span class="tcusto"></span>';
+      b.querySelector('img').src = window.PixmonIcones.talento(id); b.querySelector('.tnome').textContent = (mot ? '🔒 ' : '') + t.nome;
+      b.querySelector('.tdesc').textContent = t.desc + ' · Tática ' + n.degrau + (mot ? ' · ' + mot.replace(/[a-z_]+/g, (w) => (B.TAL_TATICA[w] ? B.TAL_TATICA[w].nome : w)) : '');
+      b.querySelector('.tcusto').textContent = t.custo + ' pt' + (t.custo > 1 ? 's' : '');
+      b.onclick = () => { tal.tatica = sel ? limparArvore(tal.tatica.filter((x) => x !== id), 'tatica') : [...tal.tatica, id]; salvarTal(); S.tocar('toque'); renderTal(); };
+      tat.appendChild(b);
+    });
+  }
+  document.getElementById('talZerar').onclick = () => { tal.time = []; tal.mon = {}; tal.tatica = []; salvarTal(); S.tocar('toque'); renderTal(); };
   document.getElementById('sortear').onclick = () => { if (timeTravado()) return; const ids = B.MONSTROS.map((_, i) => i); time = []; while (time.length < 3) time.push(ids.splice(Math.floor(Math.random() * ids.length), 1)[0]); sel = time[0]; marcarTime(); mostrar(); S.tocar('toque'); };
   document.getElementById('contagem').textContent = B.MONSTROS.length + ' monstros';
 
@@ -793,10 +834,11 @@
   // ---------- jogo do mundo (Fase B): coleção, níveis, captura ----------
   const JOGO_K = 'pixmon-jogo', INICIAIS = ['fagulhao', 'mareal', 'brotinho'];
   let jogo = { v: 1, col: {}, eq: [], esf: 5, venc: {}, din: 40, esfF: 0, poc: 2 }, capt = false, nvSel = 5, biomaMundo = null, trMundo = null, selvagemEvo = false, evoTentou = new Set(); // trMundo: treinador do mapa que está lutando
-  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.achados = Array.isArray(jogo.achados) ? jogo.achados : []; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
+  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.achados = Array.isArray(jogo.achados) ? jogo.achados : []; jogo.visit = Array.isArray(jogo.visit) ? jogo.visit : []; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
   // Ginásios (PLANO-fases.md): ordem obrigatória Água, Vento, Raio, Pedra, Fogo; para desafiar qualquer um: 6 pixmons capturados e 20 batalhas contra treinadores (vitória ou derrota).
-  // As regras ficam DESLIGADAS enquanto as fases são criadas (decisão do George): é só trocar REGRAS_GINASIO para true. jogo.lutas conta as lutas com treinadores do mapa; jogo.ins guarda os ids dos líderes vencidos.
-  const REGRAS_GINASIO = false, ORDEM_GINASIOS = ['tati', 'laura', 'du', 'guto', 'dan'], GINASIO_CAPTURADOS = 6, GINASIO_LUTAS = 20;
+  // As regras ficaram LIGADAS na W8; ?livre no endereço as desliga para testar. jogo.lutas conta as lutas com treinadores do mapa; jogo.ins guarda os ids dos líderes vencidos.
+  const REGRAS_GINASIO = !/[?&]livre/.test(location.search), // W8: ligadas; ?livre no endereço abre todos os ginásios (teste)
+     ORDEM_GINASIOS = ['tati', 'laura', 'du', 'guto', 'dan'], GINASIO_CAPTURADOS = 6, GINASIO_LUTAS = 20;
   function podeEntrarGinasio(lider) { // { ok, faltam: [textos] }
     if (!REGRAS_GINASIO) return { ok: true, faltam: [] };
     const faltam = [], i = ORDEM_GINASIOS.indexOf(lider), nCap = Object.keys(jogo.col).length;
@@ -810,11 +852,11 @@
   const idxDe = (id) => B.MONSTROS.findIndex((m) => m.id === id);
   const fator = (nv) => 1 + 0.05 * (nv - 10); // nível 10 = status base
   const escalar = (m, nv) => ({ ...m, nivel: nv, hp: Math.round(m.hp * fator(nv)), atk: +(m.atk * fator(nv)).toFixed(2) });
-  const forma = (id) => { const i = idxDe(id), m = B.MONSTROS[i]; return jogo.col[id] && jogo.col[id].evo ? B.evoluida(m) : m; }; // forma atual (base ou evoluída)
+  const forma = (id) => { const i = idxDe(id), m = B.MONSTROS[i]; return jogo.col[id] && jogo.col[id].evo && B.EVOLUI(id) ? B.evoluida(m) : m; }; // forma atual (base ou evoluída)
   const monDoMundo = (i) => escalar(forma(B.MONSTROS[i].id), jogo.col[B.MONSTROS[i].id].nv);
   // texto de XP: devolve a frase de subida de nível ou de evolução (ou null)
-  function sortearSelvagem(elemento, soEvo) { // sorteio ponderado pela raridade (comum 1, rara 0,4, lendária 0,1); o elemento da área aparece 3x mais; soEvo: só espécies que têm evolução
-    const pesos = B.MONSTROS.map((m) => (soEvo && !B.EVOLUCOES[m.id] ? 0 : B.PESO_RARIDADE[m.raridade] * (elemento && m.tipo === elemento ? 3 : 1))); let r = Math.random() * pesos.reduce((a, b) => a + b, 0);
+  function sortearSelvagem(area, soEvo) { // sorteio pelo pool da região da área (B.pesosSelvagem); soEvo: só espécies que têm evolução
+    const pesos = B.pesosSelvagem(area, soEvo); let r = Math.random() * pesos.reduce((a, b) => a + b, 0);
     for (let i = 0; i < pesos.length; i++) { r -= pesos[i]; if (r <= 0) return i; }
     return 0;
   }
@@ -822,7 +864,7 @@
   const EVO_LUTA = { chance: 0.6, hpMax: 0.5, nvMin: 1 }; // evolução no meio da luta: ao cair abaixo de 50% da vida, 60% de chance (1 tentativa por monstro por luta)
   function verEvolucaoLuta() {
     if (!noMundo || !bt || bt.fim) return;
-    const l = bt.lados[0], m = l.m, E = B.EVOLUCOES[m.id], c = jogo.col[m.id];
+    const l = bt.lados[0], m = l.m, E = B.EVOLUI(m.id) ? B.EVOLUCOES[m.id] : null, c = jogo.col[m.id];
     if (!E || !c || c.evo || l.hp <= 0 || l.hp / m.hp >= EVO_LUTA.hpMax || c.nv < EVO_LUTA.nvMin || evoTentou.has(m.id)) return;
     evoTentou.add(m.id);
     if (Math.random() >= EVO_LUTA.chance) return;
@@ -832,7 +874,7 @@
     montarTime();
   }
   function textoXp(id, xp) {
-    const c = jogo.col[id], nomeAntes = forma(id).nome, nvAntes = c.nv, subiu = ganhaXp(id, xp), E = B.EVOLUCOES[id];
+    const c = jogo.col[id], nomeAntes = forma(id).nome, nvAntes = c.nv, subiu = ganhaXp(id, xp), E = B.EVOLUI(id) ? B.EVOLUCOES[id] : null;
     if (!subiu) return null;
     if (E && !c.evo && c.nv >= E.nv) { c.evo = true; return nomeAntes + ' evoluiu para ' + E.nome + '!'; }
     return nomeAntes + ' subiu para Nv ' + c.nv + '!';
@@ -883,7 +925,7 @@
   esferaBtn.onclick = () => {
     if (!bt || bt.fim || jogo.esf < 1 || capt) return;
     jogo.esf--; salvarJogo();
-    const l = bt.lados[1], falta = 1 - Math.max(0, l.hp) / l.m.hp, chance = Math.min(0.97, 0.12 + 0.78 * falta + bonusEsf);
+    const l = bt.lados[1], falta = 1 - Math.max(0, l.hp) / l.m.hp, chance = Math.min(0.97, (0.12 + 0.78 * falta + bonusEsf) * (B.CAPTURA_RARIDADE[l.m.raridade] || 1));
     if (Math.random() < chance) { capt = true; l.hp = 0; mostrarIntro({ f: 'ESFERA', n: 'Capturado!', q: l.m.nome + ' é seu', chefe: false }); }
     else mostrarIntro({ f: 'ESFERA', n: 'Escapou!', q: 'Chance era ' + Math.round(chance * 100) + '%. Enfraqueça mais.', chefe: false });
     atualizarEsfera();
@@ -897,6 +939,7 @@
       b.onclick = () => ao(id); lista.appendChild(b);
     });
   }
+  const visitar = (a) => { if (a && !jogo.visit.includes(a)) { jogo.visit.push(a); salvarJogo(); } }; // áreas já pisadas (viagem rápida)
   function abrirCaixa() {
     window.PixmonMundo.pausar(); const el = document.getElementById('caixa'); el.hidden = false;
     const desenhar = () => mostrarEscolha(document.getElementById('caixaLista'), Object.keys(jogo.col), (id) => {
@@ -907,6 +950,13 @@
     desenhar();
   }
   document.getElementById('mundoEq').onclick = abrirCaixa;
+  document.getElementById('caixaMapa').onclick = () => { // viagem rápida: só para áreas visitadas, na entrada (destino de algum portal que leva até ela)
+    const M = window.PixmonMundo, A = M.AREAS, ini = (a) => { for (const k in A) for (const ch in (A[k].portais || {})) { const p = A[k].portais[ch]; if (p.area === a) return p; } return null; };
+    const lista = document.getElementById('mapaLista'); lista.innerHTML = '';
+    jogo.visit.filter((a) => A[a] && ini(a)).forEach((a) => { const b = document.createElement('button'); b.className = 'mc'; b.textContent = A[a].nome + (M.estado().area === a ? ' (aqui)' : ''); b.onclick = () => { const p = ini(a); M.ir(a, p.c, p.r); S.mundo(a); M.aviso(A[a].nome); document.getElementById('mapaV').hidden = true; document.getElementById('caixa').hidden = true; M.retomar(); }; lista.appendChild(b); });
+    document.getElementById('mapaV').hidden = false;
+  };
+  document.getElementById('mapaFechar').onclick = () => { document.getElementById('mapaV').hidden = true; };
   document.getElementById('caixaFechar').onclick = () => { document.getElementById('caixa').hidden = true; window.PixmonMundo.retomar(); };
 
   // ---------- mundo andável (Fase A) ----------
@@ -916,14 +966,13 @@
     document.getElementById('escolha').hidden = true; document.getElementById('luta').hidden = true; mundoEl.hidden = false;
     S.tocar('toque'); atualizarEsfera();
     const desafioMundo = (id) => { // luta contra o treinador do mapa (o lider de ginasio luta no cenario neutro 'ginasio'; os outros, no cenario da area)
-      trMundo = B.treinadorPorId(id); const med = jogo.eq.reduce((a, i) => a + jogo.col[i].nv, 0) / jogo.eq.length;
-      nvSel = Math.max(3, Math.min(30, Math.round(med) + trMundo.nivel - 1)); mundoEl.hidden = true;
+      trMundo = B.treinadorPorId(id); nvSel = B.nivelNoMundo(trMundo, window.PixmonMundo.estado().area); mundoEl.hidden = true; // B4: nível fixo da área + posto
       const AR = window.PixmonMundo.AREAS[window.PixmonMundo.estado().area] || {};
       iniciar(jogo.eq.map(idxDe), ORDEM_GINASIOS.includes(id) ? 'ginasio' : (AR.bioma || null));
     };
-    const comecar = () => window.PixmonMundo.iniciar(document.getElementById('mundoCv'), { encontro: (a) => {
+    const comecar = () => { window.PixmonMundo.iniciar(document.getElementById('mundoCv'), { encontro: (a) => {
       const AR = window.PixmonMundo.AREAS[a] || {}; biomaMundo = AR.bioma || null;
-      trMundo = null; selvagem = sortearSelvagem(AR.elemento, AR.soEvo); selvagemEvo = !!B.EVOLUCOES[B.MONSTROS[selvagem].id] && (AR.soEvo || Math.random() < CHANCE_SELVAGEM_EVO); // Floresta Oculta: só evoluídos
+      trMundo = null; selvagem = sortearSelvagem(a, AR.soEvo); selvagemEvo = B.EVOLUI(B.MONSTROS[selvagem].id) && (AR.soEvo || Math.random() < CHANCE_SELVAGEM_EVO); // Floresta Oculta: só evoluídos
       const med = jogo.eq.reduce((a, id) => a + jogo.col[id].nv, 0) / jogo.eq.length; nvSel = Math.max(2, Math.min(30, Math.round(med) + Math.floor(Math.random() * 3) - 1 + (AR.nvMais || 0))); // áreas fortes somam níveis
       mundoEl.hidden = true; iniciar(jogo.eq.map(idxDe), biomaMundo);
     }, evento: (tipo, a, ch) => { // baú, chave e porta trancada do Castelo
@@ -932,12 +981,12 @@
       else if (tipo === 'chave') { if (tem) M.aviso('Você já pegou a chave.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; salvarJogo(); M.aviso('Você pegou a Chave do Castelo!'); } }
       else if (tipo === 'porta') M.aviso(chave ? 'Selada por magia (em breve)' : 'Trancada: falta uma chave');
       M.retomar();
-    }, loja: abrirLoja, area: (a) => S.mundo(a), vencido: (id) => !!jogo.venc[id], ginasio: (id) => { // porta do ginasio: confere as regras (desligadas por enquanto) e chama o lider
+    }, loja: abrirLoja, area: (a) => { S.mundo(a); visitar(a); }, rotuloNpc: (id) => { const t = B.treinadorPorId(id); return t ? ' Nv' + B.nivelNoMundo(t, window.PixmonMundo.estado().area) : ''; }, vencido: (id) => !!jogo.venc[id], ginasio: (id) => { // porta do ginasio: confere as regras (desligadas por enquanto) e chama o lider
       const tr = B.treinadorPorId(id), r = podeEntrarGinasio(id), M = window.PixmonMundo;
       if (jogo.venc[id]) { M.aviso('Você já venceu ' + tr.nome); M.retomar(); return; }
       if (!r.ok) { M.aviso('Ginásio fechado: ' + r.faltam.join('; ')); M.retomar(); return; }
       desafioMundo(id);
-    }, desafio: desafioMundo }, novo);
+    }, desafio: desafioMundo }, novo); visitar(window.PixmonMundo.estado().area); };
     if (jogo.eq.length) comecar(); else { // primeira vez: escolhe o inicial
       const el = document.getElementById('inicial'); el.hidden = false;
       mostrarEscolha(document.getElementById('inicialLista'), INICIAIS, (id) => { jogo.col[id] = { nv: 5, xp: 0 }; jogo.eq = [id]; salvarJogo(); el.hidden = true; comecar(); });
@@ -1117,7 +1166,7 @@
       r.appendChild(d);
     }
     const p = document.createElement('p'); p.className = 'nota';
-    const ntal = tal.time.filter(liberadoTime).length, nmon = time.filter((i) => tal.mon[B.MONSTROS[i].id] && liberadoMon(tal.mon[B.MONSTROS[i].id])).length;
+    const ntal = tal.time.filter(liberadoTime).length, nmon = time.reduce((a, i) => a + (tal.mon[B.MONSTROS[i].id] || []).filter(liberadoMon).length, 0);
     p.textContent = ntal + ' talento(s) do time · ' + nmon + ' de monstro · regras: ' + B.ESTILOS[pol.estilo].nome;
     r.appendChild(p); p.style.gridColumn = '1 / -1';
   }
