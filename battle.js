@@ -49,7 +49,7 @@
   // B5: talentos novos da árvore (PLANO-balanceamento.md seção 6)
   const COMBO_MULT = 1.25, FOCO_MULT = 1.08, ESCUDO_MULT = 0.85, ESCUDO_MS = 5000, MURALHA_MULT = 0.7, MURALHA_MS = 5000, RECARGA_MULT = 0.85, ULT_PODER_DANO = 1.12, ULT_PODER_CD = 1.1, ULT_DUPLA_PCT = 0.10;
   // T2: traço de cada família (todo membro tem) e sinergias de time. Números iniciais, calibrados no sim.js.
-  const TRACO = { fera: 0.05, ave: 0.04, inseto: 1.08, planta: 0.0025, pedra: { dano: 0.94, cd: 1.06 }, dragao: { forte: 0.9, ult: 1.08 }, psiquico: 0.65, aquatico: 1.05 };
+  const TRACO = { fera: 0.05, ave: 0.04, inseto: 1.08, planta: 0.0025, pedra: { dano: 0.94, cd: 1.06 }, dragao: { forte: 0.9, ult: 1.12 }, psiquico: 0.65, aquatico: 1 };
   const LACOS_MULT = 1.08, MISTO_MULT = 0.95;
   const PELE_GROSSA = 1.08, CRIT_FINO = 0.05, PESADO_DANO = 1.16, PESADO_CD = 1.10, PARALISIA_EXTRA = 1500;
   const SORTE_OTIMO = 0.3, SORTE_DESFAZ = 0.5, TROCA_AGIL_CD = 3000;
@@ -194,7 +194,7 @@
     { id: 'algazinho', nome: 'Algazinho', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.92, cg: 0.95, raridade: 'comum', golpes: h(['Gosma', 'agua'], ['Chicote de Alga', 'agua'], 'Véu de Limo', 'Pedras do Fundo', 'terra') },
     { id: 'coraline', nome: 'Coraline', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.08, cg: 1.12, raridade: 'rara', golpes: h(['Bolha Rosa', 'agua'], ['Galhada de Coral', 'agua'], 'Recife Vivo', 'Esfera do Recife', 'terra') },
     { id: 'pedrinho', nome: 'Pedrinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.12, cg: 1.18, raridade: 'comum', golpes: h(['Cascalho', 'terra'], ['Rolamento', 'terra'], 'Pele de Pedra', 'Brasa de Rocha', 'fogo') },
-    { id: 'tatufungo', nome: 'Tatufungo', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1, cg: 1.05, raridade: 'rara', golpes: h(['Esporo', 'terra'], ['Cabeçada do Chapéu', 'terra'], 'Escudo de Cogumelo', 'Nuvem Ardente de Esporos', 'fogo') },
+    { id: 'tatufungo', nome: 'Tatufungo', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.02, cg: 1.07, raridade: 'rara', golpes: h(['Esporo', 'terra'], ['Cabeçada do Chapéu', 'terra'], 'Escudo de Cogumelo', 'Nuvem Ardente de Esporos', 'fogo') },
     { id: 'plumelho', nome: 'Plumelho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.82, cg: 0.78, raridade: 'comum', golpes: h(['Bicada', 'ar'], ['Mergulho Veloz', 'ar'], 'Penas Fofas', 'Chuva de Orvalho', 'agua') },
     { id: 'redemoinha', nome: 'Redemoinha', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.02, cg: 1.08, raridade: 'rara', golpes: h(['Sopro Giratório', 'ar'], ['Tornado Miúdo', 'ar'], 'Giro Protetor', 'Tempestade de Água', 'agua') },
     { id: 'zapinho', nome: 'Zapinho', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.8, cg: 0.7, raridade: 'comum', golpes: h(['Faísca Miúda', 'eletrico'], ['Descarga', 'eletrico'], 'Pelo Eriçado', 'Ventania Elétrica', 'ar') },
@@ -203,7 +203,7 @@
     { id: 'bolhudo', nome: 'Bolhudo', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.05, cg: 1.0, raridade: 'comum', golpes: h(['Bolhinha', 'agua'], ['Inchaço Líquido', 'agua'], 'Barriga de Bolhas', 'Mergulho de Pedra', 'terra') },
     { id: 'taupino', nome: 'Taupino', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.12, raridade: 'comum', golpes: h(['Cavada', 'terra'], ['Garra Barrenta', 'terra'], 'Toca Funda', 'Lava da Toca', 'fogo') },
     { id: 'pipinha', nome: 'Pipinha', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.88, cg: 0.85, raridade: 'rara', golpes: h(['Rabiola', 'ar'], ['Puxão de Vento', 'ar'], 'Fita Balançante', 'Garoa Súbita', 'agua') },
-    { id: 'lampiro', nome: 'Lampiro', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.83, cg: 0.75, raridade: 'rara', golpes: h(['Pisca-Pisca', 'eletrico'], ['Luz Cegante', 'eletrico'], 'Brilho de Escudo', 'Ventania de Asas', 'ar') },
+    { id: 'lampiro', nome: 'Lampiro', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.82, cg: 0.75, raridade: 'rara', golpes: h(['Pisca-Pisca', 'eletrico'], ['Luz Cegante', 'eletrico'], 'Brilho de Escudo', 'Ventania de Asas', 'ar') },
     { id: 'brasoleta', nome: 'Brasoleta', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.87, cg: 0.82, raridade: 'comum', golpes: h(['Faísca Alada', 'fogo'], ['Rasante Ardente', 'fogo'], 'Asas de Brasa', 'Enxame de Centelhas', 'eletrico') },
     { id: 'besourao', nome: 'Besourão', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.13, cg: 1.22, raridade: 'comum', golpes: h(['Chifrada Curta', 'terra'], ['Investida de Chifre', 'terra'], 'Carapaça Dura', 'Chifre Incandescente', 'fogo') },
     { id: 'casulucia', nome: 'Casulúcia', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.91, cg: 0.9, raridade: 'incomum', golpes: h(['Pó de Asa', 'ar'], ['Vendaval de Asas', 'ar'], 'Casulo de Seda', 'Chuva de Pólen', 'agua') },
@@ -212,6 +212,15 @@
     { id: 'cristalino', nome: 'Cristalino', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.96, cg: 0.92, raridade: 'incomum', golpes: h(['Estilhaço', 'eletrico'], ['Prisma Trovejante', 'eletrico'], 'Cristal Refletor', 'Tempestade de Cristais', 'ar') },
     { id: 'texugao', nome: 'Texugão', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.09, cg: 1.1, raridade: 'comum', golpes: h(['Unhada', 'terra'], ['Escavada Furiosa', 'terra'], 'Toca Rápida', 'Fogueira do Texugo', 'fogo') },
     { id: 'cinzarim', nome: 'Cinzarim', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.98, cg: 1.05, raridade: 'mitica', golpes: h(['Pena Ardente', 'fogo'], ['Rasante da Fênix', 'fogo'], 'Asas de Cinza', 'Chama que Renasce', 'eletrico') },
+    { id: 'pimentao', nome: 'Pimentão', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.94, cg: 0.93, raridade: 'comum', golpes: h(['Pimenta Quente', 'fogo'], ['Cuspe de Pimenta', 'fogo'], 'Casca Apimentada', 'Fogo na Horta', 'eletrico') },
+    { id: 'soprinho', nome: 'Soprinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.81, cg: 0.76, raridade: 'comum', golpes: h(['Sopro de Pólen', 'ar'], ['Dente-de-Leão', 'ar'], 'Casulo de Pétalas', 'Chuva de Sementes', 'agua') },
+    { id: 'cipochoque', nome: 'Cipó-choque', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.04, cg: 1.02, raridade: 'incomum', golpes: h(['Cipó Elétrico', 'eletrico'], ['Chicote de Raio', 'eletrico'], 'Folhagem Condutora', 'Tempestade de Cipós', 'ar') },
+    { id: 'medusonho', nome: 'Medusonho', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.07, cg: 1.1, raridade: 'incomum', golpes: h(['Toque Gelatinoso', 'agua'], ['Tentáculo Brilhante', 'agua'], 'Sino Mental', 'Mergulho Psíquico', 'terra') },
+    { id: 'cogumenta', nome: 'Cogumenta', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.12, cg: 1.16, raridade: 'incomum', golpes: h(['Esporo Mental', 'terra'], ['Cabeçada Psíquica', 'terra'], 'Cogumelo Espelho', 'Tremor da Mente', 'fogo') },
+    { id: 'mentilha', nome: 'Mentilha', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.9, cg: 0.84, raridade: 'rara', golpes: h(['Faísca Mental', 'eletrico'], ['Onda Cerebral', 'eletrico'], 'Aura de Cristal', 'Tempestade Psíquica', 'ar') },
+    { id: 'voadorzinho', nome: 'Voadorzinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.92, cg: 0.86, raridade: 'comum', golpes: h(['Salto Alto', 'ar'], ['Borrifo Alado', 'ar'], 'Escama Voadora', 'Chuva Furiosa', 'agua') },
+    { id: 'peixebrasa', nome: 'Peixe-brasa', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.02, cg: 0.98, raridade: 'incomum', golpes: h(['Mordida Quente', 'fogo'], ['Jato Fervente', 'fogo'], 'Escama de Brasa', 'Descarga de Vapor', 'eletrico') },
+    { id: 'avestruzinho', nome: 'Avestruzinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 0.95, cg: 0.91, raridade: 'comum', golpes: h(['Corrida Veloz', 'terra'], ['Chute de Avestruz', 'terra'], 'Penas de Areia', 'Areia em Chamas', 'fogo') },
     { id: 'lontrinha', nome: 'Lontrinha', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.89, cg: 0.87, raridade: 'comum', golpes: h(['Respingo', 'agua'], ['Mergulho da Lontra', 'agua'], 'Concha Protetora', 'Pedra do Rio', 'terra') },
   ];
 
@@ -219,12 +228,12 @@
   //   feixe = Lightbeam, raio contínuo (só visual) | frenesi = não causa dano: buff de dano e ritmo por um tempo, que custa vida
   // Evoluções herdam pelo spread de `golpes`.
   const PODER_DE = {
-    feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao'],
-    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha', 'tesloura'],
-    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo', 'besourao', 'texugao', 'pingolino'],
-    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo', 'rochilo', 'brasoleta', 'lontrinha', 'cinzarim'],
-    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho', 'cristalino'],
-    disco: ['ventinho', 'redemoinha', 'algazinho', 'casulucia'],
+    feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao', 'cipochoque'],
+    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha', 'tesloura', 'pimentao'],
+    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo', 'besourao', 'texugao', 'pingolino', 'mentilha', 'avestruzinho'],
+    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo', 'rochilo', 'brasoleta', 'lontrinha', 'cinzarim', 'cogumenta', 'peixebrasa'],
+    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho', 'cristalino', 'medusonho'],
+    disco: ['ventinho', 'redemoinha', 'algazinho', 'casulucia', 'soprinho', 'voadorzinho'],
   };
   Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { const m = MONSTROS.find((x) => x.id === id); m.golpes.ultimate.poder = p; if (p === 'esfera') m.golpes.ultimate.tipo = m.tipo; })); // a esfera gigante é do elemento do próprio monstro (sem cobrir a fraqueza como o ultimate comum), senão o golpe enorme vira o jogo contra quem tem vantagem
   // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
@@ -236,13 +245,13 @@
   // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
   // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
   const FX_FORTE = {
-    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante', 'lontrinha', 'casulucia', 'cinzarim'],
-    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro', 'cristalino', 'rochilo', 'tesloura', 'brasoleta', 'texugao'],
+    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante', 'lontrinha', 'casulucia', 'cinzarim', 'medusonho', 'peixebrasa'],
+    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro', 'cristalino', 'rochilo', 'tesloura', 'brasoleta', 'texugao', 'cogumenta', 'avestruzinho'],
   };
   // Forma do golpe rápido: investida (padrão), 'garra' (investida e arranhões no alvo) ou 'rajada' (fica parado e dispara 3 tiros miúdos)
   const FX_RAPIDO = {
-    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo', 'besourao', 'texugao', 'rochilo', 'lontrinha'],
-    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho', 'brasoleta', 'tesloura', 'casulucia', 'cinzarim'],
+    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo', 'besourao', 'texugao', 'rochilo', 'lontrinha', 'pimentao', 'cipochoque'],
+    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho', 'brasoleta', 'tesloura', 'casulucia', 'cinzarim', 'soprinho', 'voadorzinho', 'mentilha'],
   };
   Object.keys(FX_RAPIDO).forEach((fx) => FX_RAPIDO[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.rapido.fx = fx; }));
   Object.keys(FX_FORTE).forEach((fx) => FX_FORTE[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.forte.fx = fx; }));
@@ -258,8 +267,8 @@
   Object.assign(FAMILIAS.pedra, { traco: 'Casca: ' + Math.round((1 - TRACO.pedra.dano) * 100) + '% menos dano recebido e ' + Math.round((TRACO.pedra.cd - 1) * 100) + '% mais recarga' }); Object.assign(FAMILIAS.dragao, { traco: 'Escamas: ' + Math.round((1 - TRACO.dragao.forte) * 100) + '% menos dano de golpes fortes e +' + Math.round((TRACO.dragao.ult - 1) * 100) + '% no ultimate' });
   Object.assign(FAMILIAS.psiquico, { traco: 'Mente: os status duram ' + Math.round((1 - TRACO.psiquico) * 100) + '% menos nele' }); Object.assign(FAMILIAS.aquatico, { traco: 'Fluido: +' + Math.round((TRACO.aquatico - 1) * 100) + '% de vida' });
   const FAMILIA_DE = {
-    fera: ['fagulhao', 'chamuscao', 'faiscao', 'trovinho', 'zapinho', 'pavio', 'taupino', 'texugao', 'lontrinha'], ave: ['ventinho', 'plumelho', 'raiomante', 'cinzarim'], inseto: ['lampiro', 'brasoleta', 'besourao', 'casulucia', 'tesloura'], planta: ['brotinho', 'musgarra', 'algazinho', 'tatufungo'],
-    pedra: ['vulcanejo', 'pedrinho', 'rochilo', 'cristalino'], dragao: ['brasinha'], psiquico: ['nuvelino', 'redemoinha', 'pipinha'], aquatico: ['mareal', 'pingolino', 'coraline', 'bolhudo'],
+    fera: ['fagulhao', 'chamuscao', 'faiscao', 'trovinho', 'zapinho', 'pavio', 'taupino', 'texugao', 'lontrinha'], ave: ['ventinho', 'plumelho', 'raiomante', 'cinzarim', 'avestruzinho'], inseto: ['lampiro', 'brasoleta', 'besourao', 'casulucia', 'tesloura'], planta: ['brotinho', 'musgarra', 'algazinho', 'tatufungo', 'pimentao', 'soprinho', 'cipochoque'],
+    pedra: ['vulcanejo', 'pedrinho', 'rochilo', 'cristalino'], dragao: ['brasinha'], psiquico: ['nuvelino', 'redemoinha', 'pipinha', 'medusonho', 'cogumenta', 'mentilha'], aquatico: ['mareal', 'pingolino', 'coraline', 'bolhudo', 'voadorzinho', 'peixebrasa'],
   };
   Object.entries(FAMILIA_DE).forEach(([f, ids]) => ids.forEach((id) => { MONSTROS.find((m) => m.id === id).familia = f; })); // as formas evoluídas herdam (evoluida copia o monstro)
   const PESO_RARIDADE = { comum: 1, incomum: 0.6, rara: 0.3, lendaria: 0.05, mitica: 0.06 }; // chance relativa de aparecer como selvagem no mundo
@@ -551,6 +560,7 @@
   ];
   // Evolução (Fase D): ao chegar no nível indicado, a forma base vira a evoluída (mesmos golpes, mais vida e ataque). Só 4 linhas por enquanto.
   const EVOLUCOES = {
+    pimentao: { id: 'chilibrasa', nome: 'Chilibrasa', nv: 16 }, soprinho: { id: 'dentevento', nome: 'Dentevento', nv: 16 }, cipochoque: { id: 'cipotrovao', nome: 'Cipótrovão', nv: 16 }, medusonho: { id: 'medusalma', nome: 'Medusalma', nv: 16 }, cogumenta: { id: 'cogumentor', nome: 'Cogumentor', nv: 16 }, mentilha: { id: 'mentilhante', nome: 'Mentilhante', nv: 16 }, voadorzinho: { id: 'voadorao', nome: 'Voadorão', nv: 16 }, peixebrasa: { id: 'brasamarao', nome: 'Brasamarão', nv: 16 }, avestruzinho: { id: 'avestruzao', nome: 'Avestruzão', nv: 16 }, 
     fagulhao: { id: 'labaredo', nome: 'Labaredo', nv: 16 }, mareal: { id: 'oceanico', nome: 'Oceânico', nv: 16 },
     brotinho: { id: 'carvalhinho', nome: 'Carvalhinho', nv: 16 }, faiscao: { id: 'faiscante', nome: 'Faiscante', nv: 16 },
     chamuscao: { id: 'carvaoreal', nome: 'Carvão Real', nv: 16 }, pingolino: { id: 'pingueiroimperial', nome: 'Pingueiro Imperial', nv: 16 }, musgarra: { id: 'musgarrao', nome: 'Musgarrão', nv: 16 },
@@ -631,7 +641,7 @@
     { id: 'vlad', nome: 'Treinador Vlad', nivel: 5, evo: true, time: ['fagulhao', 'mareal', 'brotinho'], frase: 'A chave tem dono.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura'], mon: [null, 'corpo', 'ultimo'] } },
     // W6 (PLANO-fases.md; PROPOSTOS): Praia, Farol e Ginásio da Pedra (Guto, 4º ginásio). Nomes de até 5 letras.
     { id: 'dani', nome: 'Treinadora Dani', nivel: 4, time: ['bolhudo', 'algazinho', 'pipinha'], frase: 'O mar traz de tudo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
-    { id: 'lipe', nome: 'Treinador Lipe', nivel: 4, time: ['coraline', 'pingolino', 'plumelho'], frase: 'Pega onda ou pega areia.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
+    { id: 'lipe', nome: 'Treinador Lipe', nivel: 4, time: ['coraline', 'pingolino', 'plumelho'], frase: 'Pega onda ou pega areia.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'rosa', nome: 'Treinadora Rosa', nivel: 4, time: ['mareal', 'taupino', 'bolhudo'], frase: 'Cuidado com os caranguejos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, null, 'folego'] } },
     { id: 'edu', nome: 'Treinador Edu', nivel: 4, time: ['coraline', 'mareal', 'pedrinho'], frase: 'Maré cheia!', pol: POL('equilibrado', 'forte', 'pronto', true, 0), tal: { time: ['arco', 'reserva'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'jair', nome: 'Treinador Jair', nivel: 4, time: ['ventinho', 'nuvelino', 'algazinho'], frase: 'Sou o guardião da luz.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
@@ -641,7 +651,7 @@
     { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['taupino', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
     { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['tatufungo'], time: ['pedrinho', 'brotinho', 'tatufungo'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', false, 0), tal: { time: [], mon: [null, null, null] } },
     // Floresta Oculta: andam pela clareira, times só de evoluídos (por isso nível 5 e dois talentos de time)
-    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'escudo_ini', 'recarga'], mon: ['ultimo', 'pele_grossa', 'espinhos'] } },
+    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'recarga'], mon: ['ultimo', 'pele_grossa', 'espinhos'] } },
     { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'aurora', nome: 'Mestra Aurora', nivel: 5, time: ['faiscao', 'mareal', 'brotinho'], frase: 'Mostre o que aprendeu.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate'], mon: ['espinhos', 'corpo', 'folego'] } },

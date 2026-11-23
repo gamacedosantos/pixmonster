@@ -2,223 +2,681 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PixMonster: Wiki</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1621">
+<title>PixMonster · Wiki Oficial</title>
 <style>
-  @font-face { font-family: 'Pixelify Sans'; src: url(fonts/pixelify-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
-  :root { color-scheme: dark; }
-  body { margin: 0; background: #14110f; color: #e8f1ff; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 700; line-height: 1.35; }
-  main { max-width: 640px; margin: 0 auto; padding: 10px 12px 40px; }
-  h1 { margin: 6px 0 2px; font-size: 28px; color: #ffd35a; text-shadow: 0 2px 0 #14285a; }
-  h2 { margin: 22px 0 6px; font-size: 20px; color: #ffd35a; border-bottom: 2px solid #3a5ea6; padding-bottom: 3px; }
-  h3 { margin: 12px 0 4px; font-size: 16px; color: #8fd0ff; }
-  p, li { font-size: 15px; color: #cfdcff; }
-  ul { padding-left: 20px; margin: 4px 0; }
-  a { color: #ffd35a; }
-  .caixa { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px 12px; box-shadow: inset 0 0 0 4px #14285a; margin-top: 8px; }
-  .tabela { overflow-x: auto; margin-top: 6px; }
-  table { border-collapse: collapse; width: 100%; font-size: 13px; background: #0f2147; border-radius: 8px; overflow: hidden; }
-  th, td { padding: 5px 7px; border-bottom: 1px solid #24417f; text-align: left; white-space: nowrap; }
-  th { background: #16306a; color: #ffd35a; }
-  .el { display: inline-block; padding: 0 8px; border-radius: 10px; color: #1b1020; border: 1px solid #ffffff55; }
-  .nota { font-size: 13px; color: #8fb0ff; }
-  .topo { display: flex; justify-content: space-between; align-items: center; }
-  .roda { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0; font-size: 15px; }
-  .bom { color: #6fd66f; } .ruim { color: #ff7a6a; }
-  #tabLoja td, #tabGanho td { white-space: normal; }
-  .nav { margin: 2px 0 6px; font-size: 14px; } .nav a { margin-right: 10px; }
-  .dex { display: grid; gap: 10px; margin-top: 8px; }
-  .dexc { background: #1b3366; border: 2px solid #3a5ea6; border-radius: 12px; padding: 10px; box-shadow: inset 0 0 0 3px #14285a; }
-  .dexc.evo { border-color: #ffd35a; }
-  .dexc .cab { display: flex; gap: 10px; align-items: center; }
-  .dexc .cab img { width: 96px; height: 96px; image-rendering: pixelated; background: #0f2147; border-radius: 10px; flex: none; }
-  .dexc .cab h3 { margin: 0 0 4px; font-size: 20px; color: #ffd35a; }
-  .dexc .cab p { margin: 4px 0 0; font-size: 13px; }
-  .dexc .num { font-size: 12px; color: #8fb0ff; }
-  .dexc .poderes { width: 100%; margin-top: 8px; }
-  .dexc .poderes td { white-space: normal; }
-  .dexc .linha { font-size: 13px; margin: 6px 0 0; }
-  .dexc .evol { display: flex; align-items: center; gap: 8px; margin-top: 8px; background: #14285a; border-radius: 10px; padding: 6px 8px; font-size: 13px; }
-  .dexc .evol img { width: 48px; height: 48px; image-rendering: pixelated; flex: none; }
+  :root {
+    color-scheme: dark;
+    --tg-bg: #0e1621;
+    --tg-panel: #17212b;
+    --tg-hover: #202b36;
+    --tg-in: #182533;
+    --tg-out: #2b5278;
+    --tg-blue: #5eb5f7;
+    --tg-green: #00a884;
+    --tg-gold: #f5c451;
+    --tg-danger: #eb5757;
+    --tg-text: #f5f5f5;
+    --tg-muted: #8a9aa9;
+    --tg-border: rgba(255, 255, 255, 0.08);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--tg-bg);
+    background-image: radial-gradient(rgba(94, 181, 247, 0.045) 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: var(--tg-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    line-height: 1.42;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.modal-open { overflow: hidden; }
+  .lucide { display: inline-block; vertical-align: middle; flex: none; }
+  button { font: inherit; color: inherit; }
+
+  /* Cabeçalho + Busca Global + Abas 100% visíveis em um único topo sticky */
+  .wiki-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(23, 33, 43, 0.97);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--tg-border);
+    padding: calc(env(safe-area-inset-top) + 8px) 10px 8px;
+  }
+  .wiki-topbar-in {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tg-header-row { display: flex; align-items: center; gap: 8px; }
+  .tg-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: 16px;
+    background: var(--tg-hover);
+    border: 1px solid rgba(94, 181, 247, 0.28);
+    color: var(--tg-blue);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    flex: none;
+  }
+  .tg-back:hover { background: #293847; }
+  .tg-hav {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2b5278, #1b3b5c);
+    color: #fff;
+    border: 1px solid rgba(94, 181, 247, 0.4);
+  }
+  .tg-titlebox { flex: 1; min-width: 0; }
+  .tg-titlebox h1 { margin: 0; font-size: 15px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tg-titlebox span { display: block; font-size: 11px; color: var(--tg-blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Busca Global */
+  .global-search {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--tg-bg);
+    border: 1px solid rgba(94, 181, 247, 0.3);
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: var(--tg-muted);
+  }
+  .global-search:focus-within { border-color: var(--tg-blue); box-shadow: 0 0 0 2px rgba(94, 181, 247, 0.16); }
+  .global-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+  }
+  .global-search input::placeholder { color: var(--tg-muted); }
+  .clear-btn {
+    border: 0;
+    background: var(--tg-hover);
+    color: var(--tg-muted);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+  .clear-btn[hidden] { display: none; }
+  .clear-btn:hover { color: #fff; }
+
+  /* Grade de 5 Abas sem corte lateral no 390px */
+  .wiki-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+  .wiki-tab {
+    min-width: 0;
+    padding: 6px 2px;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(14, 22, 33, 0.65);
+    color: var(--tg-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .wiki-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .wiki-tab:hover { background: var(--tg-hover); color: #fff; }
+  .wiki-tab.sel {
+    background: var(--tg-out);
+    border-color: rgba(94, 181, 247, 0.5);
+    color: #fff;
+  }
+  .wiki-tab.sel svg { color: var(--tg-blue); }
+
+  main {
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px 10px 44px;
+    overflow-x: clip;
+  }
+
+  /* Painel de resultados da Busca Global */
+  .search-panel { display: flex; flex-direction: column; gap: 10px; }
+  .search-panel[hidden] { display: none; }
+  .search-group { background: var(--tg-in); border: 1px solid var(--tg-border); border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; }
+  .search-group h3 { margin: 0; font-size: 12.5px; font-weight: 800; color: var(--tg-blue); display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.3px; }
+  .sr-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 11px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-panel);
+    text-align: left;
+    cursor: pointer;
+  }
+  .sr-item:hover { background: var(--tg-hover); border-color: rgba(94, 181, 247, 0.35); }
+  .sr-item img { width: 38px; height: 38px; image-rendering: pixelated; background: var(--tg-bg); border-radius: 9px; flex: none; padding: 2px; }
+  .sr-body { flex: 1; min-width: 0; }
+  .sr-body b { display: block; font-size: 13px; color: #fff; }
+  .sr-body small { display: block; font-size: 11.5px; color: var(--tg-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Seções principais */
+  .wiki-sec { display: flex; flex-direction: column; gap: 10px; }
+  .wiki-sec[hidden] { display: none; }
+  .cartao {
+    background: var(--tg-in);
+    border: 1px solid var(--tg-border);
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.24);
+    min-width: 0;
+  }
+  .cartao h2 { margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--tg-blue); display: flex; align-items: center; gap: 7px; }
+  .cartao h3.sub { margin: 12px 0 6px; font-size: 13px; font-weight: 800; color: #e8f1ff; display: flex; align-items: center; gap: 6px; }
+  .cartao p { margin: 4px 0; font-size: 13px; color: #d5e2ee; }
+  .nota { font-size: 12px; color: var(--tg-muted); }
+  .bom { color: #36e2b4; font-weight: 700; }
+  .ruim { color: #ff7a6a; font-weight: 700; }
+
+  /* Pílulas de elemento, família e filtros */
+  .el {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 7px;
+    border-radius: 9px;
+    color: #0b141e;
+    font-size: 10.5px;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    white-space: nowrap;
+  }
+  .fam-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 7px;
+    border-radius: 9px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(14, 22, 33, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #e8f1ff;
+    white-space: nowrap;
+  }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .f-pill {
+    padding: 5px 9px;
+    border-radius: 12px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-panel);
+    color: var(--tg-muted);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .f-pill:hover { background: var(--tg-hover); color: #fff; }
+  .f-pill.sel { background: var(--tg-out); border-color: var(--tg-blue); color: #fff; }
+  .ord-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px; padding-top: 2px; }
+  .dex-count { font-size: 11.5px; font-weight: 800; color: var(--tg-blue); }
+
+  /* Catálogo Visual Compacto de Monstros */
+  .dex-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  @media (min-width: 560px) { .dex-grid { grid-template-columns: repeat(3, 1fr); } }
+  .mcard {
+    background: var(--tg-panel);
+    border: 1px solid var(--tg-border);
+    border-radius: 14px;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    cursor: pointer;
+    min-width: 0;
+    transition: border-color .12s, transform .1s, background .12s;
+  }
+  .mcard:hover { background: var(--tg-hover); border-color: rgba(94, 181, 247, 0.45); transform: translateY(-1px); }
+  .mcard-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 10.5px; color: var(--tg-muted); font-weight: 700; }
+  .rar-dot { padding: 1px 5px; border-radius: 6px; font-size: 9.5px; font-weight: 800; background: rgba(245, 196, 81, 0.16); color: var(--tg-gold); border: 1px solid rgba(245, 196, 81, 0.35); }
+  .mcard-mid { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .mcard-sp {
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+    background: var(--tg-bg);
+    border: 1px solid var(--tg-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mcard-sp img { width: 60px; height: 60px; image-rendering: pixelated; }
+  .mcard-name { font-size: 14px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .mcard-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+  .mcard-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #c8dff5;
+    background: rgba(14, 22, 33, 0.55);
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+  .mcard-evo {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10.5px;
+    color: var(--tg-muted);
+    background: rgba(14, 22, 33, 0.45);
+    border-radius: 8px;
+    padding: 4px 6px;
+    min-height: 28px;
+  }
+  .mcard-evo img { width: 20px; height: 20px; image-rendering: pixelated; flex: none; }
+  .mcard-evo span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Modal de Ficha Completa */
+  .modal-back {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(6, 10, 16, 0.84);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+  .modal-back[hidden] { display: none; }
+  .modal-card {
+    width: 100%;
+    max-width: 520px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    background: var(--tg-panel);
+    border: 1px solid rgba(94, 181, 247, 0.4);
+    border-radius: 18px;
+    padding: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.65);
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--tg-border); }
+  .modal-head h3 { margin: 0; font-size: 17px; color: #fff; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .modal-x {
+    padding: 6px 10px;
+    border-radius: 14px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-hover);
+    color: var(--tg-text);
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    flex: none;
+  }
+  .estagios-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .est-btn {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 11px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-bg);
+    color: var(--tg-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 0;
+  }
+  .est-btn img { width: 26px; height: 26px; image-rendering: pixelated; flex: none; }
+  .est-btn span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .est-btn.sel { background: var(--tg-out); border-color: var(--tg-blue); color: #fff; }
+  .modal-hero { display: flex; gap: 12px; align-items: flex-start; }
+  .modal-sp { width: 88px; height: 88px; border-radius: 16px; background: var(--tg-bg); border: 1px solid var(--tg-border); display: flex; align-items: center; justify-content: center; flex: none; }
+  .modal-sp img { width: 78px; height: 78px; image-rendering: pixelated; }
+  .fam-box {
+    background: rgba(14, 22, 33, 0.7);
+    border: 1px solid var(--tg-border);
+    border-left: 3px solid var(--tg-blue);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: #d5e2ee;
+  }
+  .fam-box b { color: #fff; }
+  .dex-stats { display: grid; gap: 6px; background: rgba(14, 22, 33, 0.55); border: 1px solid var(--tg-border); border-radius: 11px; padding: 9px 10px; }
+  .sbar { display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 8px; font-size: 11.5px; }
+  .sbar span { color: var(--tg-muted); font-weight: 700; }
+  .sbar .trilho { height: 7px; background: #0b1118; border-radius: 4px; overflow: hidden; }
+  .sbar .trilho i { display: block; height: 100%; border-radius: 4px; }
+  .sbar b { color: #e8f1ff; white-space: nowrap; }
+  .golpes-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  @media (min-width: 480px) { .golpes-grid { grid-template-columns: 1fr 1fr; } }
+  .gcard { background: var(--tg-bg); border: 1px solid var(--tg-border); border-radius: 11px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }
+  .gcard-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .gslot { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: var(--tg-blue); }
+  .gcard b { font-size: 13px; color: #fff; }
+  .gstats { font-size: 11.5px; color: #c8dff5; }
+  .gstatus { font-size: 11px; color: var(--tg-gold); font-weight: 700; }
+
+  /* Cards de Combate, Famílias, Talentos, Treinadores e Mundo */
+  .cards-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 8px; }
+  @media (min-width: 520px) { .cards-grid.dois { grid-template-columns: repeat(2, 1fr); } }
+  .wcard { background: var(--tg-panel); border: 1px solid var(--tg-border); border-radius: 12px; padding: 10px 11px; display: flex; flex-direction: column; gap: 6px; }
+  .wcard-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .wcard-head b { font-size: 13.5px; color: #fff; }
+  .custo-badge { padding: 2px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 800; background: rgba(245, 196, 81, 0.16); color: var(--tg-gold); border: 1px solid rgba(245, 196, 81, 0.35); white-space: nowrap; }
+  .ramo-badge { padding: 2px 7px; border-radius: 9px; font-size: 10.5px; font-weight: 700; background: rgba(94, 181, 247, 0.12); color: var(--tg-blue); white-space: nowrap; }
+  .roda { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 6px 0; padding: 8px 10px; background: var(--tg-panel); border: 1px solid var(--tg-border); border-radius: 11px; font-size: 12px; }
+
+  /* Chips de monstros clicáveis dentro de Famílias e Treinadores */
+  .mon-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .mon-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px 4px 5px;
+    border-radius: 10px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-bg);
+    color: #e8f1ff;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .mon-chip-btn:hover { background: var(--tg-hover); border-color: var(--tg-blue); }
+  .mon-chip-btn img { width: 24px; height: 24px; image-rendering: pixelated; }
+
+  /* Cards de Treinadores (3 slots de sprites sem cortar texto) */
+  .trein-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 2px; }
+  .trein-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    border-radius: 10px;
+    border: 1px solid var(--tg-border);
+    background: var(--tg-bg);
+    cursor: pointer;
+    min-width: 0;
+  }
+  .trein-slot:hover { border-color: var(--tg-blue); background: var(--tg-hover); }
+  .trein-slot img { width: 36px; height: 36px; image-rendering: pixelated; }
+  .trein-slot span { font-size: 11px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .ia-pills { display: flex; flex-wrap: wrap; gap: 4px; font-size: 10.5px; color: var(--tg-muted); }
+  .ia-pills span { padding: 2px 7px; border-radius: 8px; background: rgba(14, 22, 33, 0.65); border: 1px solid var(--tg-border); }
+
+  .cap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; margin-top: 6px; }
+  @media (min-width: 520px) { .cap-grid { grid-template-columns: repeat(4, 1fr); } }
+  .cap-box { background: var(--tg-panel); border: 1px solid var(--tg-border); border-radius: 11px; padding: 8px; text-align: center; }
+  .cap-box b { display: block; font-size: 12px; color: var(--tg-muted); margin-bottom: 3px; }
+  .cap-box span { display: block; font-size: 14px; font-weight: 800; color: #36e2b4; }
+  .cap-box small { display: block; font-size: 11px; color: var(--tg-gold); margin-top: 2px; }
+
+  .flash-hi { animation: flashHi 1.6s ease; }
+  @keyframes flashHi {
+    0% { box-shadow: 0 0 0 2px var(--tg-blue), 0 0 18px rgba(94, 181, 247, 0.5); }
+    100% { box-shadow: none; }
+  }
+  .empty-box { text-align: center; padding: 18px; color: var(--tg-muted); font-size: 13px; background: var(--tg-panel); border: 1px dashed var(--tg-border); border-radius: 12px; }
 </style>
 </head>
 <body>
+
+<header class="wiki-topbar">
+  <div class="wiki-topbar-in">
+    <div class="tg-header-row">
+      <a class="tg-back" id="btnWikiVoltar" href="index.html" aria-label="Voltar ao jogo">Jogo</a>
+      <div class="tg-hav" id="wikiAvatar"></div>
+      <div class="tg-titlebox">
+        <h1>PixMonster · Wiki Oficial</h1>
+        <span id="wikiSub">carregando dados…</span>
+      </div>
+    </div>
+
+    <label class="global-search" aria-label="Buscar em toda a Wiki">
+      <span id="icoSearchGlobal"></span>
+      <input id="wikiBuscaGlobal" type="text" inputmode="search" placeholder="Buscar monstro, golpe, talento, treinador ou item...">
+      <button type="button" class="clear-btn" id="btnLimparBusca" aria-label="Limpar busca" hidden></button>
+    </label>
+
+    <nav class="wiki-tabs" id="wikiNav" aria-label="Seções da Wiki"></nav>
+  </div>
+</header>
+
 <main>
-  <div class="topo"><h1>PixMonster · Wiki</h1><a href="index.html">Voltar ao jogo</a></div>
-  <div class="nav"><a href="#pixdex">Pixdex</a><a href="#itens">Itens</a><a href="#capturar">Capturar e evoluir</a><a href="#elementos">Elementos</a><a href="#talentos">Talentos</a></div>
-  <p class="nota">Esta página é montada a partir dos números do próprio jogo (<code>battle.js</code>): se um valor mudar lá, ela muda junto.</p>
+  <!-- Resultados da Busca Global -->
+  <section class="search-panel" id="painelBuscaGlobal" hidden></section>
 
-  <h2>Como funciona a luta</h2>
-  <div class="caixa">
-    <ul>
-      <li><b>Time de 3:</b> você escolhe 3 monstros (sem repetir) e o adversário sorteia outros 3. Um monstro de cada lado fica em campo; quando ele cai, o próximo do time entra.</li>
-      <li><b>Quatro golpes:</b> forte, rápido, defesa e ultimate. Cada um tem a sua recarga, e os ataques passam por um tempo de carga (o anel que fecha) antes de acertar. O jogo é só automático: o seu time escolhe os golpes sozinho, pelas regras que você define.</li>
-      <li><b>Defesa:</b> evita 1 ataque dentro da janela de <span id="defDur"></span> s. Quando o adversário carrega um ataque forte, aparece um "!" e o time defende conforme a regra de defesa.</li>
-      <li><b>Trocar de monstro:</b> o time troca sozinho (regras de troca por desvantagem e vida baixa). A troca cancela a carga e a defesa, o novo monstro fica <span id="entraMs"></span> s sem agir, e só dá para trocar de novo depois de <span id="trocaCd"></span> s. Depois de um nocaute, você escolhe quem entra (se não escolher, entra o melhor contra o adversário).</li>
-      <li><b>O que descansa não recarrega:</b> as recargas e os status só correm para quem está em campo.</li>
-      <li><b>Crítico</b> (<span id="critCh"></span>% de chance, dano x<span id="critMu"></span>) e <b>esquiva</b> (<span id="esqCh"></span>%): sorteados em cada golpe.</li>
-      <li><b>Regras da luta:</b> você escolhe o estilo, quando defender, quando soltar o ultimate e quando trocar; o time cumpre as regras sozinho.</li>
-    </ul>
-  </div>
+  <!-- Aba 1: Monstros (Pixdex) -->
+  <section class="wiki-sec" data-sec="pixdex" id="sec-pixdex">
+    <div class="cartao" id="pixdex">
+      <h2 id="titPixdex">Catálogo de Monstros (Pixdex)</h2>
+      <p class="nota">Toque em qualquer Pixmon para abrir a ficha completa, ver o traço da família, os valores de golpe e alternar entre as evoluções.</p>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">
+        <div class="pill-row" id="dexFiltroEl"></div>
+        <div class="pill-row" id="dexFiltroFamilia"></div>
+        <div class="ord-row">
+          <div class="pill-row" id="dexOrdem"></div>
+          <span class="dex-count" id="dexContagem"></span>
+        </div>
+      </div>
+    </div>
+    <div class="dex-grid" id="dex"></div>
+    <div class="empty-box" id="dexVazio" hidden>Nenhum Pixmon encontrado com os filtros atuais.</div>
+  </section>
 
-  <h2 id="elementos">Elementos</h2>
-  <p>Cada elemento tem <b class="bom">vantagem</b> sobre um, <b class="ruim">desvantagem</b> contra outro e é <b>normal</b> contra os outros dois.</p>
-  <div class="caixa">
-    <div class="roda" id="roda"></div>
-    <p>Golpe com vantagem causa <b class="bom">x<span id="vant"></span></b> de dano; com desvantagem, <b class="ruim">x<span id="desv"></span></b>; nos outros casos, x1. O ultimate de cada monstro é de <i>outro</i> elemento, para cobrir a fraqueza do próprio monstro.</p>
-  </div>
-  <h3>Força de cada elemento</h3>
-  <p>De propósito, os elementos não são iguais: uns batem mais forte, outros aguentam mais. Todos os monstros têm o mesmo nível (<span id="nivel"></span>) e o mesmo ataque base; o que muda é o elemento, o ritmo e os golpes.</p>
-  <div class="tabela"><table id="tabEl"></table></div>
+  <!-- Aba 2: Combate, Elementos & Famílias -->
+  <section class="wiki-sec" data-sec="combate" id="sec-combate" hidden>
+    <div class="cartao">
+      <h2 id="titLuta">Como funciona a luta automática</h2>
+      <div class="cards-grid dois" id="gridRegrasLuta"></div>
+    </div>
 
-  <h2>Cenários</h2>
-  <p>Cada cenário favorece um elemento: os monstros desse elemento causam <b class="bom">+<span id="bonusBioma"></span>%</b> de dano lá. O cenário aparece em uma faixa no alto da arena. Na tela de escolha dá para fixar o cenário ou deixar no sorteio. A Vila (com a casa e a fumaça da chaminé) favorece o Fogo.</p>
-  <div class="tabela"><table id="tabBioma"></table></div>
+    <div class="cartao" id="elementos">
+      <h2 id="titEl">Elementos &amp; Cenários (+<span id="bonusBioma"></span>%)</h2>
+      <p>Cada elemento tem vantagem (<b class="bom">x<span id="vant"></span></b>) e fraqueza (<b class="ruim">x<span id="desv"></span></b>). Toque em um elemento para ver seus monstros.</p>
+      <div class="roda" id="roda"></div>
+      <div class="cards-grid dois" id="gridElementos"></div>
+    </div>
 
-  <h2>Status</h2>
-  <p>Alguns golpes podem aplicar um status quando acertam (não acontece em golpe bloqueado ou esquivado). O ultimate aplica o status do elemento dele em <b id="ultSt"></b>% dos acertos.</p>
-  <div class="tabela"><table id="tabStatus"></table></div>
-  <div class="tabela"><table id="tabChance"></table></div>
+    <div class="cartao" id="familias">
+      <h2 id="titFamilias">As 8 Famílias (Traços Passivos)</h2>
+      <p class="nota">Todo Pixmon pertence a uma família com habilidade passiva própria na luta. Toque em um monstro para abrir a ficha.</p>
+      <div class="cards-grid" id="gridFamilias"></div>
+    </div>
 
-  <h2>Objetos quebráveis (na arena)</h2>
-  <p>Barris, caixotes e jarros espalhados pela arena quebram quando uma investida, um projétil ou um impacto passa por perto. Quem quebra leva um sorteio:</p>
-  <div class="tabela"><table id="tabItens"></table></div>
+    <div class="cartao">
+      <h2 id="titStatus">Status Negativos &amp; Arena</h2>
+      <p class="nota">Golpes bloqueados ou esquivados não aplicam status. Ultimates têm <b id="ultSt"></b>% de chance de aplicar o status do seu elemento.</p>
+      <div class="cards-grid dois" id="gridStatus"></div>
+      <h3 class="sub" id="subQuebraveis">Objetos quebráveis na arena</h3>
+      <div class="cards-grid dois" id="gridQuebraveis"></div>
+    </div>
+  </section>
 
-  <h2 id="talentos">Talentos</h2>
-  <p>Antes da luta, o time gasta <b id="orc"></b> pontos em <b>talentos do time</b> (valem para os 3 monstros) e cada monstro leva <b>1 talento próprio</b>, grátis. O adversário recebe talentos sorteados. Os bônus são pequenos de propósito: o que decide é a combinação com o time e o cenário.</p>
-  <h3>Talentos do time</h3>
-  <div class="tabela"><table id="tabTalTime"></table></div>
-  <h3>Talentos do monstro</h3>
-  <div class="tabela"><table id="tabTalMon"></table></div>
+  <!-- Aba 3: Talentos -->
+  <section class="wiki-sec" data-sec="talentos" id="sec-talentos" hidden>
+    <div class="cartao" id="talentos">
+      <h2 id="titTal">Talentos, Tática (IA) e Passivas</h2>
+      <p>Na Luta Rápida e Área de Treino você usa <b>26 pontos</b> livres. No Torneio começa em <b>4 pts</b> e no Mundo o limite cresce com batalhas e insígnias.</p>
+      <div class="pill-row" id="subTabsTalentos" style="margin-top:8px"></div>
+    </div>
+    <div id="talConteudo"></div>
+  </section>
 
-  <h2>Torneio</h2>
-  <p>Cinco lutas seguidas contra adversários cada vez melhores, com <b id="tVidas"></b> vidas. No torneio os talentos começam <b>travados</b> (só os iniciais estão liberados) e o orçamento começa em <b id="tOrc"></b> pontos. Cada vitória deixa escolher <b>1 de 3 prêmios</b>: um talento novo (do time ou de monstro) ou <b>+1 ponto</b> de orçamento (até +<span id="tMax"></span>). O time é escolhido na primeira luta e não muda; os talentos e as regras do automático podem ser ajustados entre as lutas. Perder uma luta custa 1 vida (você tenta a fase de novo); sem vidas, o torneio acaba.</p>
-  <p><b>A vida do time vai de uma luta para a outra</b>: depois de cada vitória, cada monstro vivo recupera <span id="tCura"></span>% e os caídos voltam com <span id="tRev"></span>%; o prêmio <b>Descanso completo</b> devolve toda a vida. Ao tentar uma fase de novo, o time volta à vida de antes da luta. O chefe (fase 5) tem talentos fixos além dos sorteados.</p>
-  <div class="tabela"><table id="tabTorneio"></table></div>
-  <h3>Dificuldade</h3>
-  <div class="tabela"><table id="tabDif"></table></div>
-  <p class="nota">Talentos iniciais: <span id="tIni"></span>. Nas fases 4 e 5, cada vaga do adversário tem 20% de chance de ser o monstro com vantagem sobre um dos seus.</p>
+  <!-- Aba 4: Treinadores & Copa -->
+  <section class="wiki-sec" data-sec="modos" id="sec-modos" hidden>
+    <div class="cartao" id="torneio">
+      <h2 id="titTorneio">Copa de 5 Fases (Torneio)</h2>
+      <p id="resumoTorneio"></p>
+      <h3 class="sub">Dificuldades</h3>
+      <div class="cards-grid dois" id="cardsDifTorneio"></div>
+      <h3 class="sub">Os 5 Campeões</h3>
+      <div class="cards-grid" id="cardsTorneio"></div>
+    </div>
 
-  <h2>Treinadores e insígnias</h2>
-  <p>Na aba <b>Treinadores</b> há 15 treinadores em 5 níveis. Cada um tem o seu time, o seu jeito de jogar e talentos fixos. Os 3 do nível 1 estão liberados; os outros níveis pedem uma <b>insígnia</b>. A <b>primeira vitória</b> contra um treinador dá <b>10 x o nível</b> em pontos; repetir a vitória dá <b>3</b>. Os pontos compram as insígnias, em ordem.</p>
-  <div class="tabela"><table id="tabIns"></table></div>
-  <div class="tabela"><table id="tabTrein"></table></div>
+    <div class="cartao" id="treinadores">
+      <h2 id="titTreinadores">Desafiar Treinadores &amp; Insígnias</h2>
+      <p>São <b id="nTreinWiki"></b> treinadores em 5 níveis. A 1ª vitória dá <b>10 × nível</b> pts (revanche dá 3 pts) para desbloquear as insígnias:</p>
+      <div class="cards-grid dois" id="cardsInsignias"></div>
+      <h3 class="sub">Filtrar Treinadores por Nível</h3>
+      <div class="pill-row" id="wikiFiltroTrein" style="margin-top:4px"></div>
+    </div>
+    <div class="cards-grid" id="cardsTreinadores"></div>
+  </section>
 
-  <h2 id="itens">Itens</h2>
-  <p>No modo <b>Explorar o mundo</b> você começa com <b id="iDin"></b> moedas, <b id="iEsf"></b> esferas e <b id="iPoc"></b> poções. Os itens ficam na mochila e são usados na luta (Esfera e Poção) pelos botões embaixo do time.</p>
-  <h3>Mercado do Vovô (Vila)</h3>
-  <p>Pise na entrada da casa do <b>MERCADO</b>, na Vila. O vovô sempre cumprimenta com "Bom dia!", "Boa tarde!" ou "Boa noite!".</p>
-  <div class="tabela"><table id="tabLoja"></table></div>
-  <h3>Como ganhar</h3>
-  <div class="tabela"><table id="tabGanho"></table></div>
-  <p class="nota">Itens de teste e valores podem mudar enquanto o jogo é um protótipo.</p>
+  <!-- Aba 5: Mundo, Captura & Evolução -->
+  <section class="wiki-sec" data-sec="mundo" id="sec-mundo" hidden>
+    <div class="cartao" id="itens">
+      <h2 id="titMundo">Explorar o Mundo (RPG) &amp; Mercado</h2>
+      <p id="resumoMochila"></p>
+      <div class="cards-grid dois" id="cardsLoja"></div>
+      <h3 class="sub">Como ganhar moedas, esferas e insígnias</h3>
+      <div class="cards-grid" id="cardsGanhoMundo"></div>
+    </div>
 
-  <h2 id="capturar">Capturar e evoluir</h2>
-  <h3>Captura</h3>
-  <ul>
-    <li>Use uma <b>Esfera</b> num selvagem durante a luta. Chance de captura: <b id="cBase"></b>% + <b id="cFalta"></b>% x a vida que ele já perdeu (máximo <b id="cMax"></b>%). Esfera Forte soma <b id="cForte"></b> pontos.</li>
-    <li>Se a esfera falha, ela se perde. Treinadores não podem ser capturados.</li>
-    <li>Os monstros capturados ficam na coleção. Na tela <b>Equipe</b> você escolhe de 1 a 3 para lutar. Os outros ficam na caixa.</li>
-    <li>Capturar um monstro que você já tem vira XP extra, mas se o capturado estiver <b>evoluído</b> e o seu não, o seu evolui.</li>
-  </ul>
-  <h3>Nível e XP</h3>
-  <ul>
-    <li>Todo monstro nasce no nível 10 como referência de status: <b id="nBonus"></b>% de vida e ataque por nível acima ou abaixo de 10.</li>
-    <li>O selvagem tem o nível médio da sua equipe (com 1 a mais ou a menos). Treinadores sobem de nível junto com o seu time.</li>
-    <li>Vencer um selvagem dá <b>8 x nível</b> de XP (capturar dá 60% disso). Vencer um treinador dá <b>12 x nível</b>. Para subir de nível são necessários <b>15 x nível atual</b> de XP.</li>
-  </ul>
-  <h3>Evolução</h3>
-  <ul>
-    <li><b>No meio da luta:</b> quando o seu monstro cai abaixo de <b id="eHp"></b>% da vida, ele tem <b id="eCh"></b>% de chance de evoluir (uma tentativa por monstro por luta). Ele entra na forma nova com pelo menos metade da vida e <b>continua evoluído depois</b>.</li>
-    <li><b>Depois da luta:</b> ao chegar no nível <b id="eNv"></b>, evolui sozinho.</li>
-    <li>A forma evoluída tem os mesmos golpes, <b id="eBHp"></b>% a mais de vida e <b id="eBAt"></b>% a mais de ataque.</li>
-    <li><b>Selvagens evoluídos:</b> os monstros que já têm evolução aparecem evoluídos em cerca de <b id="eSelv"></b>% dos encontros. Dá para capturar e jogar com eles.</li>
-    <li>Todas as 20 espécies já evoluem (veja o Pixdex abaixo).</li>
-  </ul>
-
-  <h2 id="pixdex">Pixdex</h2>
-  <p>A enciclopédia dos pixmonstros. Cada cartão mostra o monstro, seus quatro poderes, o que ele vence e o que o vence, onde ele é mais forte e a evolução.</p>
-  <div class="dex" id="dex"></div>
-  <h3>Tabela comparativa</h3>
-  <div class="tabela"><table id="tabMon"></table></div>
-  <p class="nota">Ritmo: recarga e carga em relação ao padrão (menor = mais rápido). Quem recarrega devagar bate mais forte em cada golpe.</p>
-
-  <h2>Dicas</h2>
-  <div class="caixa"><ul>
-    <li>Monte o time para cobrir as fraquezas: se um monstro leva vantagem do adversário, troque por um que tenha vantagem contra ele.</li>
-    <li>Escolha o cenário a seu favor (ou jogue com um monstro do elemento do cenário sorteado).</li>
-    <li>Defenda quando aparecer o "!", e guarde a troca para quando levar vantagem do adversário: ela tem espera longa.</li>
-    <li>Stun cancela a carga do adversário; paralisia o impede de defender.</li>
-  </ul></div>
+    <div class="cartao" id="capturar">
+      <h2 id="titCap">Chance de Captura, Nível e Evolução</h2>
+      <p>Fórmula contra selvagens: <b id="cBase"></b>% + <b id="cFalta"></b>% × vida perdida (máx. <b id="cMax"></b>%). A <b>Esfera Forte</b> soma +<b id="cForte"></b> pontos.</p>
+      <div class="cap-grid" id="gridCaptura"></div>
+      <div class="cards-grid" id="cardsXpEvo" style="margin-top:10px"></div>
+    </div>
+  </section>
 </main>
+
+<!-- Modal da Ficha Completa -->
+<div class="modal-back" id="modalMonstro" hidden role="dialog" aria-modal="true" aria-labelledby="modalTit">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="modalTit"></h3>
+      <button type="button" class="modal-x" id="fecharModalMonstro">Fechar</button>
+    </div>
+    <div class="estagios-row" id="modalEstagios"></div>
+    <div class="modal-hero">
+      <div class="modal-sp"><img id="modalImg" alt=""></div>
+      <div style="flex:1;min-width:0">
+        <div class="pill-row" id="modalTags"></div>
+        <p id="modalDesc" style="margin:6px 0 0;font-size:12.5px;color:#d5e2ee"></p>
+      </div>
+    </div>
+    <div class="fam-box" id="modalFamiliaBox"></div>
+    <div class="dex-stats" id="modalStats"></div>
+    <div class="pill-row" id="modalMatch"></div>
+    <div>
+      <div style="font-size:12px;font-weight:800;color:var(--tg-blue);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px">Os 4 Poderes (Nível <span id="modalNvRef">10</span>)</div>
+      <div class="golpes-grid" id="modalGolpes"></div>
+    </div>
+  </div>
+</div>
+
 <script src="battle.js"></script>
 <script>
 (function () {
   const B = window.PixmonBatalha, $ = (id) => document.getElementById(id);
+
+  // Ícones SVG inline do Lucide Icons (sem dependência externa)
+  const LUCIDE = {
+    'arrow-left': '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+    'book-open': '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+    sparkles: '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+    swords: '<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/>',
+    'git-branch': '<line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/>',
+    trophy: '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+    compass: '<path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/>',
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+    flame: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+    droplets: '<path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/>',
+    mountain: '<path d="m8 3 4 8 5-5 5 15H2L8 3z"/>',
+    wind: '<path d="M12.8 19.6A2 2 0 1 0 14 16H2"/><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"/><path d="M9.8 4.4A2 2 0 1 1 11 8H2"/>',
+    zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+    shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    award: '<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>',
+    target: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+    layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  };
+  const L = (nome, tam = 15) => '<svg viewBox="0 0 24 24" width="' + tam + '" height="' + tam + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide" aria-hidden="true">' + (LUCIDE[nome] || '') + '</svg>';
+  const EL_ICO = { fogo: 'flame', agua: 'droplets', terra: 'mountain', ar: 'wind', eletrico: 'zap' };
   const N = { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Eletricidade' };
   const COR = { fogo: '#ff9a3a', agua: '#5ab0ff', terra: '#c8a468', ar: '#cfe9ee', eletrico: '#ffe84a' };
-  const el = (t) => '<span class="el" style="background:' + COR[t] + '">' + N[t] + '</span>';
+  const IMG = (id) => 'sprites-pixellab/' + id + '-teste.png';
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const el = (t) => '<span class="el" style="background:' + COR[t] + '">' + L(EL_ICO[t], 10) + ' ' + N[t] + '</span>';
   const pct = (v) => Math.round((v - 1) * 100);
   const sinal = (v) => (v >= 1 ? '+' : '') + pct(v) + '%';
-  const tabela = (id, cab, linhas) => { $(id).innerHTML = '<tr>' + cab.map((c) => '<th>' + c + '</th>').join('') + '</tr>' + linhas.map((l) => '<tr>' + l.map((c) => '<td>' + c + '</td>').join('') + '</tr>').join(''); };
-  $('defDur').textContent = (B.BASE.defesa.dur / 1000).toFixed(1); $('entraMs').textContent = '0,6'; $('trocaCd').textContent = B.TROCA_CD / 1000;
-  $('critCh').textContent = Math.round(B.CRIT_CHANCE * 100); $('critMu').textContent = B.CRIT_MULT; $('esqCh').textContent = Math.round(B.ESQUIVA_CHANCE * 100);
-  $('vant').textContent = B.VANTAGEM; $('desv').textContent = B.DESVANTAGEM; $('nivel').textContent = B.NIVEL;
-  $('bonusBioma').textContent = pct(B.BONUS_BIOMA); $('ultSt').textContent = 60;
-  // roda: cada elemento vence o seguinte
-  const ordem = ['agua']; while (ordem.length < 5) ordem.push(B.VENCE[ordem[ordem.length - 1]]);
-  $('roda').innerHTML = ordem.map((t) => el(t)).join(' <span class="bom">vence</span> ') + ' <span class="bom">vence</span> ' + el(ordem[0]);
-  tabela('tabEl', ['Elemento', 'Vence', 'Perde para', 'Normal contra', 'Dano', 'Vida', 'Casa'], Object.keys(B.EL).map((t) => {
-    const fraco = Object.keys(B.VENCE).find((e) => B.VENCE[e] === t), neutros = Object.keys(B.EL).filter((e) => e !== t && e !== B.VENCE[t] && e !== fraco);
-    const casa = Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === t).join(', ') || '—';
-    return [el(t), el(B.VENCE[t]), el(fraco), neutros.map(el).join(' '), 'x' + B.EL[t].dano + ' (' + sinal(B.EL[t].dano) + ')', 'x' + B.EL[t].hp + ' (' + sinal(B.EL[t].hp) + ')', casa];
-  }));
-  tabela('tabBioma', ['Cenário', 'Elemento favorecido', 'Bônus de dano'], Object.keys(B.BIOMA_ELEMENTO).map((b) => [b[0].toUpperCase() + b.slice(1), el(B.BIOMA_ELEMENTO[b]), '+' + pct(B.BONUS_BIOMA) + '%']));
-  tabela('tabStatus', ['Status', 'Efeito', 'Duração'], [
-    ['<b style="color:#5cc84a">Veneno</b>', 'perde ' + (1.5) + '% da vida máxima por segundo', (B.DURACAO.veneno / 1000) + ' s'],
-    ['<b style="color:#5ab0ff">Lentidão</b>', 'recargas 30% mais lentas e cargas 30% mais longas', (B.DURACAO.lento / 1000) + ' s'],
-    ['<b style="color:#ffd35a">Paralisia</b>', 'não pode atacar nem defender (a carga em andamento termina)', (B.DURACAO.paralisia / 1000) + ' s'],
-    ['<b style="color:#ff6a5a">Stun</b>', 'cancela a carga em andamento e trava tudo', (B.DURACAO.stun / 1000) + ' s'],
-  ]);
-  const linhasC = []; Object.keys(B.EFEITO).forEach((t) => { const e = B.EFEITO[t]; ['rapido', 'forte'].forEach((s) => { if (e[s]) linhasC.push([el(t), s === 'rapido' ? 'Rápido' : 'Forte', e[s][0], Math.round(e[s][1] * 100) + '%']); }); });
-  tabela('tabChance', ['Golpe de', 'Slot', 'Status', 'Chance'], linhasC);
-  tabela('tabItens', ['Item', 'Efeito', 'Chance'], [
-    ['Cura', '+' + Math.round(15) + '% da vida máxima', '22%'], ['Força', 'x' + B.FORCA_MULT + ' de dano por 8 s', '18%'], ['Recarga', 'zera todas as recargas (ultimate incluído)', '20%'],
-    ['<span class="ruim">Maldição: dano</span>', 'perde 10% da vida (não mata)', '14%'], ['<span class="ruim">Maldição: stun</span>', 'de 1 a 3 s', '14%'], ['<span class="ruim">Maldição: veneno</span>', 'veneno normal', '12%'],
-  ]);
-  $('orc').textContent = B.ORCAMENTO;
-  tabela('tabTalTime', ['Talento', 'Custo', 'Efeito'], Object.values(B.TAL_TIME).map((t) => ['<b>' + t.nome + '</b>', t.custo + ' pt' + (t.custo > 1 ? 's' : ''), t.desc]));
-  tabela('tabTalMon', ['Talento', 'Efeito'], Object.values(B.TAL_MON).map((t) => ['<b>' + t.nome + '</b>', t.desc]));
-  const T = B.TORNEIO; $('tVidas').textContent = T.vidas; $('tOrc').textContent = T.orcBase; $('tMax').textContent = T.bonusMax;
-  $('tIni').textContent = [...T.iniciais.time.map((id) => B.TAL_TIME[id].nome), ...T.iniciais.mon.map((id) => B.TAL_MON[id].nome)].join(', ');
-  $('tCura').textContent = Math.round(T.curaEntre * 100); $('tRev').textContent = Math.round(T.revive * 100);
-  tabela('tabTorneio', ['Fase', 'Adversário', 'Jeito de jogar', 'Reação / ritmo', 'Talentos (pontos)'], T.adv.map((a, i) => [i + 1, '<b>' + a.nome + '</b>, ' + a.titulo + (a.chefe ? ' (chefe)' : '') + '<br><i>“' + a.frase + '”</i>', B.ESTILOS[a.pol.estilo].nome + ' · defesa: ' + a.pol.defesa + ' · ultimate: ' + a.pol.ultimate, Math.round(a.ia.reacao * 100) + '% / ' + Math.round(a.ia.ritmo * 100) + '%', a.orc + (a.fixos ? ' + fixos: ' + [...a.fixos.time.map((id) => B.TAL_TIME[id].nome), ...a.fixos.mon.map((id) => B.TAL_MON[id].nome)].join(', ') : '')]));
-  tabela('tabDif', ['Dificuldade', 'Vidas', 'Adversário', 'Talentos do adversário'], Object.values(T.dificuldades).map((d) => [d.nome, d.vidas, 'reage e ataca x' + d.ia, (d.orc >= 0 ? '+' : '') + d.orc + ' pt']));
-  tabela('tabIns', ['Insígnia', 'Custo', 'Libera'], B.INSIGNIAS.map((i) => [i.nome, i.custo + ' pts', 'treinadores do nível ' + i.libera]));
-  tabela('tabTrein', ['Nível', 'Treinador', 'Time', 'Jeito de jogar', 'Pontos (1ª vitória)'], B.TREINADORES.map((t) => [t.nivel, '<b>' + t.nome + '</b><br><i>“' + t.frase + '”</i>', B.timeDoTreinador(t).map((m) => m.nome).join(', '), B.ESTILOS[t.pol.estilo].nome + ' · defesa: ' + t.pol.defesa + ' · ultimate: ' + t.pol.ultimate, B.PONTOS_TREINADOR.primeira(t.nivel)]));
-  // ---------- itens, captura e evolução (valores do mundo; ficam em index.html, aqui só espelhados) ----------
-  $('iDin').textContent = 40; $('iEsf').textContent = 5; $('iPoc').textContent = 2;
-  tabela('tabLoja', ['Item', 'Preço', 'O que faz'], [
-    ['<b>Esfera</b>', '15 moedas', 'Captura um monstro selvagem'], ['<b>Esfera Forte</b>', '40 moedas', '+20 pontos de chance de captura'], ['<b>Poção</b>', '20 moedas', 'Cura 35% da vida do monstro em campo (uma a cada 8 s, também contra treinadores)'],
-  ]);
-  tabela('tabGanho', ['Fonte', 'O que dá'], [
-    ['Vencer um selvagem', '6 + 2 x nível dele em moedas · 40% de chance de achar 1 esfera (se não capturou)'],
-    ['Vencer um treinador', '30 x nível do treinador em moedas · 2 esferas · pontos de treinador (aba Treinadores)'],
-    ['Vencer o líder do ginásio (Tomás)', 'Insígnia de Bronze, que libera os treinadores do nível 2'],
-  ]);
-  $('cBase').textContent = 12; $('cFalta').textContent = 78; $('cMax').textContent = 95; $('cForte').textContent = 20; $('nBonus').textContent = 5;
-  $('eHp').textContent = 50; $('eCh').textContent = 60; $('eNv').textContent = 16; $('eSelv').textContent = 30;
-  $('eBHp').textContent = pct(B.BONUS_EVO.hp); $('eBAt').textContent = pct(B.BONUS_EVO.atk);
-  // ---------- Pixdex ----------
-  const IMG = (id) => 'sprites-pixellab/' + id + '-teste.png';
+  const fraco = (t) => Object.keys(B.VENCE).find((e) => B.VENCE[e] === t);
+  const casa = (t) => Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === t).map((b) => b[0].toUpperCase() + b.slice(1)).join(', ');
+  const rarLabel = (m) => (m.raridade && m.raridade !== 'comum' ? (m.raridade === 'mitica' ? 'ultrarara' : m.raridade === 'lendaria' ? 'lendária' : m.raridade) : '');
+
+  $('btnWikiVoltar').innerHTML = L('arrow-left', 14) + ' Jogo';
+  $('wikiAvatar').innerHTML = L('book-open', 17);
+  $('icoSearchGlobal').innerHTML = L('search', 15);
+  $('btnLimparBusca').innerHTML = L('x', 13);
+  $('fecharModalMonstro').innerHTML = L('x', 14) + ' Fechar';
+
+  const setTit = (id, ico, txt) => { $(id).innerHTML = L(ico, 16) + ' <span>' + txt + '</span>'; };
+  setTit('titPixdex', 'sparkles', 'Catálogo de Monstros (Pixdex)');
+  setTit('titLuta', 'swords', 'Como funciona a luta automática');
+  setTit('titFamilias', 'users', 'As 8 Famílias (Traços Passivos)');
+  setTit('titStatus', 'shield', 'Status Negativos & Arena');
+  setTit('titTal', 'git-branch', 'Talentos, Tática (IA) e Passivas');
+  setTit('titTorneio', 'trophy', 'Copa de 5 Fases (Torneio)');
+  setTit('titTreinadores', 'award', 'Desafiar Treinadores & Insígnias');
+  setTit('titMundo', 'compass', 'Explorar o Mundo (RPG) & Mercado');
+  setTit('titCap', 'target', 'Chance de Captura, Nível e Evolução');
+
+  // Textos descritivos de todas as espécies e evoluções
   const PAPEL = {
     fagulhao: 'O primeiro que aparece no mato alto. Corajoso e apressado, adora se exibir.', chamuscao: 'O mais curioso: segue o cheiro de comida e acaba queimando o que encontra.',
     mareal: 'Calmo, marca a margem do lago e cuida de quem está ferido.', pingolino: 'Desajeitado, cai de barriga no gelo, mas nunca desiste.',
     brotinho: 'Nasce de tronco caído. Resistente e paciente.', musgarra: 'O mais velho da floresta. Quem tem terra não se move por pouco.',
     ventinho: 'Sopra a poeira das trilhas e gosta de assustar quem passa.', nuvelino: 'Mora nas nuvens baixas. Brinca com quem tenta pegá-lo.',
     faiscao: 'Acende as luzes da vila sem querer. Rápido e nervoso.', trovinho: 'O mais barulhento, vive nas montanhas e é difícil de acalmar.',
-  };
-  Object.assign(PAPEL, {
     brasinha: 'Lagarto de brasa. Aparece nas trilhas e sempre deixa um rastro quentinho.', vulcanejo: 'Tatu de lava que dorme sob a montanha. Só acorda quando alguém passa perto.',
     algazinho: 'Uma alga com olhos, grudenta e curiosa. Gruda em quem passa.', coraline: 'Coral vivo que só aparece perto do porto. Gosta de bolhas e de música.',
     pedrinho: 'Uma pedra que anda e faz amizade com crianças. Não gosta de ser chutado.', tatufungo: 'Cogumelo blindado que leva esporos como arma. O chapéu serve de escudo.',
@@ -226,9 +684,19 @@
     zapinho: 'Camundongo elétrico que dá choquinhos em quem tenta pegar seu queijo.', raiomante: 'Morcego-tempestade. Só aparece em dia de chuva e é muito raro de achar.',
     brasoleta: 'Libélula de brasa que paira sobre a fazenda deixando um rastro de faíscas. Rápida e nervosa, prefere atacar de longe.', besourao: 'Besouro-escaravelho de casco duro e um chifrinho na testa. Lento, teimoso e muito difícil de derrubar.', casulucia: 'Casulo de seda que balança no vento. Parece quieto, mas já sonha em virar lagarta, e depois borboleta.', tesloura: 'Besouro de pinças que soltam faíscas. Corta qualquer coisa que encoste nele e carrega o ar de eletricidade.', rochilo: 'Gatinho de pedra com asinhas de gárgula. Fica parado nos telhados da pedreira e só se mexe quando ninguém olha.', cristalino: 'Bolinha de cristal amarelo e azul que solta centelhas. Os raios batem nos espinhos e voltam em outra direção.', texugao: 'Texugo de listra branca e garras fortes. Cava tocas por toda a fazenda e não gosta de visitas.', lontrinha: 'Lontra azul-esverdeada que carrega uma conchinha para todo lado. Mergulha melhor do que anda.', cinzarim: 'Pintinho de fênix nascido das cinzas, com uma crista de brasa na cabeça. É ultrarraro: quase ninguém viu um. Diz a lenda que ele renasce quando cai.',
     pavio: 'Gatinho de brasa com um pavio aceso no lugar do rabo. Adora brincar perto de coisas que explodem, mas sempre acaba soprando a própria chama.', bolhudo: 'Baiacu redondo que enche de bolhas quando fica envergonhado. As bolhas protegem e fazem cócegas no adversário.', taupino: 'Toupeira peluda com uma folhinha brotando na cabeça. Cava tocas fundas no mato e esconde suas coisas lá embaixo.', pipinha: 'Pipa viva que flutua no vento. Só aparece em dia de brisa forte e vive tentando não ficar presa em galho.', lampiro: 'Vagalume elétrico. Acende a barriga para avisar quando vem tempestade e as antenas soltam pequenos raios.',
-  });
+  };
+  Object.assign(PAPEL, {"pimentao":"Pimenta viva que cospe fogo quando fica nervosa. Cresce na fazenda e não deixa ninguém chegar perto da horta.","soprinho":"Dente-de-leão que vai embora com o vento. Solta pólen que faz espirrar quem passa.","cipochoque":"Trepadeira que dá choque em quem tenta arrancar. Gosta de subir em postes da vila do raio.","medusonho":"Água-viva que flutua no lago e sonha em voz alta. Os tentáculos brilham quando ela pensa.","cogumenta":"Cogumelo vidente que enxerga o que vai acontecer. Fica quieto na rocha e só fala quando perguntam.","mentilha":"Cristal que pensa rápido demais. Solta faíscas de ideia e é difícil de acompanhar.","voadorzinho":"Peixe que voa pelo ar por cima das ondas. Salta alto e cai de barriga, sempre rindo.","peixebrasa":"Peixe de brasa que nada em água quente. Deixa vapor por onde passa e assusta os outros peixes.","avestruzinho":"Avestruz de areia que corre mais rápido que qualquer um. Enterra a cabeça quando fica com medo."});
   const PAPEL_EVO = {
-    brasadeira: 'Quatro asas de chama e uma coroa de fogo. Paira sobre os campos e queima tudo o que toca.', besourei: 'Um chifre enorme e placas de ouro no casco. Empina e atropela o que estiver na frente.', teslorrao: 'As pinças viram duas serras de raio e uma aura amarela cobre o casco inteiro.', cristalao: 'Uma coroa de cristais cresce nas costas e cada passo solta uma chuva de centelhas.', texugarra: 'Em pé, musculoso e com armadura de pedra nos ombros. Ninguém mais entra na toca dele.', gargolo: 'Asas de pedra enormes e olhos laranja brilhantes. Vigia a pedreira inteira do alto.', lontrao: 'Casca em espiral nas costas e coroa de coral na cabeça. Mergulha fundo e volta com tesouros.', lagartucia: 'A lagarta de seda que sai do casulo. Come folhas o dia todo para ganhar asas, e a terceira forma, a borboleta Papelúcia, vem mais tarde.', brasafenix: 'A fênix jovem abre as asas de fogo pela primeira vez. Voa baixo e deixa cinzas quentes pelo caminho.',
+    chilibrasa: "Pimenteira em chamas com um chapéu de pimentas e braços de cipó. Cada passo espalha fogo pela horta.",
+    dentevento: "Uma flor gigante de pétalas brancas e sementes que voam. Aparece onde o vento sopra forte.",
+    cipotrovao: "Raios correm pelas folhas e uma flor elétrica coroa a cabeça. Trepa até o alto da torre do raio.",
+    medusalma: "Um sino enorme de cristal sobre a cabeça, tentáculos brilhantes. Ouve o pensamento de quem se aproxima.",
+    cogumentor: "Um cogumelo gigante de olho aberto e esporos flutuando. Enxerga o futuro de toda a rocha.",
+    mentilhante: "Cristais flutuando em volta e um raio de mente. Pensa mais rápido do que qualquer um consegue reagir.",
+    voadorao: "Barbatanas que viram asas enormes. Voa por cima dos lagos e mergulha como uma flecha.",
+    brasamarao: "Escamas de lava e cauda em chamas. Nada no rio quente e deixa um rastro de vapor.",
+    avestruzao: "Ereto, com plumas de areia e pernas fortes. Corre pela pedreira e levanta poeira de fogo.",
+    brasadeira: 'Quatro asas de chama e uma coroa de fogo. Paira sobre os campos e queima tudo o que toca.', besourei: 'Um chifre enorme e placas de ouro no casco. Empina e atropela o que estiver na frente.', teslorrao: 'As pinças viram duas serras de raio e uma aura amarela cobre o casco inteiro.', cristalao: 'Uma coroa de cristais cresce nas costas e cada passo solta uma chuva de centelhas.', texugarra: 'Em pé, musculoso e com armadura de pedra nos ombros. Ninguém mais entra na toca dele.', gargolo: 'Asas de pedra enormes e olhos laranja brilhantes. Vigia a pedreira inteira do alto.', lontrao: 'Casca em espiral nas costas e coroa de coral na cabeça. Mergulha fundo e volta com tesouros.', lagartucia: 'A lagarta de seda que sai do casulo e ganha forças antes da forma alada final.', papelucia: 'A borboleta final de seda iluminada: domina a arena com velocidade e asas brilhantes.', brasafenix: 'A fênix jovem abre as asas de fogo pela primeira vez e deixa cinzas quentes pelo caminho.', phoenix: 'A forma lendária completa das cinzas: envolta em chamas douradas de poder extremo.',
     labaredo: 'As chamas crescem com a coragem. Bate forte e aguenta mais.', oceanico: 'Nada em círculos majestosos e cura a calma de quem está perto.',
     carvalhinho: 'Uma árvore cresce nas costas. Lento e firme como o tronco.', faiscante: 'Cada passo solta faíscas. É a eletricidade em estado puro.',
     carvaoreal: 'Brasa viva com armadura de carvão. Cada rachadura brilha quando ele se irrita.', pingueiroimperial: 'Usa uma coroa de cristais de gelo. Anda como um rei e escorrega como um pinguim.',
@@ -240,32 +708,483 @@
     plumareu: 'As asas abrem de ponta a ponta e a cauda desenha riscos no céu. Canta ainda mais alto.', ciclonara: 'O redemoinho ganha fitas de vento e olhar firme. Quem fica na frente dele sai voando.',
     zapotrao: 'Em pé, com juba de faíscas e a cauda de raio gigante. O queijo agora é só dele.', tempestauro: 'O morcego da tempestade em sua forma completa. Cada relâmpago na asa conta uma tormenta.',
   };
-  const fraco = (t) => Object.keys(B.VENCE).find((e) => B.VENCE[e] === t);
-  const casa = (t) => Object.keys(B.BIOMA_ELEMENTO).filter((b) => B.BIOMA_ELEMENTO[b] === t).map((b) => b[0].toUpperCase() + b.slice(1)).join(', ');
-  const slots = [['rapido', 'Rápido'], ['forte', 'Forte'], ['defesa', 'Defesa'], ['ultimate', 'Ultimate']];
-  const efeito = (t, sl) => { const e = B.EFEITO[t] && B.EFEITO[t][sl]; return e ? ' <span class="nota">(' + Math.round(e[1] * 100) + '% de ' + e[0] + ')</span>' : ''; };
-  const cartao = (m, num, evo) => {
-    const E = B.EVOLUCOES[m.id], eva = evo ? m : null, base = evo ? B.MONSTROS.find((x) => B.EVOLUCOES[x.id] && B.EVOLUCOES[x.id].id === evo) : null;
-    const forma = evo ? B.evoluida(base) : m, id = evo || m.id, nome = evo ? B.EVOLUCOES[base.id].nome : m.nome;
-    const el_ = (evo ? base : m).tipo, g = (evo ? base : m).golpes, t = el_;
-    const poderes = slots.map(([sl, nm]) => '<tr><td><b>' + nm + '</b></td><td>' + g[sl].nome + '</td><td>' + el(g[sl].tipo) + efeito(g[sl].tipo, sl) + '</td></tr>').join('');
-    let evolBox;
-    if (evo) evolBox = '<div class="evol"><img src="' + IMG(base.id) + '" alt=""><span>Evolução de <b>' + base.nome + '</b>. Mesmos golpes, <b class="bom">+' + pct(B.BONUS_EVO.hp) + '% de vida</b> e <b class="bom">+' + pct(B.BONUS_EVO.atk) + '% de ataque</b>.</span></div>';
-    else if (E) evolBox = '<div class="evol"><img src="' + IMG(E.id) + '" alt=""><span>Evolui para <b>' + E.nome + '</b> no nível ' + E.nv + ', ou no meio da luta (60% de chance ao cair abaixo de 50% da vida).</span></div>';
-    else evolBox = '<div class="evol"><span class="nota">Ainda sem evolução (em breve).</span></div>';
-    return '<div class="dexc' + (evo ? ' evo' : '') + '"><div class="cab"><img src="' + IMG(id) + '" alt="' + nome + '"><div><div class="num">' + num + (m.raridade && m.raridade !== 'comum' ? ' · ' + (m.raridade === 'mitica' ? 'ultrarara' : m.raridade === 'lendaria' ? 'lendária' : m.raridade === 'incomum' ? 'incomum' : 'rara') : '') + '</div><h3>' + nome + '</h3>' + el(el_) + '<p>' + (evo ? PAPEL_EVO[id] : PAPEL[id]) + '</p></div></div>' +
-      '<p class="linha"><b>Vida</b> ' + forma.hp + ' (x' + B.EL[el_].hp + ' do elemento) · <b>Ataque</b> ' + forma.atk + ' (x' + B.EL[el_].dano + ') · <b>Ritmo</b> recarga ' + m.rc + ', carga ' + m.cg + '</p>' +
-      '<p class="linha"><span class="bom">Vence:</span> ' + el(B.VENCE[el_]) + ' (x' + B.VANTAGEM + ' de dano) · <span class="ruim">Perde para:</span> ' + el(fraco(el_)) + ' (x' + B.DESVANTAGEM + ' de dano) · <b>Cenário forte:</b> ' + casa(el_) + ' (+' + pct(B.BONUS_BIOMA) + '%)</p>' +
-      '<div class="tabela"><table class="poderes"><tr><th>Slot</th><th>Poder</th><th>Elemento</th></tr>' + poderes + '</table></div>' + evolBox + '</div>';
-  };
-  let cartoes = '', k = 0;
-  B.MONSTROS.forEach((m) => { k++; cartoes += cartao(m, 'Nº ' + String(k).padStart(3, '0'), null);
-    const E = B.EVOLUCOES[m.id]; if (E) { cartoes += cartao(m, 'Nº ' + String(k).padStart(3, '0') + ' · evolução', E.id); } });
-  $('dex').innerHTML = cartoes;
-  tabela('tabMon', ['Monstro', 'Elemento', 'Vida', 'Ritmo', 'Rápido', 'Forte', 'Defesa', 'Ultimate'], B.MONSTROS.map((m) => [
-    '<b>' + m.nome + '</b>', el(m.tipo), m.hp, 'rec ' + m.rc + ' · carga ' + m.cg,
-    m.golpes.rapido.nome, m.golpes.forte.nome, m.golpes.defesa.nome, m.golpes.ultimate.nome + ' (' + N[m.golpes.ultimate.tipo] + ')',
-  ]));
+
+  // Monta cadeia evolutiva de cada espécie (1, 2 ou 3 formas usando battle.js)
+  const cadeias = B.MONSTROS.map((m, idx) => {
+    const estagios = [{ id: m.id, nome: m.nome, nv: m.nivel, forma: m, desc: PAPEL[m.id] || '' }];
+    const e1 = B.EVOLUCOES[m.id];
+    if (e1) {
+      const f1 = B.evoluidaN(m, 1);
+      estagios.push({ id: e1.id, nome: e1.nome, nv: e1.nv, forma: f1, desc: PAPEL_EVO[e1.id] || '' });
+      const e2 = B.EVOLUCOES[e1.id];
+      if (e2) {
+        const f2 = B.evoluidaN(m, 2);
+        estagios.push({ id: e2.id, nome: e2.nome, nv: e2.nv, forma: f2, desc: PAPEL_EVO[e2.id] || '' });
+      }
+    }
+    return { idx, num: 'Nº ' + String(idx + 1).padStart(3, '0'), base: m, estagios };
+  });
+  const totalEvos = Object.keys(B.EVOLUCOES).length;
+  $('wikiSub').textContent = cadeias.length + ' espécies · ' + totalEvos + ' evoluções · ' + B.TREINADORES.length + ' treinadores';
+
+  const todasFormas = cadeias.flatMap((c) => c.estagios.map((s) => s.forma));
+  const maxHp = Math.max(...todasFormas.map((f) => f.hp));
+  const maxAtk = Math.max(...todasFormas.map((f) => f.atk));
+  const maxVel = Math.max(...todasFormas.map((f) => 1 / f.rc));
+
+  // Navegação por 5 abas 100% visíveis
+  const ABAS = [
+    ['pixdex', 'Monstros', 'sparkles'],
+    ['combate', 'Combate', 'swords'],
+    ['talentos', 'Talentos', 'git-branch'],
+    ['modos', 'Treinadores', 'trophy'],
+    ['mundo', 'Mundo', 'compass'],
+  ];
+  let secAtiva = 'pixdex';
+  const navBox = $('wikiNav');
+  function abrirSecao(sec) {
+    secAtiva = sec || 'pixdex';
+    document.querySelectorAll('.wiki-sec').forEach((s) => { s.hidden = s.dataset.sec !== secAtiva; });
+    navBox.querySelectorAll('.wiki-tab').forEach((b) => b.classList.toggle('sel', b.dataset.sec === secAtiva));
+  }
+  ABAS.forEach(([id, nome, ico]) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wiki-tab' + (id === secAtiva ? ' sel' : '');
+    b.dataset.sec = id;
+    b.innerHTML = L(ico, 15) + '<span>' + nome + '</span>';
+    b.onclick = () => {
+      if ($('wikiBuscaGlobal').value) { $('wikiBuscaGlobal').value = ''; atualizarBuscaGlobal(); }
+      abrirSecao(id);
+      scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    navBox.appendChild(b);
+  });
+
+  // Modal de Ficha Completa do Monstro
+  let modalCadeia = null, modalEst = 0;
+  function renderModalEstagio() {
+    if (!modalCadeia) return;
+    const c = modalCadeia, est = c.estagios[modalEst] || c.estagios[0], m = c.base, f = est.forma;
+    const rar = rarLabel(m), fam = B.FAMILIAS[m.familia];
+    $('modalTit').innerHTML = '<span>' + c.num + ' · ' + est.nome + '</span>' + (rar ? '<span class="rar-dot">' + rar + '</span>' : '');
+    $('modalEstagios').innerHTML = '';
+    if (c.estagios.length > 1) {
+      c.estagios.forEach((s, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'est-btn' + (i === modalEst ? ' sel' : '');
+        b.innerHTML = '<img src="' + IMG(s.id) + '" alt=""><span>' + (i + 1) + 'ª: ' + s.nome + (i > 0 ? ' (Nv ' + s.nv + ')' : '') + '</span>';
+        b.onclick = () => { modalEst = i; renderModalEstagio(); };
+        $('modalEstagios').appendChild(b);
+      });
+    } else {
+      $('modalEstagios').innerHTML = '<span class="nota">Esta espécie possui apenas forma única.</span>';
+    }
+
+    $('modalImg').src = IMG(est.id);
+    $('modalImg').alt = est.nome;
+    $('modalTags').innerHTML = el(m.tipo) + (fam ? ' <span class="fam-pill" style="border-color:' + fam.cor + '">Família ' + fam.nome + '</span>' : '');
+    $('modalDesc').textContent = est.desc;
+
+    $('modalFamiliaBox').style.borderLeftColor = fam ? fam.cor : '#5eb5f7';
+    $('modalFamiliaBox').innerHTML = fam ? '<b>Família ' + fam.nome + '</b> — ' + fam.traco : '';
+
+    const pHp = Math.round((f.hp / maxHp) * 100), pAtk = Math.round((f.atk / maxAtk) * 100), pVel = Math.round(((1 / f.rc) / maxVel) * 100);
+    $('modalStats').innerHTML =
+      '<div class="sbar"><span>Vida</span><div class="trilho"><i style="width:' + pHp + '%;background:#00a884"></i></div><b>' + f.hp + ' (x' + B.EL[m.tipo].hp + ')</b></div>'
+      + '<div class="sbar"><span>Ataque</span><div class="trilho"><i style="width:' + pAtk + '%;background:#eb5757"></i></div><b>' + f.atk + ' (x' + B.EL[m.tipo].dano + ')</b></div>'
+      + '<div class="sbar"><span>Ritmo</span><div class="trilho"><i style="width:' + pVel + '%;background:#5eb5f7"></i></div><b>rec ' + f.rc + ' · cg ' + f.cg + '</b></div>';
+
+    $('modalMatch').innerHTML =
+      '<span class="f-pill"><span class="bom">Vence</span> ' + el(B.VENCE[m.tipo]) + ' (x' + B.VANTAGEM + ')</span>'
+      + '<span class="f-pill"><span class="ruim">Perde</span> ' + el(fraco(m.tipo)) + ' (x' + B.DESVANTAGEM + ')</span>'
+      + '<span class="f-pill"><b>Cenário</b> ' + casa(m.tipo) + ' (+' + pct(B.BONUS_BIOMA) + '%)</span>';
+
+    $('modalNvRef').textContent = f.nivel;
+    const slots = [['rapido', 'Rápido'], ['forte', 'Forte'], ['defesa', 'Defesa'], ['ultimate', 'Ultimate']];
+    $('modalGolpes').innerHTML = slots.map(([sl, nm]) => {
+      const g = f.golpes[sl], cd = (B.cdDe(f, sl) / 1000).toFixed(1);
+      if (sl === 'defesa') {
+        const dur = (B.BASE.defesa.dur / 1000).toFixed(1);
+        return '<div class="gcard"><div class="gcard-top"><span class="gslot">' + nm + '</span>' + el(g.tipo) + '</div><b>' + g.nome + '</b><div class="gstats">Escudo ' + dur + ' s · Recarga ' + cd + ' s</div><div class="gstatus">Bloqueia 1 ataque recebido</div></div>';
+      }
+      const dano = B.danoBase(f, sl).toFixed(1), carga = (B.cargaDe(f, sl) / 1000).toFixed(2);
+      const ef = B.EFEITO[g.tipo] && B.EFEITO[g.tipo][sl];
+      const stTxt = sl === 'ultimate' ? (g.poder ? 'Efeito especial: ' + g.poder : '60% chance de status (' + N[g.tipo] + ')') : (ef ? Math.round(ef[1] * 100) + '% de ' + ef[0] : 'Sem status extra');
+      return '<div class="gcard"><div class="gcard-top"><span class="gslot">' + nm + '</span>' + el(g.tipo) + '</div><b>' + g.nome + '</b><div class="gstats">Dano ≈ ' + dano + ' · Carga ' + carga + ' s · Recarga ' + cd + ' s</div><div class="gstatus">' + stTxt + '</div></div>';
+    }).join('');
+  }
+  function abrirModalMonstro(baseId, estIdx = 0) {
+    const c = cadeias.find((x) => x.base.id === baseId || x.estagios.some((s) => s.id === baseId));
+    if (!c) return;
+    modalCadeia = c;
+    modalEst = Math.max(0, Math.min(c.estagios.length - 1, estIdx));
+    renderModalEstagio();
+    $('modalMonstro').hidden = false;
+    document.body.classList.add('modal-open');
+    $('modalMonstro').querySelector('.modal-card').scrollTop = 0;
+  }
+  function fecharModalMonstro() {
+    $('modalMonstro').hidden = true;
+    document.body.classList.remove('modal-open');
+  }
+  $('fecharModalMonstro').onclick = fecharModalMonstro;
+  $('modalMonstro').onclick = (e) => { if (e.target === $('modalMonstro')) fecharModalMonstro(); };
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('modalMonstro').hidden) fecharModalMonstro(); });
+
+  // Aba 1: Filtros + Grade Compacta de Monstros
+  let filtroEl = 'todos', filtroFam = 'todas', ordemDex = 'num';
+  function renderFiltrosDex() {
+    const elBox = $('dexFiltroEl'); elBox.innerHTML = '';
+    [['todos', 'Todos', 'layers'], ['fogo', 'Fogo', 'flame'], ['agua', 'Água', 'droplets'], ['terra', 'Terra', 'mountain'], ['ar', 'Ar', 'wind'], ['eletrico', 'Elétrico', 'zap']].forEach(([id, nm, ico]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'f-pill' + (filtroEl === id ? ' sel' : '');
+      b.innerHTML = L(ico, 11) + ' ' + nm;
+      b.onclick = () => { filtroEl = id; renderFiltrosDex(); renderDex(); };
+      elBox.appendChild(b);
+    });
+    const famBox = $('dexFiltroFamilia'); famBox.innerHTML = '';
+    const allFam = document.createElement('button'); allFam.type = 'button'; allFam.className = 'f-pill' + (filtroFam === 'todas' ? ' sel' : ''); allFam.textContent = 'Todas famílias';
+    allFam.onclick = () => { filtroFam = 'todas'; renderFiltrosDex(); renderDex(); }; famBox.appendChild(allFam);
+    Object.entries(B.FAMILIAS).forEach(([id, info]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'f-pill' + (filtroFam === id ? ' sel' : '');
+      b.innerHTML = '<i style="width:7px;height:7px;border-radius:50%;background:' + info.cor + ';display:inline-block"></i> ' + info.nome;
+      b.onclick = () => { filtroFam = id; renderFiltrosDex(); renderDex(); };
+      famBox.appendChild(b);
+    });
+    const ordBox = $('dexOrdem'); ordBox.innerHTML = '';
+    [['num', 'Nº 001'], ['hp', 'Maior Vida'], ['atk', 'Maior Ataque'], ['vel', 'Mais Rápido']].forEach(([id, nm]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'f-pill' + (ordemDex === id ? ' sel' : '');
+      b.textContent = nm;
+      b.onclick = () => { ordemDex = id; renderFiltrosDex(); renderDex(); };
+      ordBox.appendChild(b);
+    });
+  }
+  function renderDex() {
+    let lista = cadeias.filter((c) => (filtroEl === 'todos' || c.base.tipo === filtroEl) && (filtroFam === 'todas' || c.base.familia === filtroFam));
+    if (ordemDex === 'hp') lista.sort((a, b) => b.base.hp - a.base.hp);
+    else if (ordemDex === 'atk') lista.sort((a, b) => b.base.atk - a.base.atk);
+    else if (ordemDex === 'vel') lista.sort((a, b) => a.base.rc - b.base.rc);
+    else lista.sort((a, b) => a.idx - b.idx);
+
+    const grid = $('dex'); grid.innerHTML = '';
+    lista.forEach((c) => {
+      const m = c.base, fam = B.FAMILIAS[m.familia], rar = rarLabel(m);
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'mcard';
+      let evoHtml = '<div class="mcard-evo"><span>Forma única</span></div>';
+      if (c.estagios.length > 1) {
+        const ultimo = c.estagios[c.estagios.length - 1];
+        const chainTxt = c.estagios.slice(1).map((s) => s.nome).join(' → ');
+        evoHtml = '<div class="mcard-evo"><img src="' + IMG(ultimo.id) + '" alt=""><span>→ ' + chainTxt + '</span></div>';
+      }
+      b.innerHTML =
+        '<div class="mcard-top"><span>' + c.num + '</span>' + (rar ? '<span class="rar-dot">' + rar + '</span>' : '') + '</div>'
+        + '<div class="mcard-mid"><div class="mcard-sp"><img src="' + IMG(m.id) + '" alt="' + m.nome + '" loading="lazy"></div>'
+        + '<div class="mcard-name">' + m.nome + '</div>'
+        + '<div class="mcard-tags">' + el(m.tipo) + (fam ? '<span class="fam-pill">' + fam.nome + '</span>' : '') + '</div></div>'
+        + '<div class="mcard-stats"><span>HP ' + m.hp + '</span><span>ATQ ' + m.atk + '</span><span>RC ' + m.rc + '</span></div>'
+        + evoHtml;
+      b.onclick = () => abrirModalMonstro(m.id, 0);
+      grid.appendChild(b);
+    });
+    $('dexContagem').textContent = lista.length + ' espécie' + (lista.length === 1 ? '' : 's');
+    $('dexVazio').hidden = lista.length > 0;
+  }
+  renderFiltrosDex();
+  renderDex();
+
+  // Aba 2: Combate, Elementos, 8 Famílias e Status em Cards
+  $('gridRegrasLuta').innerHTML = [
+    ['Time de 3 Pixmons', 'Você escolhe 3 monstros sem repetir. Um de cada lado entra em campo; quando cai, o próximo assume.'],
+    ['Combate Automático (IA)', 'Cada Pixmon tem golpe Rápido, Forte, Defesa e Ultimate. A luta corre pelas regras escolhidas em Tática & IA.'],
+    ['Defesa (' + (B.BASE.defesa.dur / 1000).toFixed(1) + ' s) e "!"', 'Quando o rival carrega um ataque forte, surge o alerta “!”. A defesa evita 1 acerto dentro da janela.'],
+    ['Troca & Crítico/Esquiva', 'Troca voluntária tem espera de ' + (B.TROCA_CD / 1000) + ' s e pausa de 0,6 s. Crítico: ' + Math.round(B.CRIT_CHANCE * 100) + '% (x' + B.CRIT_MULT + ') · Esquiva: ' + Math.round(B.ESQUIVA_CHANCE * 100) + '%.'],
+  ].map(([t, d]) => '<div class="wcard"><div class="wcard-head"><b>' + t + '</b></div><p style="margin:0;font-size:12px;color:#c8dff5">' + d + '</p></div>').join('');
+
+  $('bonusBioma').textContent = pct(B.BONUS_BIOMA);
+  $('vant').textContent = B.VANTAGEM;
+  $('desv').textContent = B.DESVANTAGEM;
+  $('ultSt').textContent = 60;
+  const ordem = ['agua']; while (ordem.length < 5) ordem.push(B.VENCE[ordem[ordem.length - 1]]);
+  $('roda').innerHTML = ordem.map((t) => el(t)).join(' <span class="bom">vence</span> ') + ' <span class="bom">vence</span> ' + el(ordem[0]);
+
+  const elCardsBox = $('gridElementos');
+  Object.keys(B.EL).forEach((t) => {
+    const fr = fraco(t), c = document.createElement('button');
+    c.type = 'button'; c.className = 'wcard'; c.style.textAlign = 'left'; c.style.cursor = 'pointer';
+    c.innerHTML =
+      '<div class="wcard-head">' + el(t) + '<span class="ramo-badge">Cenário: ' + casa(t) + '</span></div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12px"><span><span class="bom">Vence:</span> ' + N[B.VENCE[t]] + '</span><span>·</span><span><span class="ruim">Perde:</span> ' + N[fr] + '</span></div>'
+      + '<div class="nota">Dano x' + B.EL[t].dano + ' (' + sinal(B.EL[t].dano) + ') · Vida x' + B.EL[t].hp + ' (' + sinal(B.EL[t].hp) + ') · Ver monstros →</div>';
+    c.onclick = () => { filtroEl = t; renderFiltrosDex(); renderDex(); abrirSecao('pixdex'); scrollTo({ top: 0, behavior: 'smooth' }); };
+    elCardsBox.appendChild(c);
+  });
+
+  const famBox = $('gridFamilias');
+  Object.entries(B.FAMILIAS).forEach(([id, info]) => {
+    const membros = cadeias.filter((c) => c.base.familia === id);
+    const d = document.createElement('div'); d.className = 'wcard'; d.style.borderLeft = '3px solid ' + info.cor;
+    d.innerHTML = '<div class="wcard-head"><b>' + info.nome + '</b><span class="ramo-badge">' + membros.length + ' espécies</span></div><p style="margin:0;font-size:12.5px">' + info.traco + '</p>';
+    const chips = document.createElement('div'); chips.className = 'mon-chips';
+    membros.forEach((c) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'mon-chip-btn';
+      b.innerHTML = '<img src="' + IMG(c.base.id) + '" alt=""><span>' + c.base.nome + '</span>';
+      b.onclick = () => abrirModalMonstro(c.base.id, 0);
+      chips.appendChild(b);
+    });
+    d.appendChild(chips);
+    famBox.appendChild(d);
+  });
+
+  $('gridStatus').innerHTML = [
+    ['Veneno', '#5cc84a', (B.DURACAO.veneno / 1000) + ' s', 'Perde 1,5% da vida máx./s · Fogo (10%/25%) e Terra rápido (15%).'],
+    ['Lentidão', '#5ab0ff', (B.DURACAO.lento / 1000) + ' s', 'Recargas e cargas 30% mais lentas · Água (20%/30%) e Ar rápido (20%).'],
+    ['Paralisia', '#ffd35a', (B.DURACAO.paralisia / 1000) + ' s', 'Impede atacar e defender · Eletricidade (35% rápido / 50% forte).'],
+    ['Stun', '#ff6a5a', (B.DURACAO.stun / 1000) + ' s', 'Cancela a carga atual e trava ações · Terra forte (25%) e Ar forte (25%).'],
+  ].map(([nm, cor, dur, desc]) => '<div class="wcard"><div class="wcard-head"><b style="color:' + cor + '">' + nm + '</b><span class="custo-badge">' + dur + '</span></div><p style="margin:0;font-size:12px;color:#c8dff5">' + desc + '</p></div>').join('');
+
+  $('gridQuebraveis').innerHTML = [
+    ['Cura (22%)', '+15% da vida máxima ao quebrar barril/caixote/jarro.', 'bom'],
+    ['Força (18%)', 'Multiplica dano por x' + B.FORCA_MULT + ' durante 8 s.', 'bom'],
+    ['Recarga (20%)', 'Zera todas as recargas (inclusive do ultimate).', 'bom'],
+    ['Maldições (40%)', 'Dano (-10% vida, 14%), Stun (1–3 s, 14%) ou Veneno (12%). Mão de sorte protege!', 'ruim'],
+  ].map(([nm, desc, cl]) => '<div class="wcard"><div class="wcard-head"><b class="' + cl + '">' + nm + '</b></div><p style="margin:0;font-size:12px;color:#c8dff5">' + desc + '</p></div>').join('');
+
+  // Aba 3: Talentos em Sub-abas + Cards por Ramo
+  let subTal = 'time';
+  const RAMO_NOMES = { ataque: 'Ataque', defesa: 'Defesa', ultimate: 'Ultimate', mundo: 'Mundo & Arena', corpo: 'Corpo', status: 'Status', tatica: 'Tática' };
+  function nomeNo(id) { return (B.TAL_TIME[id] || B.TAL_TATICA[id] || B.TAL_MON[id] || { nome: id }).nome; }
+  function renderTalentosWiki() {
+    const sb = $('subTabsTalentos'); sb.innerHTML = '';
+    [['time', 'Time (' + Object.keys(B.TAL_TIME).length + ')'], ['tatica', 'Tática IA (' + Object.keys(B.TAL_TATICA).length + ')'], ['mon', 'Passivas (' + Object.keys(B.TAL_MON).length + ')']].forEach(([id, nm]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'f-pill' + (subTal === id ? ' sel' : '');
+      b.textContent = nm;
+      b.onclick = () => { subTal = id; renderTalentosWiki(); };
+      sb.appendChild(b);
+    });
+    const out = $('talConteudo'); out.innerHTML = '';
+    const mapSrc = subTal === 'time' ? B.TAL_TIME : subTal === 'tatica' ? B.TAL_TATICA : B.TAL_MON;
+    const grupos = {};
+    Object.entries(mapSrc).forEach(([id, t]) => {
+      const n = B.ARVORE[id] || { ramo: subTal === 'tatica' ? 'tatica' : 'geral', degrau: 1 };
+      const r = n.ramo || 'geral';
+      (grupos[r] = grupos[r] || []).push([id, t, n]);
+    });
+    Object.entries(grupos).forEach(([ramo, itens]) => {
+      const card = document.createElement('div'); card.className = 'cartao'; card.style.marginBottom = '10px';
+      card.innerHTML = '<h3 class="sub" style="margin-top:0">Ramo: ' + (RAMO_NOMES[ramo] || ramo) + '</h3><div class="cards-grid dois"></div>';
+      const grid = card.querySelector('.cards-grid');
+      itens.forEach(([id, t, n]) => {
+        const d = document.createElement('div'); d.className = 'wcard'; d.dataset.talId = id;
+        const badge = subTal === 'mon' ? 'Nv ' + B.NV_DEGRAU[(n.degrau || 1) - 1] : (t.custo + ' pt' + (t.custo > 1 ? 's' : ''));
+        const reqs = [];
+        if (n.pre) reqs.push('Exige: ' + n.pre.map(nomeNo).join(', '));
+        if (n.preAlg) reqs.push('Exige um de: ' + n.preAlg.map(nomeNo).join(' / '));
+        if (n.ou) reqs.push('Exclusivo (não acumula com ' + nomeNo(n.ou) + ')');
+        d.innerHTML = '<div class="wcard-head"><b>' + t.nome + '</b><span class="custo-badge">' + badge + '</span></div><p style="margin:0;font-size:12px;color:#d5e2ee">' + t.desc + '</p>' + (reqs.length ? '<div class="nota">' + reqs.join(' · ') + '</div>' : '');
+        grid.appendChild(d);
+      });
+      out.appendChild(card);
+    });
+  }
+  renderTalentosWiki();
+
+  // Aba 4: Copa (Torneio) + 67 Treinadores com Sprites
+  const T = B.TORNEIO;
+  $('resumoTorneio').innerHTML = 'Cinco lutas seguidas com <b>' + T.vidas + ' vidas base</b> e orçamento inicial de <b>' + T.orcBase + ' pts</b> (até +' + T.bonusMax + ' por prêmios). Vivos recuperam <b>' + Math.round(T.curaEntre * 100) + '%</b> e caídos voltam com <b>' + Math.round(T.revive * 100) + '%</b> entre fases.';
+  $('cardsDifTorneio').innerHTML = Object.values(T.dificuldades).map((d) => '<div class="wcard"><div class="wcard-head"><b>' + d.nome + '</b><span class="custo-badge">' + d.vidas + ' vida(s)</span></div><div class="nota">Ritmo/reação x' + d.ia + ' · Orçamento rival ' + (d.orc >= 0 ? '+' : '') + d.orc + ' pt</div></div>').join('');
+  $('cardsTorneio').innerHTML = T.adv.map((a, i) => {
+    const fixos = a.fixos ? [...a.fixos.time.map(nomeNo), ...a.fixos.mon.map(nomeNo)].join(', ') : '';
+    return '<div class="wcard"><div class="wcard-head"><b>Fase ' + (i + 1) + ': ' + a.nome + ', ' + a.titulo + (a.chefe ? ' (Chefe)' : '') + '</b><span class="custo-badge">' + a.orc + ' pts</span></div><div class="nota">“' + a.frase + '”</div><div class="ia-pills"><span>Estilo: ' + B.ESTILOS[a.pol.estilo].nome + '</span><span>Defesa: ' + a.pol.defesa + '</span><span>Ult: ' + a.pol.ultimate + '</span><span>IA: ' + Math.round(a.ia.reacao * 100) + '% / ' + Math.round(a.ia.ritmo * 100) + '%</span></div>' + (fixos ? '<div class="nota">Fixos: ' + fixos + '</div>' : '') + '</div>';
+  }).join('');
+
+  $('nTreinWiki').textContent = B.TREINADORES.length;
+  $('cardsInsignias').innerHTML = B.INSIGNIAS.map((ins) => '<div class="wcard"><div class="wcard-head"><b>' + ins.nome + '</b><span class="custo-badge">' + ins.custo + ' pts</span></div><div class="nota">Libera treinadores do nível ' + ins.libera + '</div></div>').join('');
+
+  let filtroTreinNv = 1;
+  function renderTreinWiki() {
+    const fEl = $('wikiFiltroTrein'); fEl.innerHTML = '';
+    [1, 2, 3, 4, 5, 0].forEach((n) => {
+      const qtd = n === 0 ? B.TREINADORES.length : B.TREINADORES.filter((t) => t.nivel === n).length;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'f-pill' + (filtroTreinNv === n ? ' sel' : '');
+      b.textContent = (n === 0 ? 'Todos' : 'Nv ' + n) + ' (' + qtd + ')';
+      b.onclick = () => { filtroTreinNv = n; renderTreinWiki(); };
+      fEl.appendChild(b);
+    });
+    const listBox = $('cardsTreinadores'); listBox.innerHTML = '';
+    const lista = filtroTreinNv === 0 ? B.TREINADORES : B.TREINADORES.filter((t) => t.nivel === filtroTreinNv);
+    lista.forEach((t) => {
+      const card = document.createElement('div'); card.className = 'wcard'; card.dataset.treinId = t.id;
+      card.innerHTML = '<div class="wcard-head"><b>Nv ' + t.nivel + ' · ' + t.nome + '</b><span class="custo-badge">+' + B.PONTOS_TREINADOR.primeira(t.nivel) + ' pts</span></div><div class="nota">“' + t.frase + '”</div>';
+      const teamRow = document.createElement('div'); teamRow.className = 'trein-team';
+      B.timeDoTreinador(t).forEach((m) => {
+        const slot = document.createElement('button'); slot.type = 'button'; slot.className = 'trein-slot';
+        slot.innerHTML = '<img src="' + IMG(m.id) + '" alt="' + m.nome + '" loading="lazy"><span>' + m.nome + '</span>' + el(m.tipo);
+        slot.onclick = () => abrirModalMonstro(m.id, 0);
+        teamRow.appendChild(slot);
+      });
+      card.appendChild(teamRow);
+      const iaRow = document.createElement('div'); iaRow.className = 'ia-pills';
+      iaRow.innerHTML = '<span>Estilo: ' + B.ESTILOS[t.pol.estilo].nome + '</span><span>Defesa: ' + t.pol.defesa + '</span><span>Ult: ' + t.pol.ultimate + '</span>';
+      card.appendChild(iaRow);
+      listBox.appendChild(card);
+    });
+  }
+  renderTreinWiki();
+
+  // Aba 5: Mundo, Mercado, Captura & Evolução
+  $('resumoMochila').innerHTML = 'Você começa com <b>40 moedas</b>, <b>5 esferas</b> e <b>2 poções</b>. Visite o <b>Mercado do Vovô</b> na Vila para comprar mais itens:';
+  $('cardsLoja').innerHTML = [
+    ['Esfera', '15 moedas', 'Captura Pixmons selvagens durante a luta.'],
+    ['Esfera Forte', '40 moedas', 'Soma +20 pontos extras na chance de captura.'],
+    ['Poção', '20 moedas', 'Cura 35% da vida em campo (1 a cada 8 s, também contra treinadores).'],
+  ].map(([nm, pr, d]) => '<div class="wcard"><div class="wcard-head"><b>' + nm + '</b><span class="custo-badge">' + pr + '</span></div><div class="nota">' + d + '</div></div>').join('');
+  $('cardsGanhoMundo').innerHTML = [
+    ['Selvagens', 'Dá 6 + 2 × nível em moedas, 8 × nível em XP (capturar dá 60% do XP) e 40% de chance de achar 1 esfera.'],
+    ['Treinadores do Mapa', 'Dá 30 × nível do treinador em moedas, 2 esferas e 12 × nível em XP.'],
+    ['5 Ginásios do Mundo', 'Requer 6 capturados e 20 lutas com treinadores no mapa. Vencer líderes desbloqueia insígnias e mais talentos!'],
+  ].map(([nm, d]) => '<div class="wcard"><div class="wcard-head"><b>' + nm + '</b></div><div class="nota">' + d + '</div></div>').join('');
+
+  $('cBase').textContent = 12; $('cFalta').textContent = 78; $('cMax').textContent = 95; $('cForte').textContent = 20;
+  $('gridCaptura').innerHTML = [[100, 'Vida cheia'], [50, 'Meia vida'], [25, 'Vida baixa'], [10, 'Quase K.O.']].map(([hpPct, lbl]) => {
+    const perda = (100 - hpPct) / 100, normCh = Math.min(95, Math.round(12 + 78 * perda)), forteCh = Math.min(95, normCh + 20);
+    return '<div class="cap-box"><b>' + lbl + ' (' + hpPct + '% HP)</b><span>Esfera: ' + normCh + '%</span><small>Forte: ' + forteCh + '%</small></div>';
+  }).join('');
+  $('cardsXpEvo').innerHTML = [
+    ['Nível &amp; Escala de Status', 'Cada nível varia Vida e Ataque em 5% (referência Nv 10). Subir de nível exige 15 × nível atual em XP.'],
+    ['Evolução em Combate', 'Abaixo de 50% da vida em luta no Mundo, há 60% de chance de evoluir no meio da batalha (1 tentativa por luta) e a evolução fica permanente!'],
+    ['Evolução por Nível (' + totalEvos + ' formas)', 'Atingindo o nível da espécie (ex.: Nv 10–16 na 2ª forma; Nv 20–24 na 3ª), evolui automaticamente. Ganha +' + pct(B.BONUS_EVO.hp) + '% Vida e +' + pct(B.BONUS_EVO.atk) + '% Ataque.'],
+  ].map(([nm, d]) => '<div class="wcard"><div class="wcard-head"><b>' + nm + '</b></div><div class="nota">' + d + '</div></div>').join('');
+
+  // Busca Global Instantânea em toda a Wiki
+  const itensBusca = [
+    ...Object.entries(B.EL).map(([id]) => ({ cat: 'combate', tit: 'Elemento: ' + N[id], sub: 'Vence ' + N[B.VENCE[id]] + ' · Cenário ' + casa(id), sec: 'combate', elId: 'elementos' })),
+    ...Object.entries(B.FAMILIAS).map(([id, f]) => ({ cat: 'combate', tit: 'Família: ' + f.nome, sub: f.traco, sec: 'combate', elId: 'familias' })),
+    { cat: 'combate', tit: 'Status: Veneno, Lentidão, Paralisia e Stun', sub: 'Durações e chances de cada elemento', sec: 'combate', elId: 'titStatus' },
+    { cat: 'combate', tit: 'Objetos quebráveis na arena (Cura, Força, Recarga, Maldições)', sub: 'Barris, caixotes e jarros', sec: 'combate', elId: 'subQuebraveis' },
+    { cat: 'mundo', tit: 'Mercado do Vovô: Esfera, Esfera Forte e Poção', sub: '15, 40 e 20 moedas na Vila', sec: 'mundo', elId: 'itens' },
+    { cat: 'mundo', tit: 'Captura, XP, Nível e Evolução', sub: 'Chances até 95% · Evolução em luta ou por nível', sec: 'mundo', elId: 'capturar' },
+    { cat: 'modos', tit: 'Copa de 5 Fases (Torneio) e Dificuldades', sub: 'Bia, Caio, Dona, Rex e Zéfira', sec: 'modos', elId: 'torneio' },
+  ];
+  const inputGlobal = $('wikiBuscaGlobal'), panelGlobal = $('painelBuscaGlobal'), btnClear = $('btnLimparBusca');
+  function atualizarBuscaGlobal() {
+    const q = norm(inputGlobal.value.trim());
+    btnClear.hidden = !q;
+    if (!q) {
+      panelGlobal.hidden = true;
+      abrirSecao(secAtiva);
+      return;
+    }
+    document.querySelectorAll('.wiki-sec').forEach((s) => { s.hidden = true; });
+    panelGlobal.hidden = false;
+    panelGlobal.innerHTML = '';
+
+    // 1. Monstros & Evoluções
+    const resMon = [];
+    cadeias.forEach((c) => {
+      c.estagios.forEach((st, stIdx) => {
+        const golpesTxt = Object.values(st.forma.golpes).map((g) => g.nome).join(' ');
+        const hay = norm([st.nome, c.base.nome, N[c.base.tipo], B.FAMILIAS[c.base.familia].nome, golpesTxt, st.desc].join(' '));
+        if (hay.includes(q)) resMon.push({ c, st, stIdx });
+      });
+    });
+
+    // 2. Talentos (Time, Tática, Passivas)
+    const resTal = [];
+    const addTal = (map, sub, catLbl) => Object.entries(map).forEach(([id, t]) => {
+      if (norm(t.nome + ' ' + t.desc + ' ' + catLbl).includes(q)) resTal.push({ id, t, sub, catLbl });
+    });
+    addTal(B.TAL_TIME, 'time', 'Talento do Time');
+    addTal(B.TAL_TATICA, 'tatica', 'Tática IA');
+    addTal(B.TAL_MON, 'mon', 'Passiva de Monstro');
+
+    // 3. Treinadores
+    const resTrein = B.TREINADORES.filter((t) => {
+      const teamNames = B.timeDoTreinador(t).map((m) => m.nome).join(' ');
+      return norm('nv ' + t.nivel + ' ' + t.nome + ' ' + t.frase + ' ' + teamNames).includes(q);
+    });
+
+    // 4. Regras, Famílias, Status & Mundo
+    const resRegras = itensBusca.filter((it) => norm(it.tit + ' ' + it.sub).includes(q));
+
+    const addGroup = (titulo, count, builder) => {
+      const g = document.createElement('div'); g.className = 'search-group';
+      g.innerHTML = '<h3><span>' + titulo + '</span><span>' + count + '</span></h3>';
+      builder(g);
+      panelGlobal.appendChild(g);
+    };
+
+    if (resMon.length) addGroup('Monstros & Evoluções', resMon.length, (g) => {
+      resMon.slice(0, 12).forEach(({ c, st, stIdx }) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'sr-item';
+        b.innerHTML = '<img src="' + IMG(st.id) + '" alt=""><div class="sr-body"><b>' + st.nome + (stIdx > 0 ? ' (Evolução de ' + c.base.nome + ')' : '') + '</b><small>' + c.num + ' · ' + N[c.base.tipo] + ' · ' + B.FAMILIAS[c.base.familia].nome + '</small></div>' + el(c.base.tipo);
+        b.onclick = () => abrirModalMonstro(c.base.id, stIdx);
+        g.appendChild(b);
+      });
+    });
+
+    if (resTal.length) addGroup('Talentos & Passivas', resTal.length, (g) => {
+      resTal.slice(0, 10).forEach((item) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'sr-item';
+        b.innerHTML = '<div class="sr-body"><b>' + item.t.nome + '</b><small>' + item.catLbl + ' · ' + item.t.desc + '</small></div>';
+        b.onclick = () => {
+          inputGlobal.value = ''; btnClear.hidden = true; panelGlobal.hidden = true;
+          subTal = item.sub; renderTalentosWiki(); abrirSecao('talentos');
+          const elCard = document.querySelector('[data-tal-id="' + item.id + '"]');
+          if (elCard) { elCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); elCard.classList.add('flash-hi'); }
+        };
+        g.appendChild(b);
+      });
+    });
+
+    if (resTrein.length) addGroup('Treinadores', resTrein.length, (g) => {
+      resTrein.slice(0, 10).forEach((t) => {
+        const mons = B.timeDoTreinador(t);
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'sr-item';
+        b.innerHTML = '<img src="' + IMG(mons[0].id) + '" alt=""><div class="sr-body"><b>Nv ' + t.nivel + ' · ' + t.nome + '</b><small>' + mons.map((m) => m.nome).join(', ') + ' · “' + t.frase + '”</small></div>';
+        b.onclick = () => {
+          inputGlobal.value = ''; btnClear.hidden = true; panelGlobal.hidden = true;
+          filtroTreinNv = t.nivel; renderTreinWiki(); abrirSecao('modos');
+          const elCard = document.querySelector('[data-trein-id="' + t.id + '"]');
+          if (elCard) { elCard.scrollIntoView({ behavior: 'smooth', block: 'center' }); elCard.classList.add('flash-hi'); }
+        };
+        g.appendChild(b);
+      });
+    });
+
+    if (resRegras.length) addGroup('Regras, Famílias & Mundo', resRegras.length, (g) => {
+      resRegras.forEach((it) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'sr-item';
+        b.innerHTML = '<div class="sr-body"><b>' + it.tit + '</b><small>' + it.sub + '</small></div>';
+        b.onclick = () => {
+          inputGlobal.value = ''; btnClear.hidden = true; panelGlobal.hidden = true;
+          abrirSecao(it.sec);
+          const alvo = $(it.elId);
+          if (alvo) { alvo.scrollIntoView({ behavior: 'smooth', block: 'start' }); alvo.classList.add('flash-hi'); }
+        };
+        g.appendChild(b);
+      });
+    });
+
+    if (!resMon.length && !resTal.length && !resTrein.length && !resRegras.length) {
+      panelGlobal.innerHTML = '<div class="empty-box">Nenhum resultado encontrado para “' + inputGlobal.value.replace(/</g, '&lt;') + '”. Tente buscar um Pixmon, elemento, talento ou treinador.</div>';
+    }
+  }
+  inputGlobal.oninput = atualizarBuscaGlobal;
+  btnClear.onclick = () => { inputGlobal.value = ''; atualizarBuscaGlobal(); inputGlobal.focus(); };
+
+  // Sincronização de âncoras diretas (#pixdex, #elementos, #talentos, #torneio, #treinadores, #itens, #capturar)
+  const HASH_MAP = { pixdex: 'pixdex', elementos: 'combate', familias: 'combate', talentos: 'talentos', torneio: 'modos', treinadores: 'modos', itens: 'mundo', capturar: 'mundo' };
+  function aplicarHash() {
+    const h = location.hash.replace('#', '');
+    if (HASH_MAP[h]) {
+      abrirSecao(HASH_MAP[h]);
+      const alvo = $(h);
+      if (alvo) setTimeout(() => alvo.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
+    } else abrirSecao('pixdex');
+  }
+  addEventListener('hashchange', aplicarHash);
+  aplicarHash();
 })();
 </script>
 </body>

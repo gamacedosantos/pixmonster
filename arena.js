@@ -41,6 +41,9 @@
   // T3 (onda 1): 8 espécies novas (inseto, pedra, fera) e as formas evoluídas delas
   const T3 = { brasoleta: 'brasadeira', besourao: 'besourei', tesloura: 'teslorrao', rochilo: 'gargolo', cristalino: 'cristalao', texugao: 'texugarra', lontrinha: 'lontrao' };
   Object.entries(T3).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 38; });
+  // T4 (onda 2): 9 espécies novas e as evoluções delas
+  const T4 = { pimentao: 'chilibrasa', soprinho: 'dentevento', cipochoque: 'cipotrovao', medusonho: 'medusalma', cogumenta: 'cogumentor', mentilha: 'mentilhante', voadorzinho: 'voadorao', peixebrasa: 'brasamarao', avestruzinho: 'avestruzao' };
+  Object.entries(T4).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 38; });
   // Phoenix (ultrarara, 3 estágios)
   Object.assign(PL_ARQ, { cinzarim: 'cinzarim-teste.png', brasafenix: 'brasafenix-teste.png', phoenix: 'phoenix-teste.png' }); Object.assign(ALT_PL, { cinzarim: ALT_MON, brasafenix: 38, phoenix: 44 });
   // linha da borboleta (3 estágios): casulo, lagarta e a borboleta final
