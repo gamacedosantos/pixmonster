@@ -1,0 +1,270 @@
+{
+ "boom": [
+  "fogo_explosao_1x",
+  800
+ ],
+ "blast": [
+  "fogo_explosao_grande_1x",
+  1000
+ ],
+ "cspark": [
+  "fogo_faiscas_1x",
+  700
+ ],
+ "splash": [
+  "agua_respingo_1x",
+  700
+ ],
+ "raio": [
+  "eletrico_raio_1x",
+  600
+ ],
+ "zap": [
+  "eletrico_choque_1x",
+  500
+ ],
+ "storm": [
+  "eletrico_tempestade_1x",
+  1200
+ ],
+ "hitstar": [
+  "impacto_estrela_1x",
+  350
+ ],
+ "crit": [
+  "impacto_critico_1x",
+  500
+ ],
+ "sparks": [
+  "impacto_faiscas_1x",
+  450
+ ],
+ "flash": [
+  "impacto_flash_1x",
+  300
+ ],
+ "dust": [
+  "impacto_poeira_1x",
+  600
+ ],
+ "crater": [
+  "impacto_poeira_grande_1x",
+  800
+ ],
+ "ring": [
+  "impacto_onda_1x",
+  600
+ ],
+ "stars": [
+  "impacto_estrelas_1x",
+  600
+ ],
+ "espinho": [
+  "terra_espinhos_1x",
+  900
+ ],
+ "detritos": [
+  "terra_detritos_1x",
+  700
+ ],
+ "rachadura": [
+  "terra_rachaduras_1x",
+  900
+ ],
+ "gelo_est": [
+  "gelo_estilhaco_1x",
+  600
+ ],
+ "gelo_esp": [
+  "gelo_espinhos_1x",
+  1000
+ ],
+ "cipos": [
+  "planta_cipos_1x",
+  1000
+ ],
+ "farpas": [
+  "planta_espinhos_1x",
+  900
+ ],
+ "garra": [
+  "garra_1x",
+  500
+ ],
+ "mordida": [
+  "mordida_1x",
+  600
+ ],
+ "corte": [
+  "corte_1x",
+  350
+ ],
+ "corte_onda": [
+  "corte_onda_1x",
+  600
+ ],
+ "cura": [
+  "cura_1x",
+  1000
+ ],
+ "carga": [
+  "carga_1x",
+  900
+ ],
+ "poof": [
+  "fumaca_1x",
+  800
+ ],
+ "penas": [
+  "penas_1x",
+  1000
+ ],
+ "meteoro": [
+  "meteoro_1x",
+  1200
+ ],
+ "nivel": [
+  "subir_nivel_1x",
+  1200
+ ],
+ "onda_fogo": [
+  "nova_onda_fogo_1x",
+  700
+ ],
+ "onda_agua": [
+  "nova_onda_agua_1x",
+  700
+ ],
+ "onda_eletrico": [
+  "nova_onda_eletrico_1x",
+  700
+ ],
+ "onda_terra": [
+  "nova_onda_terra_1x",
+  700
+ ],
+ "onda_ar": [
+  "nova_onda_ar_1x",
+  700
+ ],
+ "garra_fogo": [
+  "golpe_garra_fogo_1x",
+  450
+ ],
+ "garra_agua": [
+  "golpe_garra_agua_1x",
+  450
+ ],
+ "garra_eletrico": [
+  "golpe_garra_eletrico_1x",
+  450
+ ],
+ "garra_terra": [
+  "golpe_garra_terra_1x",
+  450
+ ],
+ "garra_ar": [
+  "golpe_garra_ar_1x",
+  450
+ ],
+ "mord_fogo": [
+  "golpe_mordida_fogo_1x",
+  550
+ ],
+ "mord_agua": [
+  "golpe_mordida_agua_1x",
+  550
+ ],
+ "mord_eletrico": [
+  "golpe_mordida_eletrico_1x",
+  550
+ ],
+ "mord_terra": [
+  "golpe_mordida_terra_1x",
+  550
+ ],
+ "mord_ar": [
+  "golpe_mordida_ar_1x",
+  550
+ ],
+ "cort3_fogo": [
+  "golpe_corte3_fogo_1x",
+  500
+ ],
+ "cort3_agua": [
+  "golpe_corte3_agua_1x",
+  500
+ ],
+ "cort3_eletrico": [
+  "golpe_corte3_eletrico_1x",
+  500
+ ],
+ "cort3_terra": [
+  "golpe_corte3_terra_1x",
+  500
+ ],
+ "cort3_ar": [
+  "golpe_corte3_ar_1x",
+  500
+ ],
+ "cruz_fogo": [
+  "golpe_cruz_fogo_1x",
+  450
+ ],
+ "cruz_agua": [
+  "golpe_cruz_agua_1x",
+  450
+ ],
+ "cruz_eletrico": [
+  "golpe_cruz_eletrico_1x",
+  450
+ ],
+ "cruz_terra": [
+  "golpe_cruz_terra_1x",
+  450
+ ],
+ "cruz_ar": [
+  "golpe_cruz_ar_1x",
+  450
+ ],
+ "estr_fogo": [
+  "golpe_estrela_fogo_1x",
+  350
+ ],
+ "estr_agua": [
+  "golpe_estrela_agua_1x",
+  350
+ ],
+ "estr_eletrico": [
+  "golpe_estrela_eletrico_1x",
+  350
+ ],
+ "estr_terra": [
+  "golpe_estrela_terra_1x",
+  350
+ ],
+ "estr_ar": [
+  "golpe_estrela_ar_1x",
+  350
+ ],
+ "arco_fogo": [
+  "proj_arco_fogo_1x",
+  500
+ ],
+ "arco_agua": [
+  "proj_arco_agua_1x",
+  500
+ ],
+ "arco_eletrico": [
+  "proj_arco_eletrico_1x",
+  500
+ ],
+ "arco_terra": [
+  "proj_arco_terra_1x",
+  500
+ ],
+ "arco_ar": [
+  "proj_arco_ar_1x",
+  500
+ ]
+}

@@ -1,0 +1,33 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Biblioteca de efeitos (vitrine)</title>
+<style>
+  body { margin: 0; padding: 12px; background: #1c2430; color: #cfe; font: 12px system-ui, sans-serif; }
+  h2 { margin: 16px 0 6px; font-size: 13px; color: #ffd35a; text-transform: uppercase; }
+  .e { display: flex; align-items: flex-end; gap: 6px; margin: 4px 0 10px; }
+  .n { width: 150px; flex: none; color: #cfe; } .n small { display: block; color: #8fa; }
+  canvas { background: #3b5a3a; image-rendering: pixelated; }
+  .anim { outline: 1px solid #ffd35a; }
+</style>
+<body><div id="r"></div>
+<script>
+// Mostra cada efeito de fx/lib/ em 6 quadros espaçados (x2) e, no fim da tira, o efeito tocando (borda amarela). Agrupado pelo prefixo do nome. Pivô = pontinho vermelho.
+const E = 2, N = 6;
+fetch('lib.json').then((r) => r.json()).then(async (L) => {
+  const raiz = document.getElementById('r'), grupos = {}, anims = [];
+  L.forEach((e) => { const g = e.nome.split('-')[0]; (grupos[g] = grupos[g] || []).push(e); });
+  for (const [gp, es] of Object.entries(grupos)) {
+    const h = document.createElement('h2'); h.textContent = gp; raiz.appendChild(h);
+    for (const e of es) {
+      const j = await (await fetch(e.nome + '.json')).json(), im = new Image(); im.src = e.nome + '.png'; await im.decode();
+      const pf = j.meta.pixelfx, [pw, ph] = pf.frameSize, row = document.createElement('div'); row.className = 'e';
+      row.insertAdjacentHTML('beforeend', '<div class="n">' + e.nome + '<small>' + (pf.loop ? 'loop' : 'uma vez') + ' · ' + e.quadros + ' q · ' + pf.fps + ' fps · ' + pw + 'x' + ph + '</small></div>');
+      const n = j.frames.length, mk = (q) => { const cv = document.createElement('canvas'); cv.width = pw * E; cv.height = ph * E; const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; if (q != null) { const fr = j.frames[q].frame; x.drawImage(im, fr.x, fr.y, fr.w, fr.h, 0, 0, fr.w * E, fr.h * E); x.fillStyle = '#f33'; x.fillRect(pf.pivot[0] * E - 1, pf.pivot[1] * E - 1, 2, 2); } return cv; };
+      for (let k = 0; k < N; k++) row.appendChild(mk(Math.round((k / (N - 1)) * (n - 1))));
+      const a = mk(null); a.className = 'anim'; row.appendChild(a); anims.push({ a, j, im, pf, n }); raiz.appendChild(row);
+    }
+  }
+  const t0 = performance.now();
+  setInterval(() => { const agora = performance.now() - t0; for (const { a, j, im, pf, n } of anims) { const dur = (n / pf.fps) * 1000, ms = agora % (dur + (pf.loop ? 0 : 600)), x = a.getContext('2d'); x.clearRect(0, 0, a.width, a.height); if (ms < dur) { const fr = j.frames[Math.min(n - 1, Math.floor((ms / 1000) * pf.fps))].frame; x.imageSmoothingEnabled = false; x.drawImage(im, fr.x, fr.y, fr.w, fr.h, 0, 0, fr.w * E, fr.h * E); } } }, 33);
+});
+</script>
