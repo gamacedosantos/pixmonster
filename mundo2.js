@@ -2,7 +2,10 @@
 // Usado pelo mundo.js: PixmonMundo2.area é a definição da área (mapa em texto + bloqueios) e PixmonMundo2.desenhar(g, cx, cy, extras) pinta tudo.
 // Legenda do mapa: . grama · , caminho · ~ água · P ponte · T árvore · L porta do Mercado (abre a loja) · ^ < > saídas
 (function () {
+  // Lessi, a enfermeira: a mesma para todos os hospitais (um por casa-hospital; o id muda porque o estado dos NPCs é global por id). Fica perto da porta e abre o hospital ao chegar perto.
+  window.PixmonLessi = (id, c, r) => ({ id, nome: 'Lessi', sprite: 'lessi', servico: 'hospital', c, r, vis: 0, cor: '#e8e8f0', dir: 'baixo', paradas: [{ c, r, espera: [6000, 11000] }, { c: c + 1, r, espera: [2500, 4000] }, { c: c + 1, r: r + 1, espera: [2500, 4000] }] });
   const T = 16, W = 40, H = 60, RES = [240, 427], D = 'ui/mundo/v2/';
+  const NOVAS = /lojanova/.test(location.search); // TESTE (?lojanova): arte nova do PixelLab na loja e nas casas desta Vila; sem o parâmetro nada muda
   const grade = Array.from({ length: H }, () => Array(W).fill('.'));
   const ret = (c0, r0, c1, r1, ch) => { for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) grade[r][c] = ch; };
   const bloq = new Set(), cel = (c, r) => c + ',' + r, bloquear = (c, r, w = 1, h = 1) => { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) bloq.add(cel(c + i, r + j)); };
@@ -16,42 +19,48 @@
   ret(6, 32, 7, 33, ','); ret(32, 32, 33, 33, ','); ret(6, 45, 7, 46, ','); ret(32, 45, 33, 46, ','); // caminhos das casas
   for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; }
   ret(19, 18, 20, 21, 'P');                                           // ponte
-  ret(15, 33, 16, 33, 'L');                                           // porta da loja
+  { const lx = NOVAS ? 12 : 15; ret(lx, 33, lx + 1, 33, 'L'); }       // porta da loja (na arte nova a loja é maior e a porta fica mais à esquerda)
   // muro de mata (2 tiles) com 3 saídas: norte, oeste e leste
   ret(0, 0, 39, 1, 'T'); ret(0, 58, 39, 59, 'T'); ret(0, 0, 1, 59, 'T'); ret(38, 0, 39, 59, 'T');
   ret(6, 0, 7, 1, ','); ret(0, 34, 1, 35, ','); ret(38, 34, 39, 35, ',');
   ret(0, 18, 1, 21, '.'); ret(38, 18, 39, 21, '.'); for (const k of agua) { const [c, r] = k.split(',').map(Number); grade[r][c] = '~'; } ret(19, 18, 20, 21, 'P'); // abre o muro para o rio passar; a ponte volta por cima da água
   grade[0][6] = grade[0][7] = '^'; grade[34][0] = grade[35][0] = '<'; grade[34][39] = grade[35][39] = '>';
   grade[9][19] = grade[9][20] = 'G'; // W7: porta do Ginásio (líder Dan), no fim da rua do Ginásio
+  // F3: as 4 casas da Vila viram serviços; a porta é o caminho logo abaixo da casa (H hospital, O hotel, E escola de treino, M prefeitura)
+  grade[32][6] = grade[32][7] = 'H'; grade[32][32] = grade[32][33] = 'O'; grade[45][6] = grade[45][7] = 'E'; grade[45][32] = grade[45][33] = 'M';
 
   // ---- construções (a base inteira bloqueia): [imagem, coluna, linha, largura, altura] em tiles ----
   const predios = [
     ['ginasio_f', 16, 4, 8, 5], ['loja_f', 13, 30, 6, 3], ['fonte', 18, 38, 4, 3],
     ['casa_1_f', 4, 29, 6, 3], ['casa_3_f', 30, 29, 6, 3], ['casa_2_f', 4, 42, 6, 3], ['casa_1_f', 30, 42, 6, 3], ['casa_3_f', 30, 10, 6, 3],
   ];
+  if (NOVAS) { // arte nova: loja (11 tiles), ginásio (12 x 9, porta na mesma coluna), duas casas grandes sem placa (9 x 13 e 9 x 12) e duas menores no sul; a casa da esquerda (4,29) sai
+    const troca = { 'loja_f,13,30': ['loja_n', 8, 22, 11, 11], 'ginasio_f,16,4': ['gym_n', 14, 0, 12, 9], 'casa_3_f,30,10': ['casa_b1', 27, 0, 9, 13], 'casa_3_f,30,29': ['casa_b2', 29, 21, 9, 12], 'casa_2_f,4,42': ['casa_n6', 0, 39, 9, 7], 'casa_1_f,30,42': ['casa_n7', 31, 39, 9, 7] };
+    for (let i = predios.length - 1; i >= 0; i--) { const k = predios[i].slice(0, 3).join(); if (troca[k]) predios[i] = troca[k]; else if (k === 'casa_1_f,4,29') predios.splice(i, 1); }
+  }
   predios.forEach(([, c, r, w, h]) => bloquear(c, r, w, h));
   // árvores: B (mata) em blocos de 2x2 e D (vila) em blocos de 2x1, a base na linha r
   const arvB = [[3, 4], [35, 4], [3, 16], [35, 16], [3, 23], [35, 23], [8, 50], [29, 50], [22, 53]];
-  const arvD = [[11, 6], [26, 6], [10, 17], [27, 17], [14, 24], [25, 24], [3, 38], [35, 38], [10, 52], [28, 52], [18, 55], [3, 53], [35, 53]];
-  arvB.forEach(([c, r]) => { ret(c, r, c + 1, r + 1, 'T'); });
+  const arvD = [[11, 6], [26, 6], [10, 17], [27, 17], [14, 24], [25, 24], [3, 38], [35, 38], [10, 52], [28, 52], [18, 55], [3, 53], [35, 53]].filter(([c, r]) => !(NOVAS && ((c === 14 && r === 24) || (c === 26 && r === 6))));
+  arvB.filter(([c, r]) => !(NOVAS && c === 35 && r === 4)).forEach(([c, r]) => { ret(c, r, c + 1, r + 1, 'T'); });
   arvD.forEach(([c, r]) => bloquear(c, r, 2, 1));
   // props (célula, largura em células): postes, placa, correios, bancos, cercas, canteiros
   const props = [];
   const pr = (k, c, r, w = 1) => { props.push([k, c, r, w]); bloquear(c, r, w, 1); };
-  [[12, 31], [27, 31], [12, 38], [27, 38], [12, 44], [27, 44], [18, 28], [21, 28], [18, 22], [21, 22], [18, 9], [21, 9], [18, 16], [21, 16]].forEach(([c, r]) => pr('poste', c, r));
-  pr('placa', 21, 11); [[10, 32], [29, 32], [10, 45], [29, 45], [36, 13]].forEach(([c, r]) => pr('correio_manual', c, r));
+  [[12, 31], [27, 31], [12, 38], [27, 38], [12, 44], [27, 44], [18, 28], [21, 28], [18, 22], [21, 22], [18, 9], [21, 9], [18, 16], [21, 16]].filter(([c, r]) => !(NOVAS && ((c === 12 && r === 31) || (c === 18 && r === 28)))).forEach(([c, r]) => pr('poste', c, r));
+  pr('placa', 21, 11); [[10, 32], [29, 32], [10, 45], [29, 45], [36, 13]].filter(([c, r]) => !(NOVAS && ((c === 10 && r === 32) || (c === 29 && r === 32)))).forEach(([c, r]) => pr('correio_manual', c, r));
   pr('banco_reto', 14, 40); pr('banco_reto', 25, 40); pr('banco_reto', 16, 42); pr('banco_reto', 22, 42);
   [[13, 37], [25, 37], [13, 43], [25, 43]].forEach(([c, r], i) => pr(i % 2 ? 'horta' : 'flores', c, r, 2)); // canteiros da praça
   // jardins das 3 primeiras casas: canteiros atrás da cerca, com o portão aberto no caminho
-  [[4, 32, 'horta'], [8, 32, 'flores'], [30, 32, 'flores'], [34, 32, 'horta'], [4, 45, 'flores'], [8, 45, 'horta']].forEach(([c, r, k]) => pr(k, c, r, 2));
-  [[3, 4, 5, 8, 9, 10], [29, 30, 31, 34, 35, 36]].forEach((cs) => cs.forEach((c) => pr('cerca_manual', c, 33)));
+  [[4, 32, 'horta'], [8, 32, 'flores'], [30, 32, 'flores'], [34, 32, 'horta'], [4, 45, 'flores'], [8, 45, 'horta']].filter(([c, r]) => !(NOVAS && r === 32)).forEach(([c, r, k]) => pr(k, c, r, 2));
+  [[3, 4, 5, 8, 9, 10], [29, 30, 31, 34, 35, 36]].forEach((cs, i) => cs.forEach((c) => { if (!NOVAS) pr('cerca_manual', c, 33); }));
   [3, 4, 5, 8, 9, 10].forEach((c) => pr('cerca_manual', c, 46));
   // as árvores de bloco ocupam 'T' no mapa; as D, os prédios e os props bloqueiam por 'bloq'
   const mapa = grade.map((l) => l.join(''));
 
   // ---- imagens ----
   const IM = {}; let pronto = false, chao = null; const brilhos = []; // brilhos: tiles de água inteiros, onde passam as ondinhas
-  const arqs = { arvore_b: 'arvore_b.png', arvore_d: 'arvore_d.png', casa_a: 'casa_a.png', casa_c: 'casa_c.png', mercado_a: 'mercado_a.png', ginasio_a: 'ginasio_a.png', ginasio_f: 'ginasio_f.png', loja_f: 'loja_f.png', fonte: 'fonte.png', horta: 'horta.png', flores: 'flores.png', ponte_v: 'ponte_v.png', casa_1_f: 'casa_1_f.png', casa_2_f: 'casa_2_f.png', casa_3_f: 'casa_3_f.png', ponte_f: 'ponte_f.png', poste: 'prop_poste.png', placa: 'prop_placa.png', correio_manual: 'prop_correio_manual.png',
+  const arqs = { arvore_b: 'arvore_b.png', arvore_d: 'arvore_d.png', casa_a: 'casa_a.png', casa_c: 'casa_c.png', mercado_a: 'mercado_a.png', ginasio_a: 'ginasio_a.png', ginasio_f: 'ginasio_f.png', loja_f: 'loja_f.png', loja_n: '../../mundo-lib/shop.png', gym_n: '../../mundo-lib/gym.png', casa_b1: '../../mundo-lib/casa_sem_placa.png', casa_b2: '../../mundo-lib/casa_azul.png', casa_n6: '../../mundo-lib/casa_vermelha.png', casa_n7: '../../mundo-lib/casa_verde.png', fonte: 'fonte.png', horta: 'horta.png', flores: 'flores.png', ponte_v: 'ponte_v.png', casa_1_f: 'casa_1_f.png', casa_2_f: 'casa_2_f.png', casa_3_f: 'casa_3_f.png', ponte_f: 'ponte_f.png', poste: 'prop_poste.png', placa: 'prop_placa.png', correio_manual: 'prop_correio_manual.png',
     banco_reto: 'prop_banco_reto.png', cerca_manual: 'prop_cerca_manual.png', tronco_reto: 'prop_tronco_reto.png', pedra: 'prop_pedra.png', ponte_cima: 'ponte_cima.png', ponte_baixo: 'ponte_baixo.png', chao_suave: 'chao_suave.png', agua_grama: 'agua_grama.png' };
   const carregar = (k) => new Promise((ok) => { const im = new Image(); im.onload = () => { IM[k] = im; ok(); }; im.onerror = ok; im.src = D + arqs[k]; });
   const tabela = (meta) => { const t = {}; meta.tileset_data.tiles.forEach((x) => { t[x.corners.NW[0] + x.corners.NE[0] + x.corners.SW[0] + x.corners.SE[0]] = x.bounding_box; }); return t; };
@@ -59,7 +68,7 @@
     const tc = tabela(mc), ta = tabela(ma), c = document.createElement('canvas'); c.width = W * T; c.height = H * T; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
     const cl = (x, y) => [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
     const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => { const [a, b] = cl(x, y); return f(a, b); });
-    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',L^<>P'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
+    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',L^<>PHOEM'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const ka = k(vA(x, y)) + k(vA(x + 1, y)) + k(vA(x, y + 1)) + k(vA(x + 1, y + 1));
       if (ka === 'llll') brilhos.push([x, y]);
@@ -91,7 +100,7 @@
     const visivel = (y) => y > cy - 60 && y < cy + RES[1] + 90;
     for (let c = 0; c < W; c += 2) { if (c !== 6) { objs.push({ y: 32, f: () => img('arvore_b', c * T, 32 - 40) }); objs.push({ y: H * T, f: () => img('arvore_b', c * T, H * T - 40) }); } }
     for (let r = 2; r < H - 2; r += 2) { if (![18, 20, 34, 36].includes(r)) { objs.push({ y: (r + 2) * T, f: () => img('arvore_b', 0, (r + 2) * T - 40) }); objs.push({ y: (r + 2) * T, f: () => img('arvore_b', (W - 2) * T, (r + 2) * T - 40) }); } }
-    arvB.forEach(([c, r]) => objs.push({ y: (r + 2) * T, f: () => img('arvore_b', c * T, (r + 2) * T - 40) }));
+    arvB.filter(([c, r]) => !(NOVAS && c === 35 && r === 4)).forEach(([c, r]) => objs.push({ y: (r + 2) * T, f: () => img('arvore_b', c * T, (r + 2) * T - 40) }));
     arvD.forEach(([c, r]) => objs.push({ y: (r + 1) * T, f: () => img('arvore_d', c * T, (r + 1) * T - 48) }));
     predios.forEach(([k, c, r, w, h]) => objs.push({ y: (r + h) * T, f: () => { const x0 = (c + w / 2) * T - IM[k].width / 2, y0 = (r + h) * T - IM[k].height + 1; img(k, x0, y0);
       if (k === 'fonte') { const t = performance.now(); g.fillStyle = 'rgba(190,225,250,.8)'; for (let i = 0; i < 6; i++) g.fillRect(Math.round(x0 + 8 + ((i * 9 + t / 140) % 46)), Math.round(y0 + 33 + (i % 3) * 3), 4, 1); g.fillStyle = 'rgba(160,200,230,.9)'; const q = (t / 120) % 4 | 0; for (const xx of [16, 47]) g.fillRect(x0 + xx, y0 + 22 + q * 2, 1, 2); } } })); // base alinhada embaixo; a fonte ganha água mexendo
@@ -108,8 +117,11 @@
   window.PixmonMundo2 = {
     desenhar, RES,
     area: { nome: 'Vila', largura: W, bioma: 'vila', elemento: null, v2: true, T, res: RES, mapa, bloq, desenhar,
-      npcs: [{ id: 'tomas', nome: 'Tomy', pele: '#f6d3bb', matiz: 270, c: 19, r: 24, dir: 'baixo', vis: 3, cor: '#5a3a20', camisa: '#3a9a4a', cab: '#ebebf3' }, { id: 'ivo', nome: 'Ivo', c: 20, r: 44, vis: 0, pele: '#f6d3bb', cor: '#34231b', cab: '#3a2a1a', camisa: '#c0392b', dir: 'baixo', paradas: [{ c: 20, r: 44, espera: [9000, 15000] }, { c: 15, r: 34, espera: [4000, 6000] }, { c: 7, r: 45, espera: [4000, 6000] }] }, { id: 'luki', nome: 'Luki', c: 27, r: 8, vis: 0, pele: '#c98a5e', cor: '#2f4a6a', cab: '#1b1020', camisa: '#f0b830', dir: 'baixo', paradas: [{ c: 27, r: 8, espera: [8000, 14000] }, { c: 32, r: 3, espera: [3000, 5000] }, { c: 33, r: 8, espera: [3000, 5000] }] }, { id: 'jony', nome: 'Jony', c: 4, r: 55, vis: 0, pele: '#8a5a3a', cor: '#3a5a3a', cab: '#b8501f', camisa: '#7a4ab8', dir: 'baixo', paradas: [{ c: 4, r: 55, espera: [10000, 16000] }, { c: 7, r: 56, espera: [5000, 8000] }, { c: 5, r: 51, espera: [4000, 6000] }] }],
-      ginasios: { G: 'dan' },
+      npcs: [window.PixmonLessi('lessi', 9, 34), { id: 'tomas', nome: 'Tomy', pele: '#f6d3bb', matiz: 270, c: 19, r: 24, dir: 'baixo', vis: 3, cor: '#5a3a20', camisa: '#3a9a4a', cab: '#ebebf3' }, { id: 'ivo', nome: 'Ivo', c: 20, r: 44, vis: 0, pele: '#f6d3bb', cor: '#34231b', cab: '#3a2a1a', camisa: '#c0392b', dir: 'baixo', paradas: [{ c: 20, r: 44, espera: [9000, 15000] }, { c: 15, r: 34, espera: [4000, 6000] }, { c: 7, r: 45, espera: [4000, 6000] }] }, { id: 'luki', nome: 'Luki', c: 27, r: 8, vis: 0, pele: '#c98a5e', cor: '#2f4a6a', cab: '#1b1020', camisa: '#f0b830', dir: 'baixo', paradas: [{ c: 27, r: 8, espera: [8000, 14000] }, { c: 32, r: 3, espera: [3000, 5000] }, { c: 33, r: 8, espera: [3000, 5000] }] }, { id: 'vovo', nome: 'Vovô', sprite: 'vovo', servico: 'loja', c: 17, r: 34, vis: 0, cor: '#5a3a20', dir: 'baixo', paradas: [{ c: 17, r: 34, espera: [6000, 11000] }, { c: 18, r: 34, espera: [2500, 4000] }, { c: 18, r: 35, espera: [2500, 4000] }] }, { id: 'jony', nome: 'Jony', c: 4, r: 55, vis: 0, pele: '#8a5a3a', cor: '#3a5a3a', cab: '#b8501f', camisa: '#7a4ab8', dir: 'baixo', paradas: [{ c: 4, r: 55, espera: [10000, 16000] }, { c: 7, r: 56, espera: [5000, 8000] }, { c: 5, r: 51, espera: [4000, 6000] }] }],
+      correios: [ // F3: chegando perto do correio de uma casa, o mundo avisa que estrutura é (c, r = célula do correio)
+        { c: 10, r: 32, msg: 'Hospital da Vila' }, { c: 29, r: 32, msg: 'Hotel de Pixmon' },
+        { c: 10, r: 45, msg: 'Escola de Treino' }, { c: 29, r: 45, msg: 'Prefeitura' }, { c: 36, r: 13, msg: 'Casa de morador' }],
+      ginasios: { G: 'dan' }, eventos: { H: 'hospital', O: 'hotel', E: 'escola', M: 'prefeitura' }, // F3: tratados em index.html (cb.evento)
       portais: { '^': { area: 'rota1', c: 13, r: 61 }, '<': { area: 'lago', c: 33, r: 26 }, '>': { area: 'fazenda', c: 2, r: 22 } } },
   };
 })();

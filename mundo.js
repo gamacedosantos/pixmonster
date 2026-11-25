@@ -2,6 +2,7 @@
 // Separado de battle.js e arena.js: a batalha só é avisada por cb.encontro() e devolve o controle com PixmonMundo.retomar().
 (function () {
   let W = 360, H = 640, T = 32; const PASSO = 3; // tela lógica, tamanho do tile (a Vila v2 usa 240 x 427 e tiles de 16), px por quadro ao andar num tile de 32
+  let lojaAberta = false, correioVisto = null, bike = false, lento = false; // lento: fome ou cansaço (F5) // F3: ligada por PixmonMundo.bike(true)
   const CHANCE = 0.12; // chance de encontro por passo no mato alto
   const SALVO = 'pixmon-mundo';
 
@@ -270,6 +271,18 @@
   // ---------- treinador do PixelLab (sprites-pixellab/treinador/, 68x68, 4 direções). Sem quadros de andar ainda: balança de leve. ----------
   const TREI = {}, DIR_TREI = { baixo: 'south', cima: 'north', esq: 'west', dir: 'east' }; let ESC_TREI = 0.6; // escala da sprite do treinador (a Vila v2 usa 0.42)
   Object.values(DIR_TREI).forEach((d) => { const im = new Image(); im.onload = () => { TREI[d] = im; }; im.src = 'sprites-pixellab/treinador/' + d + '.png'; });
+  // NPC com sprite próprio (PixelLab 8 direções, usa as 4 retas): sprites-pixellab/<nome>/<dir>.png, andar-<dir>-<n>.png e, se houver, parado-<dir>-<n>.png (animação de parado).
+  // SPR_N = quadros de andar e de parado de cada um. Os pés e o centro vêm da silhueta do quadro sul.
+  const SPR = {}, SPR_N = { vovo: [7, 0], debis: [6, 8], lessi: [8, 0] }, SPR_ESC = { lessi: 0.75 }; // SPR_ESC: escala (a Lessi saiu grande no canvas)
+  const spriteProprio = (nome) => {
+    if (SPR[nome]) return SPR[nome]; const o = SPR[nome] = { rot: {}, andar: { south: [], north: [], east: [], west: [] }, parado: { south: [], north: [], east: [], west: [] }, cx: 22, fy: 39 }, [na, np] = SPR_N[nome] || [6, 0];
+    Object.keys(o.andar).forEach((d) => {
+      const r = new Image(); r.onload = () => { o.rot[d] = r; if (d === 'south') { const c = document.createElement('canvas'); c.width = r.width; c.height = r.height; const x = c.getContext('2d'); x.drawImage(r, 0, 0); const dt = x.getImageData(0, 0, c.width, c.height).data; let a = c.width, b = 0, f = 0; for (let y = 0; y < c.height; y++) for (let q = 0; q < c.width; q++) if (dt[(y * c.width + q) * 4 + 3]) { a = Math.min(a, q); b = Math.max(b, q); f = Math.max(f, y); } o.cx = Math.round((a + b) / 2); o.fy = f + 1; } }; r.src = 'sprites-pixellab/' + nome + '/' + d + '.png';
+      for (let k = 0; k < na; k++) { const im = new Image(); im.onload = () => { o.andar[d][k] = im; }; im.src = 'sprites-pixellab/' + nome + '/andar-' + d + '-' + k + '.png'; }
+      for (let k = 0; k < np; k++) { const im = new Image(); im.onload = () => { o.parado[d][k] = im; }; im.src = 'sprites-pixellab/' + nome + '/parado-' + d + '-' + k + '.png'; }
+    });
+    return o;
+  };
   // Quadros de andar (6 por direção, andar-<dir>-<n>.png). O gerador refez a faixa amarela no leste: aqui ela é pintada com a cor vizinha (cabelo/pele).
   const ANDA = { south: [], north: [], east: [], west: [] };
   function semFaixa(im) {
@@ -323,6 +336,12 @@
     g.restore(); return true;
   }
   function spriteTreinador(g, x, y, dir, quadro, andando, P) {
+    if (P.sprite) { // NPC com sprite próprio
+      const o = spriteProprio(P.sprite), dk = DIR_TREI[dir]; let im = o.rot[dk];
+      if (andando) { const fa = o.andar[dk]; const q = fa[Math.min(fa.length - 1, Math.floor((P.frac != null ? P.frac : prog / T) * fa.length))]; if (q) im = q; }
+      else { const fp = o.parado[dk].filter(Boolean); if (fp.length === o.parado[dk].length && fp.length) im = fp[Math.floor(performance.now() / 150) % fp.length]; }
+      if (!im) return false; g.save(); g.imageSmoothingEnabled = false; const es = SPR_ESC[P.sprite] || 1; g.drawImage(im, Math.round(x - o.cx * es), Math.round(y - o.fy * es), Math.round(im.width * es), Math.round(im.height * es)); g.restore(); return true;
+    }
     if (AREAS[area].v2 && spritePers(g, x, y, dir, quadro, andando, P)) return true;
     if (!andando && !P.cor && parado > ESPERA && ESPRE.filter(Boolean).length === 9) {
       const t = (parado - ESPERA) % (9 * QUADRO_ESPRE + PAUSA_ESPRE), k = Math.min(8, Math.floor(t / QUADRO_ESPRE)), im = ESPRE[t < 9 * QUADRO_ESPRE ? k : 0];
@@ -485,7 +504,7 @@
       }
     }
     if (alvo) {
-      const passo = Math.min(PASSO * (T / 32) * dt / 16.7, T - prog); prog += passo;
+      const passo = Math.min(PASSO * (bike ? 1.5 : 1) * (lento ? 0.6 : 1) * (T / 32) * dt / 16.7, T - prog); prog += passo; // F3: bicicleta anda 50% mais rápido
       const [dx, dy] = DELTA[dir];
       px += dx * passo; py += dy * passo;
       if (prog >= T - 0.01) {
@@ -501,7 +520,13 @@
         else if (AREAS[area].ginasios && AREAS[area].ginasios[ch] && cb.ginasio) { salvar(); pausado = true; cb.ginasio(AREAS[area].ginasios[ch]); } // porta do ginásio: chama o líder (regras em index.html)
         else if (AREAS[area].eventos && AREAS[area].eventos[ch] && cb.evento) { salvar(); pausado = true; cb.evento(AREAS[area].eventos[ch], area, ch); } // bau, chave, porta trancada (regras em index.html)
         else if (ch === 'L' && cb.loja) { salvar(); pausado = true; cb.loja(); }
-        else { if (passos % 5 === 0) salvar(); vigiar(); }
+        else {
+          const lj = (AREAS[area].npcs || []).find((n) => { const q = npcPos[n.id] || n; return n.servico && Math.abs(q.c - col) <= 2 && Math.abs(q.r - lin) <= 2; }); // NPC de serviço (n.servico: 'loja' = Vovô, 'hospital' = Lessi) abre o serviço ao chegar perto (só reabre depois de sair do raio)
+          if (lj && !lojaAberta && cb.evento) { lojaAberta = true; salvar(); pausado = true; if (lj.servico === 'loja' && cb.loja) cb.loja(); else cb.evento(lj.servico, area, ''); } else if (!lj) lojaAberta = false;
+          const cr = (AREAS[area].correios || []).find((q) => Math.abs(q.c - col) <= 2 && Math.abs(q.r - lin) <= 2); // F3: perto do correio de uma casa, diz que estrutura é
+          if (cr && cr !== correioVisto) mostrarAviso(cr.msg); correioVisto = cr || null;
+          if (passos % 5 === 0) salvar(); vigiar();
+        }
       }
     }
   }
@@ -514,7 +539,7 @@
     (A.npcs || []).forEach((n) => { const p = npcPos[n.id]; extras.push({ y: (p.r + 1) * T, f: () => {
       const mv = npcMov[n.id], q = mv ? Math.min(1, mv.t / DUR_PASSO) : 0; let nx = p.c * T + T / 2, ny = (p.r + 1) * T - 1;
       if (mv) { nx = mv.fc * T + T / 2 + (p.c - mv.fc) * T * q; ny = (mv.fr + 1) * T - 1 + (p.r - mv.fr) * T * q; }
-      jogador(g, nx, ny, p.dir, 0, !!mv, { cor: n.cor, cab: n.cab, pele: n.pele, camisa: n.camisa, matiz: n.matiz, frac: mv ? q : null, passo: mv ? mv.passo : 0 });
+      jogador(g, nx, ny, p.dir, 0, !!mv, { cor: n.cor, cab: n.cab, pele: n.pele, camisa: n.camisa, matiz: n.matiz, sprite: n.sprite, frac: mv ? q : null, passo: mv ? mv.passo : 0 });
       etiqueta(g, nx, ny - 30, n.nome + (cb.rotuloNpc ? cb.rotuloNpc(n.id) : ''));
       if (des && des.id === n.id && des.fase === 'ex') { g.fillStyle = '#1b1020'; g.fillRect(p.c * T + 4, p.r * T - 20, 8, 12); g.fillStyle = '#ffd35a'; g.font = '8px "Press Start 2P", monospace'; g.textAlign = 'center'; g.fillText('!', p.c * T + 8, p.r * T - 10); }
     } }); });
@@ -566,8 +591,10 @@
       } });
     }));
     (A.npcs || []).forEach((n) => { const p = npcPos[n.id]; objs.push({ y: (p.r + 1) * T, f: () => {
-      jogador(g, p.c * T + T / 2, (p.r + 1) * T - 2, p.dir, 0, false, { cor: n.cor, cab: n.cab, matiz: n.matiz });
-      etiqueta(g, p.c * T + T / 2, (p.r + 1) * T - 50, n.nome + (cb.rotuloNpc ? cb.rotuloNpc(n.id) : ''));
+      const mv = npcMov[n.id], q = mv ? Math.min(1, mv.t / DUR_PASSO) : 0; let nx = p.c * T + T / 2, ny = (p.r + 1) * T - 2; // NPC que passeia (paradas): anda suave entre os tiles
+      if (mv) { nx = mv.fc * T + T / 2 + (p.c - mv.fc) * T * q; ny = (mv.fr + 1) * T - 2 + (p.r - mv.fr) * T * q; }
+      jogador(g, nx, ny, p.dir, 0, !!mv, { cor: n.cor, cab: n.cab, matiz: n.matiz, sprite: n.sprite, frac: mv ? q : null, passo: mv ? mv.passo : 0 });
+      etiqueta(g, nx, ny - 48, n.nome + (cb.rotuloNpc ? cb.rotuloNpc(n.id) : ''));
       if (des && des.id === n.id && des.fase === 'ex') { g.fillStyle = '#1b1020'; g.fillRect(p.c * T + 10, p.r * T - 22, 12, 18); g.fillStyle = '#ffd35a'; g.font = '14px "Press Start 2P", monospace'; g.textAlign = 'center'; g.fillText('!', p.c * T + 16, p.r * T - 7); }
     } }); });
     objs.push({ y: py, f: () => jogador(g, px, py - 2, dir, quadro, !!alvo) });
@@ -623,5 +650,5 @@
   }
   addEventListener('resize', () => { if (cv) usarArea(); }); // girar o celular ou mostrar/esconder a barra do navegador
 
-  window.PixmonMundo = { BLOQUEIA, BLOQ_OBJ, aviso: mostrarAviso, iniciar, parar, pausar, retomar, ligarToque, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
+  window.PixmonMundo = { lento: (v) => { lento = !!v; }, bike: (v) => { bike = !!v; }, BLOQUEIA, BLOQ_OBJ, aviso: mostrarAviso, iniciar, parar, pausar, retomar, ligarToque, esperar: (ms) => { parado = ms; }, ir: (a, c, r) => { area = a; usarArea(); col = c; lin = r; px = c * T + T / 2; py = r * T + T; alvo = null; }, npcPosEst: () => JSON.stringify(npcPos), estado: () => ({ parado, dir, area, col, lin, passos, flash, pausado, rodando, alvo, tec: [...teclas] }), AREAS };
 })();

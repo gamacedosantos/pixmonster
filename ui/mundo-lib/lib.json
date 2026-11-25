@@ -1,0 +1,170 @@
+{
+ "gym": {
+  "w": 184,
+  "h": 146,
+  "base": 145,
+  "faixa": 0,
+  "tipo": "ginasio"
+ },
+ "pref": {
+  "w": 168,
+  "h": 146,
+  "base": 143,
+  "faixa": 0,
+  "tipo": "edificio"
+ },
+ "cottage": {
+  "w": 72,
+  "h": 96,
+  "base": 93,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "cabin": {
+  "w": 92,
+  "h": 96,
+  "base": 94,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "shop": {
+  "w": 178,
+  "h": 178,
+  "base": 174,
+  "faixa": 0,
+  "tipo": "loja"
+ },
+ "housebig": {
+  "w": 138,
+  "h": 210,
+  "base": 207,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "housesmall": {
+  "w": 78,
+  "h": 86,
+  "base": 84,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "crates": {
+  "w": 38,
+  "h": 50,
+  "base": 48,
+  "faixa": 0,
+  "tipo": "prop"
+ },
+ "treeR": {
+  "w": 64,
+  "h": 84,
+  "base": 80,
+  "faixa": 8,
+  "tipo": "arvore"
+ },
+ "redgreen": {
+  "w": 94,
+  "h": 198,
+  "base": 195,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "fonteE": {
+  "w": 52,
+  "h": 58,
+  "base": 54,
+  "faixa": 0,
+  "tipo": "fonte"
+ },
+ "fonteD": {
+  "w": 62,
+  "h": 58,
+  "base": 53,
+  "faixa": 0,
+  "tipo": "fonte"
+ },
+ "casaazul1": {
+  "w": 58,
+  "h": 76,
+  "base": 72,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "casavermA": {
+  "w": 58,
+  "h": 70,
+  "base": 67,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "casacabana": {
+  "w": 62,
+  "h": 80,
+  "base": 77,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "casaazul2": {
+  "w": 58,
+  "h": 80,
+  "base": 77,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "casaazul3": {
+  "w": 60,
+  "h": 78,
+  "base": 75,
+  "faixa": 0,
+  "tipo": "casa"
+ },
+ "pococasa": {
+  "w": 44,
+  "h": 48,
+  "base": 45,
+  "faixa": 0,
+  "tipo": "poco"
+ },
+ "poco2": {
+  "w": 34,
+  "h": 40,
+  "base": 36,
+  "faixa": 0,
+  "tipo": "poco"
+ },
+ "arvA": {
+  "w": 36,
+  "h": 56,
+  "base": 52,
+  "faixa": 8,
+  "tipo": "arvore"
+ },
+ "arvB": {
+  "w": 42,
+  "h": 58,
+  "base": 55,
+  "faixa": 8,
+  "tipo": "arvore"
+ },
+ "pine1": {
+  "w": 38,
+  "h": 56,
+  "base": 52,
+  "faixa": 8,
+  "tipo": "pinheiro"
+ },
+ "pine2": {
+  "w": 38,
+  "h": 40,
+  "base": 37,
+  "faixa": 8,
+  "tipo": "pinheiro"
+ },
+ "pine3": {
+  "w": 40,
+  "h": 52,
+  "base": 50,
+  "faixa": 8,
+  "tipo": "pinheiro"
+ }
+}

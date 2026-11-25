@@ -17,6 +17,7 @@ window.PixmonMundo9 = window.PixmonBase.criar({
     ret(0, 38, 7, 39, ','); grade[38][0] = grade[39][0] = '<';                            // saida oeste para a Praia
     grade[19][29] = grade[19][30] = 'G';                                                 // porta do ginasio (embaixo do predio)
     grade[61][22] = grade[61][23] = 'L';                                                 // porta da loja
+    grade[38][12] = grade[38][13] = 'H';                                                 // F3: porta do hospital (a casa em cima)
   },
   predios: [['ginasio_f', 26, 14, 8, 5], ['loja_f', 20, 58, 6, 3], ['fonte', 28, 64, 4, 3],
     ['casa_1_f', 10, 35, 6, 3], ['casa_2_f', 20, 35, 6, 3], ['casa_3_f', 38, 35, 6, 3], ['casa_1_f', 46, 35, 6, 3],
@@ -27,7 +28,10 @@ window.PixmonMundo9 = window.PixmonBase.criar({
     [[19, 57], [38, 57], [19, 73], [38, 73]].forEach(([c, r], i) => pr(i % 2 ? 'horta' : 'flores', c, r, 2));
     [[9, 37], [36, 37], [9, 90], [36, 90]].forEach(([c, r]) => pr('correio_manual', c, r));
   },
+  eventos: { H: 'hospital' }, correios: [{ c: 9, r: 37, msg: 'Hospital' }], // tratados em index.html (cb.evento)
   npcs: [
+    window.PixmonLessi('lessi2', 15, 38),
+    { id: 'vovo2', nome: 'Vovô', sprite: 'vovo', servico: 'loja', c: 24, r: 62, vis: 0, cor: '#5a3a20', dir: 'baixo', paradas: [{ c: 24, r: 62, espera: [6000, 11000] }, { c: 25, r: 62, espera: [2500, 4000] }, { c: 25, r: 63, espera: [2500, 4000] }] }, 
     { id: 'lia', nome: 'Lia', pele: '#f6d3bb', c: 24, r: 39, dir: 'cima', vis: 3, cor: '#6a3a1a', camisa: '#2f78a8', cab: '#ffffff' },
     { id: 'beto', nome: 'Beto', pele: '#d8a878', c: 30, r: 24, dir: 'esq', vis: 3, cor: '#1b1410', camisa: '#4aa3d8', cab: '#ffd35a' },
   ],

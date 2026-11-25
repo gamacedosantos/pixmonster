@@ -57,7 +57,7 @@
     cura_cadeia: { nome: 'Cura em cadeia', custo: 3, desc: 'a cada 3 ataques rápidos de quem está em campo, o time todo recupera ' + Math.round(CADEIA_PCT * 100) + '% da vida' },
     sorte: { nome: 'Mão de sorte', custo: 3, desc: 'item quebrado: ' + Math.round(SORTE_OTIMO * 100) + '% de chance de buff ótimo (dobrado) e ' + Math.round(SORTE_DESFAZ * 100) + '% de a maldição se desfazer' },
     ultimate: { nome: 'Ultimate adiantado', custo: 2, desc: 'o ultimate de cada monstro começa 75% carregado (em vez de 50%)' },
-    troca: { nome: 'Troca ágil', custo: 2, desc: 'a espera de troca cai de 6 s para 3 s e quem entra não fica parado' },
+    troca: { nome: 'Troca ágil', custo: 2, desc: 'a espera de troca cai de 6 s para 3 s, quem entra não fica parado e leva 20% menos dano por 3 s' },
     dupla: { nome: 'Dupla elemental', custo: 2, desc: 'monstros do time que têm um parceiro do mesmo elemento causam +' + Math.round((DUPLA_MULT - 1) * 100) + '% de dano' },
     arco: { nome: 'Arco-íris', custo: 2, desc: 'com 3 elementos diferentes no time, o time recebe ' + Math.round((1 - ARCO_MULT) * 100) + '% menos dano' },
     reserva: { nome: 'Reserva descansada', custo: 2, desc: 'quem está no banco recupera ' + (RESERVA_PCT * 100).toFixed(1).replace('.', ',') + '% da vida por segundo' },
@@ -153,6 +153,34 @@
     return erros;
   }
   // Pontos de talento (decisão do George: crescem com o jogo): 4 no começo, +1 a cada 5 batalhas com treinadores (até +12), +2 por insígnia de líder (até 5).
+  // F1 (PLANO-v2-sistemas.md): teto de nível dos monstros 50 (era 30); nível do jogador (XP 20 x nível, máx 30) libera os degraus dos talentos de TIME;
+  // bag por categoria (esf/esfF/poc saem de jogo.* e vão para jogo.bag; categorias futuras: pedras, comida, chaves).
+  const NV_MAX = 50, NV_JOGADOR_MAX = 30, NV_TIME_DEGRAU = [1, 5, 10];
+  const nivelJogador = (xp = 0) => { let nv = 1, r = Math.max(0, Math.floor(xp)); while (nv < NV_JOGADOR_MAX && r >= 20 * nv) { r -= 20 * nv; nv++; } return { nv, xp: r, falta: nv < NV_JOGADOR_MAX ? 20 * nv : 0 }; };
+  const BAG_CAT = { esf: { cat: 'esferas', nome: 'Esfera' }, esfF: { cat: 'esferas', nome: 'Esfera Forte' }, poc: { cat: 'curas', nome: 'Poção' } };
+  const migrarBag = (j) => { if (!j.bag) j.bag = { esf: j.esf || 0, esfF: j.esfF || 0, poc: j.poc || 0 }; delete j.esf; delete j.esfF; delete j.poc; if (typeof j.xpJ !== 'number') j.xpJ = (j.lutas || 0) * 20; if (!j.retido) j.retido = {}; if (typeof j.fome !== 'number') j.fome = 100; if (typeof j.energia !== 'number') j.energia = 100; return j; }; // retido: pixmon em poder de treinadores (F4); fome e energia 0..100 (F5) // save antigo sem xpJ: 20 XP por luta já feita
+  // F2 (PLANO-v2-sistemas.md): evolução só por Pedra do elemento do pixmon, nível mínimo por estágio (NV_EVO), 50% de sucesso e a pedra é gasta mesmo na falha.
+  // Captura: 20% com o selvagem abaixo de 30% da vida, 1% acima (x raridade; Esfera Forte dobra).
+  const PEDRA_DE = { fogo: 'pedra_fogo', agua: 'pedra_agua', terra: 'pedra_terra', ar: 'pedra_ar', eletrico: 'pedra_eletrico' }, NV_EVO = [40, 45], CHANCE_PEDRA = 0.5;
+  Object.assign(BAG_CAT, Object.fromEntries(Object.entries(PEDRA_DE).map(([el, k]) => [k, { cat: 'pedras', nome: 'Pedra de ' + { fogo: 'Fogo', agua: 'Água', terra: 'Terra', ar: 'Ar', eletrico: 'Elétrico' }[el] }])));
+  BAG_CAT.pao = { cat: 'comida', nome: 'Pão' }; BAG_CAT.ensopado = { cat: 'comida', nome: 'Ensopado' }; // F5
+  BAG_CAT.bike = { cat: 'chaves', nome: 'Bicicleta' }; // F3: +50% de velocidade no mundo (liga e desliga no botão do mapa)
+  const capturaChance =(hpFrac, raridade, mult = 1) => Math.min(0.97, (hpFrac < 0.3 ? 0.2 : 0.01) * (CAPTURA_RARIDADE[raridade] || 1) * mult);
+  const podeEvoluir = (id, col) => { // próxima evolução do jogador: { prox, nvMin, pedra } ou null (sem evolução, exclusiva de líder ou já no último estágio)
+    if (!EVOLUI(id)) return null;
+    const s = col.evo === 2 ? 2 : col.evo ? 1 : 0, E = s === 0 ? EVOLUCOES[id] : s === 1 ? EVOLUCOES[EVOLUCOES[id].id] : null;
+    return E ? { prox: E, nvMin: NV_EVO[s], pedra: PEDRA_DE[MONSTROS.find((m) => m.id === id).tipo] } : null;
+  };
+  // F4: aposta e roubo. O primeiro pixmon da coleção (o inicial) e o último que sobrar nunca podem ser perdidos.
+  const TREINADORES_LADROES = ['vlad', 'cida', 'kira', 'odin', 'hans']; // tomam um pixmon de quem perde (avisado no desafio); o ginásio nunca
+  const candidatosPerda = (col) => { const ids = Object.keys(col); return ids.length < 2 ? [] : ids.slice(1); };
+  const escolherRoubo = (col) => candidatosPerda(col).sort((a, b) => col[a].nv - col[b].nv)[0] || null; // o de menor nível
+  const tomarPixmon = (j, trId, id) => { // tira o pixmon da coleção e da equipe e o deixa com o treinador (devolverRetidos traz de volta)
+    if (!candidatosPerda(j.col).includes(id)) return false;
+    (j.retido[trId] = j.retido[trId] || []).push({ id, c: j.col[id] }); delete j.col[id]; j.eq = j.eq.filter((x) => x !== id); if (!j.eq.length) j.eq.push(Object.keys(j.col)[0]);
+    return true;
+  };
+  const devolverRetidos = (j, trId) => { const ids = []; (j.retido[trId] || []).forEach((r) => { if (!j.col[r.id]) { j.col[r.id] = r.c; if (j.eq.length < 3) j.eq.push(r.id); ids.push(r.id); } }); delete j.retido[trId]; return ids; };
   const pontosTalento = (lutas = 0, insignias = 0) => 4 + Math.min(12, Math.floor(lutas / 5)) + 2 * Math.min(5, insignias);
   // Migração do save antigo (pixmon-tal: { time: [ids], mon: { idMonstro: 'talento' } }) para o formato da árvore (monstro com lista; tatica vem na B7).
   const migrarTal = (v) => ({ time: Array.isArray(v && v.time) ? v.time.slice() : [], mon: Object.fromEntries(Object.entries((v && v.mon) || {}).map(([k, x]) => [k, Array.isArray(x) ? x.slice() : x ? [x] : []])), tatica: Array.isArray(v && v.tatica) ? v.tatica.slice() : [] });
@@ -221,19 +249,45 @@
     { id: 'voadorzinho', nome: 'Voadorzinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.92, cg: 0.86, raridade: 'comum', golpes: h(['Salto Alto', 'ar'], ['Borrifo Alado', 'ar'], 'Escama Voadora', 'Chuva Furiosa', 'agua') },
     { id: 'peixebrasa', nome: 'Peixe-brasa', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.02, cg: 0.98, raridade: 'incomum', golpes: h(['Mordida Quente', 'fogo'], ['Jato Fervente', 'fogo'], 'Escama de Brasa', 'Descarga de Vapor', 'eletrico') },
     { id: 'avestruzinho', nome: 'Avestruzinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 0.95, cg: 0.91, raridade: 'comum', golpes: h(['Corrida Veloz', 'terra'], ['Chute de Avestruz', 'terra'], 'Penas de Areia', 'Areia em Chamas', 'fogo') },
-    { id: 'lontrinha', nome: 'Lontrinha', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.89, cg: 0.87, raridade: 'comum', golpes: h(['Respingo', 'agua'], ['Mergulho da Lontra', 'agua'], 'Concha Protetora', 'Pedra do Rio', 'terra') },
+    { id: 'dragolhama', nome: 'Dragolhama', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.08, cg: 1.18, raridade: 'rara', golpes: h(['Sopro de Chama', 'fogo'], ['Rabada Flamejante', 'fogo'], 'Escama de Magma', 'Trovão Dragônico', 'eletrico') },
+    { id: 'serpelago', nome: 'Serpelago', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.09, cg: 1.16, raridade: 'rara', golpes: h(['Mordida do Lago', 'agua'], ['Onda Serpentina', 'agua'], 'Escama de Lago', 'Maré do Abismo', 'terra') },
+    { id: 'dracopedra', nome: 'Dracopedra', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.14, cg: 1.2, raridade: 'rara', golpes: h(['Garra de Rocha', 'terra'], ['Cauda de Pedra', 'terra'], 'Couraça de Rocha', 'Erupção Dracônica', 'fogo') },
+    { id: 'vendraco', nome: 'Vendraco', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.06, cg: 1.1, raridade: 'rara', golpes: h(['Asa Cortante', 'ar'], ['Furacão Escamoso', 'ar'], 'Escama de Nuvem', 'Chuva de Dragão', 'agua') },
+    { id: 'dracoraio', nome: 'Dracoraio', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.12, cg: 1.22, raridade: 'rara', golpes: h(['Presa Elétrica', 'eletrico'], ['Raio Dracônico', 'eletrico'], 'Escama Condutora', 'Tormenta Dragônica', 'ar') },
+    { id: 'mentisca', nome: 'Mentisca', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.97, cg: 0.95, raridade: 'rara', golpes: h(['Chama Mental', 'fogo'], ['Pulso Ardente', 'fogo'], 'Véu de Brasa Mental', 'Explosão Mental', 'eletrico') },
+    { id: 'nevoalma', nome: 'Nevoalma', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.98, cg: 1.01, raridade: 'rara', golpes: h(['Sopro Fantasma', 'ar'], ['Névoa Hipnótica', 'ar'], 'Véu de Neblina', 'Chuva Espectral', 'agua') },
+    { id: 'magmite', nome: 'Magmite', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.16, cg: 1.24, raridade: 'rara', golpes: h(['Fragmento de Lava', 'fogo'], ['Soco de Magma', 'fogo'], 'Crosta Vulcânica', 'Raio de Magma', 'eletrico') },
+    { id: 'lontrinha', nome: 'Lontrinha', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.91, cg: 0.87, raridade: 'comum', golpes: h(['Respingo', 'agua'], ['Mergulho da Lontra', 'agua'], 'Concha Protetora', 'Pedra do Rio', 'terra') },
+    // Pixmon exclusivos dos 5 líderes de ginásio (2026-11-25): 3 linhas de 3 estágios por líder. Só aparecem na Luta Rápida e nos times dos líderes, nunca como selvagens (EXCLUSIVO_LIDER).
+    { id: 'lulinho', nome: 'Lulinho', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.13, cg: 1.19, raridade: 'lendaria', golpes: h(['Tinta Escura', 'agua'], ['Abraço de Tentáculos', 'agua'], 'Casco de Ventosas', 'Redemoinho Abissal', 'terra') },
+    { id: 'hidrinha', nome: 'Hidrinha', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 1.01, cg: 1.09, raridade: 'rara', golpes: h(['Mordida Dupla', 'agua'], ['Jato das Cabeças', 'agua'], 'Escama de Hidra', 'Maré Venenosa', 'terra') },
+    { id: 'lobelo', nome: 'Lobelo', tipo: 'agua', nivel: NIVEL, hp: 60, atk: 10, rc: 0.85, cg: 0.83, raridade: 'rara', golpes: h(['Uivo Úmido', 'agua'], ['Presa de Onda', 'agua'], 'Pelagem de Espuma', 'Matilha da Tempestade', 'terra') },
+    { id: 'aguinha', nome: 'Aguinha', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.84, cg: 0.79, raridade: 'rara', golpes: h(['Bicada Aguda', 'ar'], ['Garra Imperial', 'ar'], 'Penas de Prata', 'Mergulho do Rei', 'agua') },
+    { id: 'draquinho', nome: 'Draquinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 1.15, cg: 1.21, raridade: 'lendaria', golpes: h(['Sopro Gélido', 'ar'], ['Rugido Branco', 'ar'], 'Escama de Neve', 'Jato Branco Final', 'agua') },
+    { id: 'potrinho', nome: 'Potrinho', tipo: 'ar', nivel: NIVEL, hp: 60, atk: 10, rc: 0.97, cg: 0.93, raridade: 'rara', golpes: h(['Coice Alado', 'ar'], ['Galope Celeste', 'ar'], 'Crina de Nuvem', 'Chifre de Prata', 'agua') },
+    { id: 'salamandrinha', nome: 'Salamandrinha', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.01, cg: 0.97, raridade: 'rara', golpes: h(['Cuspe Quente', 'fogo'], ['Cauda Flamejante', 'fogo'], 'Pele de Brasa', 'Raio de Luz', 'eletrico') },
+    { id: 'ferrinho', nome: 'Ferrinho', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 1.17, cg: 1.23, raridade: 'lendaria', golpes: h(['Faísca de Ferro', 'fogo'], ['Martelada Ígnea', 'fogo'], 'Couraça Forjada', 'Fornalha Final', 'eletrico') },
+    { id: 'cavalinhafogo', nome: 'Cavalinho de Fogo', tipo: 'fogo', nivel: NIVEL, hp: 60, atk: 10, rc: 0.9, cg: 0.87, raridade: 'rara', golpes: h(['Coice de Brasa', 'fogo'], ['Galope em Chamas', 'fogo'], 'Crina Ardente', 'Estampido Rubro', 'eletrico') },
+    { id: 'golenzinho', nome: 'Golenzinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.11, cg: 1.19, raridade: 'rara', golpes: h(['Soco de Pedra Negra', 'terra'], ['Avalanche Negra', 'terra'], 'Pele de Obsidiana', 'Núcleo em Brasa', 'fogo') },
+    { id: 'cristalzinho', nome: 'Cristalzinho', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.09, cg: 1.14, raridade: 'lendaria', golpes: h(['Lasca de Cristal', 'terra'], ['Garra de Gema', 'terra'], 'Escama Facetada', 'Prisma Dracônico', 'fogo') },
+    { id: 'cobrapedra', nome: 'Cobrapedra', tipo: 'terra', nivel: NIVEL, hp: 60, atk: 10, rc: 1.03, cg: 1.05, raridade: 'rara', golpes: h(['Bote de Pedra', 'terra'], ['Constrição Rochosa', 'terra'], 'Capuz de Granito', 'Olhar de Basilisco', 'fogo') },
+    { id: 'leaozinho', nome: 'Leãozinho', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.93, cg: 0.89, raridade: 'rara', golpes: h(['Rugido Faiscante', 'eletrico'], ['Garra Trovejante', 'eletrico'], 'Juba Eletrizada', 'Juba de Relâmpagos', 'ar') },
+    { id: 'enguinha', nome: 'Enguinha', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 1.1, cg: 1.17, raridade: 'lendaria', golpes: h(['Descarga de Ferro', 'eletrico'], ['Enrosco Elétrico', 'eletrico'], 'Couraça Condutora', 'Tempestade de Aço', 'ar') },
+    { id: 'fantasminha', nome: 'Fantasminha', tipo: 'eletrico', nivel: NIVEL, hp: 60, atk: 10, rc: 0.99, cg: 0.94, raridade: 'rara', golpes: h(['Susto Estático', 'eletrico'], ['Mão de Raio', 'eletrico'], 'Véu de Estática', 'Assombração Elétrica', 'ar') },
   ];
+  // Quem não aparece como selvagem: as 15 linhas dos líderes (só Luta Rápida e times dos líderes)
+  const EXCLUSIVO_LIDER = ['lulinho', 'hidrinha', 'lobelo', 'aguinha', 'draquinho', 'potrinho', 'salamandrinha', 'ferrinho', 'cavalinhafogo', 'golenzinho', 'cristalzinho', 'cobrapedra', 'leaozinho', 'enguinha', 'fantasminha'];
 
   // Poder do ultimate (PLANO-poderes.md): regra própria na luta, mais um visual próprio na arena. Sem poder = o ultimate padrão (golpe grande).
   //   feixe = Lightbeam, raio contínuo (só visual) | frenesi = não causa dano: buff de dano e ritmo por um tempo, que custa vida
   // Evoluções herdam pelo spread de `golpes`.
   const PODER_DE = {
-    feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao', 'cipochoque'],
-    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha', 'tesloura', 'pimentao'],
-    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo', 'besourao', 'texugao', 'pingolino', 'mentilha', 'avestruzinho'],
-    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo', 'rochilo', 'brasoleta', 'lontrinha', 'cinzarim', 'cogumenta', 'peixebrasa'],
-    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho', 'cristalino', 'medusonho'],
-    disco: ['ventinho', 'redemoinha', 'algazinho', 'casulucia', 'soprinho', 'voadorzinho'],
+    feixe: ['raiomante', 'pavio', 'chamuscao', 'faiscao', 'cipochoque', 'dracoraio', 'salamandrinha', 'enguinha'],
+    frenesi: ['fagulhao', 'brasinha', 'zapinho', 'plumelho', 'pipinha', 'tesloura', 'pimentao', 'mentisca', 'cavalinhafogo', 'leaozinho'],
+    pulo: ['taupino', 'pedrinho', 'musgarra', 'bolhudo', 'besourao', 'texugao', 'pingolino', 'mentilha', 'avestruzinho', 'dracopedra', 'nevoalma', 'hidrinha', 'potrinho'],
+    nova: ['lampiro', 'tatufungo', 'brotinho', 'vulcanejo', 'rochilo', 'brasoleta', 'lontrinha', 'cinzarim', 'cogumenta', 'peixebrasa', 'dragolhama', 'magmite', 'ferrinho', 'golenzinho'],
+    esfera: ['mareal', 'nuvelino', 'coraline', 'trovinho', 'cristalino', 'medusonho', 'serpelago', 'lulinho', 'draquinho', 'cristalzinho'],
+    disco: ['ventinho', 'redemoinha', 'algazinho', 'casulucia', 'soprinho', 'voadorzinho', 'vendraco', 'lobelo', 'aguinha', 'cobrapedra', 'fantasminha'],
   };
   Object.keys(PODER_DE).forEach((p) => PODER_DE[p].forEach((id) => { const m = MONSTROS.find((x) => x.id === id); m.golpes.ultimate.poder = p; if (p === 'esfera') m.golpes.ultimate.tipo = m.tipo; })); // a esfera gigante é do elemento do próprio monstro (sem cobrir a fraqueza como o ultimate comum), senão o golpe enorme vira o jogo contra quem tem vantagem
   // frenesi: dur = ms de efeito; dano e ritmo = multiplicadores (ritmo acelera recarga e carga); custo = fração da vida máxima perdida por segundo (nunca mata)
@@ -245,13 +299,13 @@
   // nova (supernova): explosão em volta do atacante: não pode ser esquivada, atravessa a defesa do alvo (que se parte e deixa passar `atravessa` do dano) e derruba os buffs do alvo (força e frenesi).
   // Forma visual do golpe forte (só arena.js lê): 'proj' (projétil, padrão), 'onda' (arco de energia que varre até o alvo) ou 'area' (marca no chão do alvo e explosão). Evoluções herdam pelo spread de `golpes`.
   const FX_FORTE = {
-    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante', 'lontrinha', 'casulucia', 'cinzarim', 'medusonho', 'peixebrasa'],
-    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro', 'cristalino', 'rochilo', 'tesloura', 'brasoleta', 'texugao', 'cogumenta', 'avestruzinho'],
+    onda: ['brasinha', 'mareal', 'algazinho', 'musgarra', 'pedrinho', 'ventinho', 'pipinha', 'raiomante', 'lontrinha', 'casulucia', 'cinzarim', 'medusonho', 'peixebrasa', 'dragolhama', 'serpelago', 'vendraco', 'nevoalma', 'lulinho', 'hidrinha'],
+    area: ['chamuscao', 'vulcanejo', 'pavio', 'pingolino', 'coraline', 'tatufungo', 'taupino', 'nuvelino', 'redemoinha', 'trovinho', 'lampiro', 'cristalino', 'rochilo', 'tesloura', 'brasoleta', 'texugao', 'cogumenta', 'avestruzinho', 'dracopedra', 'magmite', 'mentisca', 'dracoraio', 'golenzinho', 'cristalzinho'],
   };
   // Forma do golpe rápido: investida (padrão), 'garra' (investida e arranhões no alvo) ou 'rajada' (fica parado e dispara 3 tiros miúdos)
   const FX_RAPIDO = {
-    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo', 'besourao', 'texugao', 'rochilo', 'lontrinha', 'pimentao', 'cipochoque'],
-    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho', 'brasoleta', 'tesloura', 'casulucia', 'cinzarim', 'soprinho', 'voadorzinho', 'mentilha'],
+    garra: ['musgarra', 'taupino', 'brasinha', 'vulcanejo', 'pedrinho', 'tatufungo', 'besourao', 'texugao', 'rochilo', 'lontrinha', 'pimentao', 'cipochoque', 'dragolhama', 'dracopedra', 'magmite', 'lobelo', 'leaozinho', 'cobrapedra', 'salamandrinha', 'cavalinhafogo'],
+    rajada: ['faiscao', 'zapinho', 'lampiro', 'ventinho', 'pipinha', 'mareal', 'pingolino', 'bolhudo', 'algazinho', 'brasoleta', 'tesloura', 'casulucia', 'cinzarim', 'soprinho', 'voadorzinho', 'mentilha', 'dracoraio', 'mentisca', 'vendraco', 'nevoalma', 'aguinha', 'draquinho', 'enguinha', 'fantasminha'],
   };
   Object.keys(FX_RAPIDO).forEach((fx) => FX_RAPIDO[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.rapido.fx = fx; }));
   Object.keys(FX_FORTE).forEach((fx) => FX_FORTE[fx].forEach((id) => { MONSTROS.find((m) => m.id === id).golpes.forte.fx = fx; }));
@@ -267,8 +321,8 @@
   Object.assign(FAMILIAS.pedra, { traco: 'Casca: ' + Math.round((1 - TRACO.pedra.dano) * 100) + '% menos dano recebido e ' + Math.round((TRACO.pedra.cd - 1) * 100) + '% mais recarga' }); Object.assign(FAMILIAS.dragao, { traco: 'Escamas: ' + Math.round((1 - TRACO.dragao.forte) * 100) + '% menos dano de golpes fortes e +' + Math.round((TRACO.dragao.ult - 1) * 100) + '% no ultimate' });
   Object.assign(FAMILIAS.psiquico, { traco: 'Mente: os status duram ' + Math.round((1 - TRACO.psiquico) * 100) + '% menos nele' }); Object.assign(FAMILIAS.aquatico, { traco: 'Fluido: +' + Math.round((TRACO.aquatico - 1) * 100) + '% de vida' });
   const FAMILIA_DE = {
-    fera: ['fagulhao', 'chamuscao', 'faiscao', 'trovinho', 'zapinho', 'pavio', 'taupino', 'texugao', 'lontrinha'], ave: ['ventinho', 'plumelho', 'raiomante', 'cinzarim', 'avestruzinho'], inseto: ['lampiro', 'brasoleta', 'besourao', 'casulucia', 'tesloura'], planta: ['brotinho', 'musgarra', 'algazinho', 'tatufungo', 'pimentao', 'soprinho', 'cipochoque'],
-    pedra: ['vulcanejo', 'pedrinho', 'rochilo', 'cristalino'], dragao: ['brasinha'], psiquico: ['nuvelino', 'redemoinha', 'pipinha', 'medusonho', 'cogumenta', 'mentilha'], aquatico: ['mareal', 'pingolino', 'coraline', 'bolhudo', 'voadorzinho', 'peixebrasa'],
+    fera: ['fagulhao', 'chamuscao', 'faiscao', 'trovinho', 'zapinho', 'pavio', 'taupino', 'texugao', 'lontrinha', 'lobelo', 'salamandrinha', 'cavalinhafogo', 'leaozinho'], ave: ['ventinho', 'plumelho', 'raiomante', 'cinzarim', 'avestruzinho', 'aguinha', 'potrinho'], inseto: ['lampiro', 'brasoleta', 'besourao', 'casulucia', 'tesloura'], planta: ['brotinho', 'musgarra', 'algazinho', 'tatufungo', 'pimentao', 'soprinho', 'cipochoque'],
+    pedra: ['vulcanejo', 'pedrinho', 'rochilo', 'cristalino', 'magmite', 'golenzinho', 'cobrapedra'], dragao: ['brasinha', 'dragolhama', 'serpelago', 'dracopedra', 'vendraco', 'dracoraio', 'hidrinha', 'draquinho', 'ferrinho', 'cristalzinho'], psiquico: ['nuvelino', 'redemoinha', 'pipinha', 'medusonho', 'cogumenta', 'mentilha', 'mentisca', 'nevoalma', 'fantasminha'], aquatico: ['mareal', 'pingolino', 'coraline', 'bolhudo', 'voadorzinho', 'peixebrasa', 'lulinho', 'enguinha'],
   };
   Object.entries(FAMILIA_DE).forEach(([f, ids]) => ids.forEach((id) => { MONSTROS.find((m) => m.id === id).familia = f; })); // as formas evoluídas herdam (evoluida copia o monstro)
   const PESO_RARIDADE = { comum: 1, incomum: 0.6, rara: 0.3, lendaria: 0.05, mitica: 0.06 }; // chance relativa de aparecer como selvagem no mundo
@@ -277,9 +331,9 @@
   // Pool: 72% do elemento da região (comuns e incomuns), 22% de um elemento vizinho, 3% de raros da região e 3% dos outros elementos. 'inicio' = só comuns e incomuns, todos os elementos; 'andarilhos' = tudo, só aqui sai o lendário.
   const REGIOES = {
     inicio: { nome: 'Sem clã' }, andarilhos: { nome: 'Andarilhos', todos: true, fam: ['dragao', 'psiquico'], camisas: ['#6a6a78', '#7a4ab8'] },
-    brasa: { nome: 'Brasa', el: 'fogo', viz: 'terra', fam: ['fera', 'dragao'], raros: ['vulcanejo', 'brasinha'], camisas: ['#c0392b', '#e0503a'] }, mare: { nome: 'Maré', el: 'agua', viz: 'ar', fam: ['aquatico', 'planta'], raros: ['coraline'], camisas: ['#2f78a8', '#4aa3d8'] },
-    brisa: { nome: 'Brisa', el: 'ar', viz: 'agua', fam: ['ave', 'inseto'], raros: ['redemoinha', 'pipinha'], camisas: ['#d8ecf6', '#6fd6ff'] },
-    rocha: { nome: 'Rocha', el: 'terra', viz: 'fogo', fam: ['planta', 'pedra', 'inseto'], raros: ['tatufungo'], camisas: ['#8a5a2b', '#6a4a2a'] }, faisca: { nome: 'Faísca', el: 'eletrico', viz: 'ar', fam: ['pedra', 'inseto'], raros: ['lampiro'], camisas: ['#f0d048', '#e8b830'] }, // B3: cada região é um clã; o uniforme é a cor da camisa (2 tons)
+    brasa: { nome: 'Brasa', el: 'fogo', viz: 'terra', fam: ['fera', 'dragao'], raros: ['vulcanejo', 'brasinha', 'dragolhama'], camisas: ['#c0392b', '#e0503a'] }, mare: { nome: 'Maré', el: 'agua', viz: 'ar', fam: ['aquatico', 'planta'], raros: ['coraline', 'serpelago'], camisas: ['#2f78a8', '#4aa3d8'] },
+    brisa: { nome: 'Brisa', el: 'ar', viz: 'agua', fam: ['ave', 'inseto'], raros: ['redemoinha', 'pipinha', 'vendraco'], camisas: ['#d8ecf6', '#6fd6ff'] },
+    rocha: { nome: 'Rocha', el: 'terra', viz: 'fogo', fam: ['planta', 'pedra', 'inseto'], raros: ['tatufungo', 'dracopedra'], camisas: ['#8a5a2b', '#6a4a2a'] }, faisca: { nome: 'Faísca', el: 'eletrico', viz: 'ar', fam: ['pedra', 'inseto'], raros: ['lampiro', 'dracoraio'], camisas: ['#f0d048', '#e8b830'] }, // B3: cada região é um clã; o uniforme é a cor da camisa (2 tons)
   };
   // B4: nível FIXO do treinador por área (não depende mais do nível do jogador): base da área + ajuste do posto; líderes têm nível próprio.
   // O posto vem do `nivel` do treinador (1 aprendiz, 2 membro, 3 veterano, 4 e 5 elite); os cinco líderes são sempre 'lider'.
@@ -292,7 +346,7 @@
   const REGIAO_DA_AREA = { vila: 'inicio', rota1: 'inicio', fazenda: 'brasa', lago: 'mare', lago2: 'mare', vilaagua: 'mare', praia: 'mare', bosque: 'brisa', bosquel: 'brisa', vilavento: 'brisa', farol: 'brisa', montanha2: 'brisa', escondida: 'rocha', bosquen: 'rocha', pedra: 'rocha', vilaraio: 'faisca', montanha: 'faisca', oculta: 'andarilhos', castelo: 'andarilhos' };
   function pesosSelvagem(area, soEvo) { // pesos (somam 1) na ordem de MONSTROS; soEvo: só espécies que têm evolução
     const g = REGIOES[REGIAO_DA_AREA[area]] || REGIOES.inicio, cm = (m) => m.raridade === 'comum' || m.raridade === 'incomum';
-    const sel = (f) => MONSTROS.map((m) => (soEvo && !EVOLUI(m.id) ? 0 : f(m) ? PESO_RARIDADE[m.raridade] * (g.fam && g.fam.includes(m.familia) ? 2 : 1) : 0)); // T3: a região favorece (2x) as famílias dela
+    const sel = (f) => MONSTROS.map((m) => (EXCLUSIVO_LIDER.includes(m.id) || (soEvo && !EVOLUI(m.id)) ? 0 : f(m) ? PESO_RARIDADE[m.raridade] * (g.fam && g.fam.includes(m.familia) ? 2 : 1) : 0)); // T3: a região favorece (2x) as famílias dela
     const norm = (v, alvo) => { const s = v.reduce((a, b) => a + b, 0); return v.map((x) => (s ? (x / s) * alvo : 0)); };
     const partes = g.todos ? [norm(sel(() => true), 1)] : !g.el ? [norm(sel(cm), 1)] : [norm(sel((m) => cm(m) && m.tipo === g.el), 0.72), norm(sel((m) => g.raros.includes(m.id)), 0.03), norm(sel((m) => cm(m) && m.tipo === g.viz), 0.22), norm(sel((m) => cm(m) && m.tipo !== g.el && m.tipo !== g.viz), 0.03)];
     const w = MONSTROS.map((_, i) => partes.reduce((a, p) => a + p[i], 0)), s = w.reduce((a, b) => a + b, 0);
@@ -324,7 +378,7 @@
     const tals = new Set([].concat(tal || [])), cdTotal = {}, cd = {};
     if (tals.has('pele_grossa') || m.familia === 'aquatico') m = { ...m, hp: Math.round(m.hp * (tals.has('pele_grossa') ? PELE_GROSSA : 1) * (m.familia === 'aquatico' ? TRACO.aquatico : 1)) };
     for (const s of SLOTS) { cdTotal[s] = cdDe(m, s) * (m.familia === 'pedra' ? TRACO.pedra.cd : 1) * (s === 'ultimate' ? (tt.has('recarga') ? RECARGA_MULT : 1) * (tt.has('ult_poder') ? ULT_PODER_CD : 1) : s === 'forte' && tals.has('golpe_pesado') ? PESADO_CD : 1); cd[s] = s === 'ultimate' ? cdTotal[s] * (tt.has('ultimate') ? ULT_TAL_INICIO : ULT_INICIO) : 0; }
-    return { m, tals, combo: 0, protAte: 0, rapidos: 0, abriu: false, hp: Math.max(0, m.hp * hpFrac), cd, cdTotal, acao: null, defesaAte: 0, st: {}, imuneAte: 0, entraAte: 0 }; // cd = ms que faltam; acao = ataque em carga; defesaAte = ms (relógio da luta)
+    return { m, tals, combo: 0, protAte: 0, trocaAte: 0, rapidos: 0, abriu: false, hp: Math.max(0, m.hp * hpFrac), cd, cdTotal, acao: null, defesaAte: 0, st: {}, imuneAte: 0, entraAte: 0 }; // cd = ms que faltam; acao = ataque em carga; defesaAte = ms (relógio da luta)
   }
   // a e b: um monstro ou um time (lista de 1 a 3). bt.lados[i] é sempre o monstro em campo do lado i (aponta para bt.times[i][ativo[i]]).
   // tal: [talentos do lado 0, do lado 1], cada um { time: [ids], mon: [id por monstro do time] } (opcional)
@@ -410,7 +464,7 @@
       * (bt.tt[i].has('dupla') && bt.sin[i].dupla.has(at.m.tipo) ? DUPLA_MULT : 1) * (bt.tt[1 - i].has('arco') && bt.sin[1 - i].arco ? ARCO_MULT : 1)
       * (bt.tt[i].has('abertura') && !at.abriu ? ABERTURA_MULT : 1) * (at.tals.has('ultimo') && at.hp < at.m.hp * ULTIMO_LIMITE ? ULTIMO_MULT : 1) * (df.tals.has('res_' + g.tipo) ? RESIST_MULT : 1)
       * (bt.tt[i].has('foco') && df.hp < df.m.hp * 0.5 ? FOCO_MULT : 1) * (a.slot === 'forte' && bt.tt[i].has('combo') && at.combo >= 3 ? COMBO_MULT : 1) * (a.slot === 'ultimate' && bt.tt[i].has('ult_poder') ? ULT_PODER_DANO : 1) * (a.slot === 'forte' && at.tals.has('golpe_pesado') ? PESADO_DANO : 1)
-      * (bt.tt[1 - i].has('escudo_ini') && bt.t < ESCUDO_MS ? ESCUDO_MULT : 1) * (bt.tt[1 - i].has('muralha') && df.protAte > bt.t ? MURALHA_MULT : 1)
+      * (bt.tt[1 - i].has('escudo_ini') && bt.t < ESCUDO_MS ? ESCUDO_MULT : 1) * (bt.tt[1 - i].has('muralha') && df.protAte > bt.t ? MURALHA_MULT : 1) * (bt.tt[1 - i].has('troca') && df.trocaAte > bt.t ? 0.8 : 1)
       * (df.m.familia === 'pedra' ? TRACO.pedra.dano : 1) * (df.m.familia === 'dragao' && a.slot === 'forte' ? TRACO.dragao.forte : 1) * (at.m.familia === 'dragao' && a.slot === 'ultimate' ? TRACO.dragao.ult : 1) * (at.m.familia === 'inseto' && a.slot === 'rapido' ? TRACO.inseto : 1)
       * (bt.tt[i].has('lacos') && bt.sin[i].fam.has(at.m.familia) ? LACOS_MULT : 1) * (bt.tt[1 - i].has('misto') && bt.sin[1 - i].misto ? MISTO_MULT : 1);
     if (a.slot === 'rapido') at.combo++; else if (a.slot === 'forte') at.combo = 0;
@@ -463,6 +517,7 @@
     const de = bt.ativo[i];
     l.acao = null; l.defesaAte = 0;
     bt.ativo[i] = idx; bt.lados[i] = novo; bt.pendente[i] = null; bt.trocaCd[i] = forcada ? Math.min(bt.trocaCd[i], 2000) : (bt.tt[i].has('troca') ? TROCA_AGIL_CD : TROCA_CD);
+    if (bt.tt[i].has('troca')) novo.trocaAte = bt.t + 3000; // Troca ágil: quem entra leva 20% menos dano por 3 s
     novo.entraAte = bt.t + (bt.tt[i].has('troca') ? 0 : ENTRA_MS); if (forcada) novo.protAte = bt.t + MURALHA_MS;
     bt.log.push(`${novo.m.nome} entra no lugar de ${l.m.nome}`);
     bt.pre.push({ ev: 'troca', i, de, para: idx, forcada, regra: bt.regra[i] }); bt.regra[i] = null;
@@ -560,6 +615,7 @@
   ];
   // Evolução (Fase D): ao chegar no nível indicado, a forma base vira a evoluída (mesmos golpes, mais vida e ataque). Só 4 linhas por enquanto.
   const EVOLUCOES = {
+    dragolhama: { id: 'infernadraco', nome: 'Infernadraco', nv: 18 }, serpelago: { id: 'leviatagua', nome: 'Leviatágua', nv: 18 }, dracopedra: { id: 'dracomonte', nome: 'Dracomonte', nv: 18 }, vendraco: { id: 'ventarrao', nome: 'Ventarrão', nv: 18 }, dracoraio: { id: 'trovadrago', nome: 'Trovadrago', nv: 18 }, mentisca: { id: 'mentiscante', nome: 'Mentiscante', nv: 18 }, nevoalma: { id: 'nevoalmao', nome: 'Nevoalmão', nv: 18 }, magmite: { id: 'magmatito', nome: 'Magmatito', nv: 18 }, // T5
     pimentao: { id: 'chilibrasa', nome: 'Chilibrasa', nv: 16 }, soprinho: { id: 'dentevento', nome: 'Dentevento', nv: 16 }, cipochoque: { id: 'cipotrovao', nome: 'Cipótrovão', nv: 16 }, medusonho: { id: 'medusalma', nome: 'Medusalma', nv: 16 }, cogumenta: { id: 'cogumentor', nome: 'Cogumentor', nv: 16 }, mentilha: { id: 'mentilhante', nome: 'Mentilhante', nv: 16 }, voadorzinho: { id: 'voadorao', nome: 'Voadorão', nv: 16 }, peixebrasa: { id: 'brasamarao', nome: 'Brasamarão', nv: 16 }, avestruzinho: { id: 'avestruzao', nome: 'Avestruzão', nv: 16 }, 
     fagulhao: { id: 'labaredo', nome: 'Labaredo', nv: 16 }, mareal: { id: 'oceanico', nome: 'Oceânico', nv: 16 },
     brotinho: { id: 'carvalhinho', nome: 'Carvalhinho', nv: 16 }, faiscao: { id: 'faiscante', nome: 'Faiscante', nv: 16 },
@@ -570,6 +626,12 @@
     casulucia: { id: 'lagartucia', nome: 'Lagartúcia', nv: 10 }, lagartucia: { id: 'papelucia', nome: 'Papelúcia', nv: 20 }, // linha de 3 estágios: Casulúcia, Lagartúcia, Papelúcia (a forma final é a borboleta)
      tesloura: { id: 'teslorrao', nome: 'Teslorrão', nv: 16 },
     rochilo: { id: 'gargolo', nome: 'Gárgolo', nv: 16 }, cristalino: { id: 'cristalao', nome: 'Cristalão', nv: 16 }, texugao: { id: 'texugarra', nome: 'Texugarra', nv: 16 }, lontrinha: { id: 'lontrao', nome: 'Lontrão', nv: 16 },
+    // linhas dos líderes (3 estágios cada)
+    lulinho: { id: 'polvoraco', nome: 'Polvoraço', nv: 16 }, polvoraco: { id: 'krakenmar', nome: 'Krakenmar', nv: 32 }, hidrinha: { id: 'hidrabi', nome: 'Hidrabi', nv: 16 }, hidrabi: { id: 'hidragua', nome: 'Hidrágua', nv: 32 }, lobelo: { id: 'lobomar', nome: 'Lobomar', nv: 16 }, lobomar: { id: 'lobotempesta', nome: 'Lobotempesta', nv: 32 },
+    aguinha: { id: 'aguiao', nome: 'Aguião', nv: 16 }, aguiao: { id: 'aguiaimperial', nome: 'Águia Imperial', nv: 32 }, draquinho: { id: 'dracobranco', nome: 'Dracobranco', nv: 16 }, dracobranco: { id: 'dragaobranco', nome: 'Dragão Branco', nv: 32 }, potrinho: { id: 'pegasinho', nome: 'Pegasinho', nv: 16 }, pegasinho: { id: 'pegasonobre', nome: 'Pégaso Nobre', nv: 32 },
+    salamandrinha: { id: 'salamandrachama', nome: 'Salamandrachama', nv: 16 }, salamandrachama: { id: 'salamandrasolar', nome: 'Salamandra Solar', nv: 32 }, ferrinho: { id: 'ferrodraco', nome: 'Ferrodraco', nv: 16 }, ferrodraco: { id: 'dragaoferro', nome: 'Dragão de Ferro', nv: 32 }, cavalinhafogo: { id: 'cavalochama', nome: 'Cavalochama', nv: 16 }, cavalochama: { id: 'cavalofogo', nome: 'Cavalo de Fogo', nv: 32 },
+    golenzinho: { id: 'golemrocha', nome: 'Golem Rocha', nv: 16 }, golemrocha: { id: 'golemobsidiana', nome: 'Golem Obsidiana', nv: 32 }, cristalzinho: { id: 'cristaldraco', nome: 'Cristaldraco', nv: 16 }, cristaldraco: { id: 'dragaocristal', nome: 'Dragão Cristalino', nv: 32 }, cobrapedra: { id: 'naja', nome: 'Naja de Pedra', nv: 16 }, naja: { id: 'serpentepedra', nome: 'Serpente de Pedra', nv: 32 },
+    leaozinho: { id: 'leaotrovao', nome: 'Leão Trovão', nv: 16 }, leaotrovao: { id: 'leaodourado', nome: 'Leão Dourado', nv: 32 }, enguinha: { id: 'enguiaferro', nome: 'Enguia Ferro', nv: 16 }, enguiaferro: { id: 'enguiaeletrica', nome: 'Enguia Elétrica', nv: 32 }, fantasminha: { id: 'espectro', nome: 'Espectro', nv: 16 }, espectro: { id: 'fantasmaeletrico', nome: 'Fantasma Elétrico', nv: 32 },
   };
   const BONUS_EVO = { hp: 1.25, atk: 1.15 };
   // B2: a forma evoluída destas espécies é só do líder (o jogador captura a base, mas ela não evolui)
@@ -603,7 +665,7 @@
     { id: 'rafa', nome: 'Treinador Rafa', nivel: 3, time: ['mareal', 'bolhudo', 'chamuscao'], frase: 'Pega a onda!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'lia', nome: 'Treinadora Lia', nivel: 3, time: ['algazinho', 'nuvelino', 'pingolino'], frase: 'O vento sopra a favor.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
     { id: 'beto', nome: 'Treinador Beto', nivel: 3, time: ['pingolino', 'mareal', 'brotinho'], frase: 'A Tati não perde para quem tem pressa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['arco'], mon: [null, 'folego', 'pele_grossa'] } },
-    { id: 'tati', nome: 'Líder Tati', nivel: 3, evo: ['coraline'], time: ['mareal', 'algazinho', 'coraline'], frase: 'A maré leva quem hesita.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: [null, null, null] } },
+    { id: 'tati', nome: 'Líder Tati', nivel: 3, evo: ['lulinho'], time: ['hidrinha', 'lobelo', 'lulinho'], frase: 'A maré leva quem hesita.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: [], mon: [null, null, null] } },
     // W2 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Floresta Escondida e Bosque leste. Nomes de até 5 letras.
     { id: 'dora', nome: 'Treinadora Dora', nivel: 2, time: ['brotinho', 'musgarra', 'ventinho'], frase: 'A mata guarda segredos.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['pe'], mon: [null, null, 'espinhos'] } },
     { id: 'kaio', nome: 'Treinador Kaio', nivel: 2, time: ['taupino', 'nuvelino', 'brotinho'], frase: 'Rápido como o vento!', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['pe'], mon: [null, null, 'espinhos'] } },
@@ -617,13 +679,13 @@
     // W3 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Vila do Vento (Laura, 2º ginásio) e Vila do Raio (Du, 3º ginásio). Nomes de até 5 letras.
     { id: 'rui', nome: 'Treinador Rui', nivel: 3, time: ['ventinho', 'plumelho', 'bolhudo'], frase: 'Aqui o vento nunca para.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'nana', nome: 'Treinadora Nana', nivel: 3, time: ['pipinha', 'ventinho', 'brotinho'], frase: 'Solte a pipa, solte o medo!', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca'], mon: [null, 'critico', 'sem_lento'] } },
-    { id: 'laura', nome: 'Líder Laura', nivel: 4, evo: ['redemoinha'], time: ['ventinho', 'nuvelino', 'redemoinha'], frase: 'O vento escolhe quem sobe.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
+    { id: 'laura', nome: 'Líder Laura', nivel: 4, evo: ['draquinho'], time: ['aguinha', 'potrinho', 'draquinho'], frase: 'O vento escolhe quem sobe.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'pedro', nome: 'Treinador Pedro', nivel: 4, time: ['faiscao', 'zapinho', 'ventinho'], frase: 'Choque de realidade!', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
-    { id: 'lara', nome: 'Treinadora Lara', nivel: 4, time: ['trovinho', 'faiscao', 'pipinha'], frase: 'Já sentiu um raio cair?', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
-    { id: 'du', nome: 'Líder Du', nivel: 4, evo: ['raiomante'], time: ['zapinho', 'trovinho', 'raiomante'], frase: 'Sente a corrente?', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'sede'], mon: ['veneno_pot', 'paralisia_longa', 'critico'] } },
+    { id: 'lara', nome: 'Treinadora Lara', nivel: 4, time: ['trovinho', 'cristalino', 'pipinha'], frase: 'Já sentiu um raio cair?', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'du', nome: 'Líder Du', nivel: 4, evo: ['enguinha'], time: ['leaozinho', 'fantasminha', 'enguinha'], frase: 'Sente a corrente?', pol: POL('agressivo', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'sede'], mon: ['veneno_pot', 'paralisia_longa', 'critico'] } },
     // W4 (PLANO-fases.md; PROPOSTOS, o George ainda pode trocar nomes, times e falas): Montanha, Montanha 2 e Bosque norte. Nomes de até 5 letras.
-    { id: 'tito', nome: 'Treinador Tito', nivel: 3, time: ['trovinho', 'faiscao', 'taupino'], frase: 'Pedra sobre pedra.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
-    { id: 'leo', nome: 'Treinador Leo', nivel: 3, time: ['faiscao', 'pedrinho', 'zapinho'], frase: 'Quer ver faísca?', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'tito', nome: 'Treinador Tito', nivel: 3, time: ['trovinho', 'tesloura', 'taupino'], frase: 'Pedra sobre pedra.', pol: POL('defensivo', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
+    { id: 'leo', nome: 'Treinador Leo', nivel: 3, time: ['faiscao', 'pedrinho', 'cristalino'], frase: 'Quer ver faísca?', pol: POL('agressivo', 'forte', 'pronto', false), tal: { time: ['ultimate'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
     { id: 'sofi', nome: 'Treinadora Sofi', nivel: 4, time: ['lampiro', 'trovinho', 'musgarra'], frase: 'Cuidado onde pisa.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
     { id: 'gil', nome: 'Treinador Gil', nivel: 4, time: ['trovinho', 'lampiro', 'pedrinho'], frase: 'Cavei fundo para te achar.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['ultimate', 'sede'], mon: [null, 'veneno_pot', 'paralisia_longa'] } },
     { id: 'elis', nome: 'Treinadora Elis', nivel: 4, time: ['pipinha', 'plumelho', 'mareal'], frase: 'Aqui em cima o ar é fino.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
@@ -647,17 +709,17 @@
     { id: 'jair', nome: 'Treinador Jair', nivel: 4, time: ['ventinho', 'nuvelino', 'algazinho'], frase: 'Sou o guardião da luz.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'moa', nome: 'Treinadora Moa', nivel: 5, time: ['nuvelino', 'redemoinha', 'lampiro'], frase: 'A luz guia os perdidos.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
     { id: 'teo', nome: 'Treinador Teo', nivel: 4, time: ['plumelho', 'nuvelino', 'pedrinho'], frase: 'Quem acende, apaga.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['troca', 'abertura'], mon: [null, 'critico', 'sem_lento'] } },
-    { id: 'olga', nome: 'Treinadora Olga', nivel: 5, time: ['pedrinho', 'tatufungo', 'chamuscao'], frase: 'Pedra que rola não cria limo.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
-    { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['taupino', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
-    { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['tatufungo'], time: ['pedrinho', 'brotinho', 'tatufungo'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', false, 0), tal: { time: [], mon: [null, null, null] } },
+    { id: 'olga', nome: 'Treinadora Olga', nivel: 5, time: ['rochilo', 'tatufungo', 'chamuscao'], frase: 'Pedra que rola não cria limo.', pol: POL('defensivo', 'forte', 'finalizar', true, 30), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'ivan', nome: 'Treinador Ivan', nivel: 5, time: ['besourao', 'pedrinho', 'trovinho'], frase: 'Na pedra se aprende.', pol: POL('equilibrado', 'forte', 'vantagem', true, 20), tal: { time: ['pe', 'arco'], mon: [null, 'espinhos', 'casca'] } },
+    { id: 'guto', nome: 'Líder Guto', nivel: 5, evo: ['cristalzinho'], time: ['golenzinho', 'cobrapedra', 'cristalzinho'], frase: 'Aqui, quem cai não levanta.', pol: POL('equilibrado', 'forte', 'vantagem', false, 0), tal: { time: [], mon: [null, null, null] } },
     // Floresta Oculta: andam pela clareira, times só de evoluídos (por isso nível 5 e dois talentos de time)
-    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: true, time: ['fagulhao', 'chamuscao', 'vulcanejo'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla', 'recarga'], mon: ['ultimo', 'pele_grossa', 'espinhos'] } },
+    { id: 'dan', nome: 'Líder Dan', nivel: 5, evo: ['ferrinho'], time: ['salamandrinha', 'cavalinhafogo', 'ferrinho'], frase: 'O fogo não perdoa quem chega até aqui.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'dupla'], mon: ['ultimo', 'pele_grossa', 'espinhos'] } },
     { id: 'ryu', nome: 'Treinador Ryu', nivel: 5, evo: true, time: ['fagulhao', 'ventinho', 'trovinho'], frase: 'O punho encontra o caminho.', pol: POL('agressivo', 'forte', 'pronto', true, 20), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'lee', nome: 'Treinador Lee', nivel: 5, evo: true, time: ['mareal', 'brotinho', 'nuvelino'], frase: 'Seja água, meu amigo.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['abertura', 'ultimate'], mon: [null, 'corpo', 'ultimo'] } },
     { id: 'aurora', nome: 'Mestra Aurora', nivel: 5, time: ['faiscao', 'mareal', 'brotinho'], frase: 'Mostre o que aprendeu.', pol: POL('equilibrado', 'forte', 'vantagem', true, 30), tal: { time: ['arco', 'ultimate'], mon: ['espinhos', 'corpo', 'folego'] } },
   ];
   const treinadorPorId = (id) => TREINADORES.find((t) => t.id === id);
-  const timeDoTreinador = (t) => t.time.map((id) => { const m = MONSTROS.find((x) => x.id === id); return t.evo === true || (Array.isArray(t.evo) && t.evo.includes(id)) ? evoluida(m) : m; }); // evo: true = o time inteiro já vem evoluído; lista = só esses monstros
+  const timeDoTreinador = (t) => t.time.map((id) => { const m = MONSTROS.find((x) => x.id === id); if (Array.isArray(t.evo2) && t.evo2.includes(id)) return evoluidaN(m, 2); return t.evo === true || (Array.isArray(t.evo) && t.evo.includes(id)) ? evoluida(m) : m; }); // evo: true = o time inteiro já vem evoluído; lista = só esses monstros; evo2: lista = esses vêm no 3º estágio
   const talentosTreinador = (t) => normalizarTalentos(t.tal, t.time.length);
   const iaTreinador = (t) => NIVEL_TREINADOR[t.nivel - 1].ia;
 
@@ -752,7 +814,7 @@
   }
 
   const api = {
-    EVOLUCOES, BONUS_EVO, evoluida, evoluidaN, FAMILIAS, TRACO, TAL_TATICA, TATICA_BASE, politicaEfetiva, taticaNoOrcamento, ARVORE, NV_DEGRAU, custoNo, validarArvore, pontosTalento, migrarTal, NIVEL_AREA, NIVEL_LIDER, OFFSET_POSTO, postoDe, nivelNoMundo, EVO_EXCLUSIVA, EVOLUI, PESO_RARIDADE, CAPTURA_RARIDADE, REGIOES, REGIAO_DA_AREA, pesosSelvagem, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
+    EVOLUCOES, BONUS_EVO, evoluida, evoluidaN, FAMILIAS, TRACO, TAL_TATICA, TATICA_BASE, politicaEfetiva, taticaNoOrcamento, ARVORE, NV_DEGRAU, NV_MAX, NV_JOGADOR_MAX, NV_TIME_DEGRAU, nivelJogador, BAG_CAT, migrarBag, PEDRA_DE, NV_EVO, CHANCE_PEDRA, capturaChance, podeEvoluir, TREINADORES_LADROES, candidatosPerda, escolherRoubo, tomarPixmon, devolverRetidos, custoNo, validarArvore, pontosTalento, migrarTal, NIVEL_AREA, NIVEL_LIDER, OFFSET_POSTO, postoDe, nivelNoMundo, EVO_EXCLUSIVA, EXCLUSIVO_LIDER, EVOLUI, PESO_RARIDADE, CAPTURA_RARIDADE, REGIOES, REGIAO_DA_AREA, pesosSelvagem, TREINADORES, INSIGNIAS, PONTOS_TREINADOR, treinadorPorId, timeDoTreinador, talentosTreinador, iaTreinador,
     TORNEIO, adversariosTorneio, talentosAdversario, iaAdversario,
     POLITICA_PADRAO, ESTILOS, OPCOES_POLITICA, iaPolitica,
     TAL_TIME, TAL_MON, ORCAMENTO, custoTalentos, normalizarTalentos, sortearTalentos, ABERTURA_MULT, RESIST_MULT,

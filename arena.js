@@ -24,6 +24,35 @@
   const FX_PL = { 'terra-rachadura': 1, 'terra-espinhos': 0.9, 'fogo-explosao': 1.2, 'agua-splash': 1.2, 'eletrico-raio': 0.9, 'ar-corte': 1, 'critico': 1, 'escudo-quebra': 0.9, 'fumaca': 0.8, 'escudo-fogo': 0.9, 'escudo-agua': 0.9, 'escudo-terra': 0.9, 'escudo-ar': 0.9, 'escudo-eletrico': 0.9, 'garra': 1.5, 'area-fogo': 0.9, 'area-agua': 0.9, 'area-terra': 0.9, 'area-ar': 0.9, 'area-eletrico': 0.9, 'frenesi-aura': 1.3, 'feixe-arcano': 1, 'carga-arcana': 1 };
   Object.keys(FX_PL).forEach((n) => { ESCALA_FX[n] = FX_PL[n]; });
   Object.keys(ESCALA_FX).forEach(carregarFx);
+  // Efeitos da biblioteca por golpe (nomes de fx/lib/ sem o prefixo). Projétil do golpe forte; 'jato' = fluxo contínuo do atacante até o alvo (labareda de fogo, jato d'água).
+  const PROJ_LIB = { fogo: 'fogo-bola', agua: 'agua-orbe', eletrico: 'eletrico-bola', ar: 'corte-onda' }; // terra segue em código (pedras girando)
+  // Variedade: cada golpe (pelo nome) escolhe um estilo, sempre o mesmo. Projétil do golpe forte: 'bola' (PROJ_LIB), 'jato' (JATO_LIB), 'dardo', 'lanca', 'pedras' (terra, em código).
+  const PROJ_VAR = { fogo: ['bola', 'jato', 'dardo', 'lanca'], agua: ['bola', 'jato', 'dardo', 'lanca'], eletrico: ['bola', 'dardo', 'lanca'], terra: ['pedras', 'lanca', 'dardo'], ar: ['bola', 'lanca', 'dardo'] };
+  const GOLPE_RAPIDO = ['garra', 'estrela', 'corte3', 'cruz', 'mordida']; // estilos de golpe rápido em fx/lib/golpe-<estilo>-<elemento>
+  const hs = (str) => { let h = 0; for (const c of String(str)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+  const escolhe = (arr, chave) => arr[hs(chave) % arr.length];
+  const JATO_LIB = { fogo: ['fogo-labareda', 0.9], agua: ['agua-jato', 0.9] };
+  // Impacto por elemento: [golpe rápido, golpe forte] = [nome, escala]; o elétrico forte é o raio que cai do céu.
+  const IMPACTO_LIB = {
+    fogo: [['fogo-faiscas', 0.7], ['fogo-explosao', 0.8]], agua: [['agua-respingo', 0.6], ['agua-respingo', 0.9]], eletrico: [['eletrico-choque', 0.7], ['eletrico-raio', 0.6]],
+    terra: [['terra-detritos', 0.7], ['terra-espinhos', 0.8]], ar: [['corte', 0.8], ['corte-onda', 0.8]],
+  };
+  // Assinatura do ultimate por elemento. No alvo, em camadas: [atraso ms, efeito, dx, dy, escala, duração ms (loops), espelha na direção do ataque].
+  const ULT_SIG = { // efeito próprio de cada ult (fx/lib/ult-*.png, feito no vfx_workbench) + reforços; ult-ar espelha na direção do ataque
+    fogo: [[0, 'impacto-flash', 0, -8, 1.1], [0, 'ult-fogo', 0, 4, 1.4]], // meteoro, explosão em cogumelo e parede de fogo
+    agua: [[0, 'ult-agua', 0, 4, 1.3]], // gêiser, coroa de respingos, ondas, chuva e bolhas
+    eletrico: [[0, 'ult-eletrico', 0, 4, 1.2]], // nuvem de tempestade, raios em sequência, choque e arcos
+    terra: [[0, 'ult-terra', 0, 4, 1.4], [60, 'impacto-poeira-grande', 0, 6, 1.2]], // espinhos, rachaduras de lava, onda e detritos
+    ar: [[0, 'ult-ar', 0, -4, 1.2, 0, true]], // ciclone cortante, ondas de corte, folhas e penas
+  };
+  // Carga do ultimate no atacante (dura a carga + 300 ms): [efeito, dx, dy, escala].
+  const ULT_CARGA = {
+    fogo: [['aura-chamas', 0, 3, 0.7], ['fogo-anel', 0, 5, 0.8], ['carga', 0, -12, 0.9]], agua: [['agua-escudo', 0, -8, 0.9], ['agua-bolhas', 0, 6, 0.8], ['carga', 0, -12, 0.9]],
+    eletrico: [['eletrico-arcos', 0, -8, 1], ['carga', 0, -12, 0.9]], terra: [['brilho-chao', 0, 6, 1.2], ['terra-trilha', 0, 6, 1.2], ['carga', 0, -12, 0.9]], ar: [['ar-rajadas', 0, -8, 0.9], ['ar-linhas', 0, -6, 0.8], ['carga', 0, -12, 0.9]],
+  };
+  // Biblioteca de efeitos reutilizáveis (fx/lib/, vitrine em fx/lib/vitrine.html, catálogo em fx/lib/CATALOGO.md): carrega todos, e qualquer golpe ou pixmon toca um com tocarFx
+  const FX_LIB = [];
+  fetch('fx/lib/lib.json', { cache: 'no-cache' }).then((r) => r.json()).then((L) => L.forEach((e) => { FX_LIB.push(e.nome); ESCALA_FX['lib/' + e.nome] = 0.6; carregarFx('lib/' + e.nome); })).catch(() => { /* sem a biblioteca: nada muda */ });
 
   // Sprites do PixelLab (sprites-pixellab/, geradas por IA): são o visual padrão de monstros, árvores e chão em todos os cenários.
   // ?codigo volta ao desenho feito em código (conferência e plano B se os PNGs não carregarem).
@@ -43,11 +72,24 @@
   Object.entries(T3).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 38; });
   // T4 (onda 2): 9 espécies novas e as evoluções delas
   const T4 = { pimentao: 'chilibrasa', soprinho: 'dentevento', cipochoque: 'cipotrovao', medusonho: 'medusalma', cogumenta: 'cogumentor', mentilha: 'mentilhante', voadorzinho: 'voadorao', peixebrasa: 'brasamarao', avestruzinho: 'avestruzao' };
+  // T5 (onda 3): 5 Dragões, 2 psíquicos e a Magmite, com as evoluções
+  const T5 = { dragolhama: 'infernadraco', serpelago: 'leviatagua', dracopedra: 'dracomonte', vendraco: 'ventarrao', dracoraio: 'trovadrago', mentisca: 'mentiscante', nevoalma: 'nevoalmao', magmite: 'magmatito' };
+  Object.entries(T5).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 40; });
   Object.entries(T4).forEach(([base, evo]) => { PL_ARQ[base] = base + '-teste.png'; ALT_PL[base] = ALT_MON; PL_ARQ[evo] = evo + '-teste.png'; ALT_PL[evo] = 38; });
   // Phoenix (ultrarara, 3 estágios)
   Object.assign(PL_ARQ, { cinzarim: 'cinzarim-teste.png', brasafenix: 'brasafenix-teste.png', phoenix: 'phoenix-teste.png' }); Object.assign(ALT_PL, { cinzarim: ALT_MON, brasafenix: 38, phoenix: 44 });
   // linha da borboleta (3 estágios): casulo, lagarta e a borboleta final
   Object.assign(PL_ARQ, { casulucia: 'casulucia-teste.png', lagartucia: 'lagartucia-teste.png', papelucia: 'papelucia-teste.png' }); Object.assign(ALT_PL, { casulucia: ALT_MON, lagartucia: 36, papelucia: 40 });
+  // 15 linhas dos líderes de ginásio (3 estágios): o tamanho das evoluções vem de EVOLUCOES (FATOR_EVO, logo abaixo)
+  [["lulinho","polvoraco","krakenmar"],["hidrinha","hidrabi","hidragua"],["lobelo","lobomar","lobotempesta"],["aguinha","aguiao","aguiaimperial"],["draquinho","dracobranco","dragaobranco"],["potrinho","pegasinho","pegasonobre"],["salamandrinha","salamandrachama","salamandrasolar"],["ferrinho","ferrodraco","dragaoferro"],["cavalinhafogo","cavalochama","cavalofogo"],["golenzinho","golemrocha","golemobsidiana"],["cristalzinho","cristaldraco","dragaocristal"],["cobrapedra","naja","serpentepedra"],["leaozinho","leaotrovao","leaodourado"],["enguinha","enguiaferro","enguiaeletrica"],["fantasminha","espectro","fantasmaeletrico"]].forEach(([a, b, c]) => { [a, b, c].forEach((id) => { PL_ARQ[id] = id + '-teste.png'; }); ALT_PL[a] = ALT_MON; });
+  // REGRA DE TAMANHO: cada evolução é 20% maior que o estágio anterior (a base tem ALT_MON; a de 2º estágio, 1,2x; a de 3º, 1,44x). Vale para toda linha de EVOLUCOES (battle.js).
+  const FATOR_EVO = 1.2;
+  (function () {
+    const E = B.EVOLUCOES || {}, pai = {};
+    Object.entries(E).forEach(([base, e]) => { pai[e.id] = base; });
+    const alt = (id) => (pai[id] ? alt(pai[id]) * FATOR_EVO : ALT_PL[id] || ALT_MON);
+    Object.values(E).forEach((e) => { ALT_PL[e.id] = Math.round(alt(e.id) * 10) / 10; });
+  })();
   // Recorta a silhueta (pixels com alfa) para a sprite ser centralizada pela base
   function plCaixa(im) {
     const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
@@ -180,16 +222,19 @@
   }
   // Quadros de andar e ataque (sprites-pixellab/animacoes/), 4 por pose; a escala é a da sprite parada
   const PL_ANIM = {};
-  if (USA_PL) ['fagulhao', 'mareal', 'musgarra'].forEach((id) => {
+  // Poses por espécie: quadros <id>-<pose>-<n>.png em sprites-pixellab/animacoes/, listados em poses.json (gerado por `node sprites-pixellab/animacoes/gerar-poses.mjs`).
+  // Poses: andar (parado), ataque, pular, cambalhota, hit, correr, voar (tipo ar), preparar (carga do poder), machucado (pouca vida), cima (andar de costas, do mundo). Sem os quadros, a espécie cai no movimento por código.
+  if (USA_PL) fetch('sprites-pixellab/animacoes/poses.json', { cache: 'no-cache' }).then((r) => r.json()).then((P) => Object.keys(P).forEach((id) => {
     PL_ANIM[id] = { andar: [], ataque: [] };
-    ['andar', 'ataque'].forEach((pose) => {
-      for (let n = 1; n <= 4; n++) {
+    Object.entries(P[id]).forEach(([pose, N]) => {
+      PL_ANIM[id][pose] = new Array(N);
+      for (let n = 1; n <= N; n++) {
         const im = new Image();
         im.onload = () => { PL_ANIM[id][pose][n - 1] = plCaixa(im); };
         im.src = 'sprites-pixellab/animacoes/' + id + '-' + pose + '-' + n + '.png';
       }
     });
-  });
+  })).catch(() => { /* sem poses.json: segue o movimento por código */ });
   // Desenha a sprite com a base em (x, y), centralizada; espelha se flip. p é o quadro (padrão: a sprite parada)
   // Silhueta de uma sprite numa cor só (cache na própria sprite): base do brilho do frenesi
   function silueta(p, cor) {
@@ -393,9 +438,14 @@
     c.width = W; c.height = H;
     const g = c.getContext('2d');
     g.imageSmoothingEnabled = false;
+    if (biomaPedido === 'ginasio' && opc.ginasio && ARENA_IMG['gin_' + opc.ginasio]) { // ginásio com cenário próprio (PixelLab): imagem pronta, sem a quadra comum
+      bioma = 'ginasio'; mapa = null; g.drawImage(ARENA_IMG['gin_' + opc.ginasio], 0, 0, W, H);
+      return c;
+    }
     if (biomaPedido === 'ginasio' && GINASIO) { // quadra pronta + anel branco do círculo central em volta do emblema
       bioma = 'ginasio'; mapa = null; g.drawImage(GINASIO, 0, 0, W, H);
       g.strokeStyle = '#e8e0d0'; g.lineWidth = 3; g.beginPath(); g.arc(180, 368, 33, 0, Math.PI * 2); g.stroke();
+      if (window.PixmonCenarios && opc.ginasio) window.PixmonCenarios.ginasio(g, opc.ginasio, iconeCanvas); // F6: cor, emblema e detalhes do líder
       return c;
     }
     const disponiveis = USA_PL ? Object.keys(RECEITA).filter((b) => Object.values(RECEITA[b]).every(([k]) => PL_PURO[k])) : [];
@@ -403,7 +453,10 @@
       semente = Math.floor(Math.random() * 1e4);
       const fixo = biomaPedido || (location.search.match(/bioma=(\w+)/) || [])[1]; // cenário escolhido na tela, ou ?bioma=lago para conferência
       bioma = disponiveis.includes(fixo) ? fixo : disponiveis[Math.floor(Math.random() * disponiveis.length)];
-      montarChao(g); cenarioPL(g);
+      montarChao(g);
+      const chaveImg = ARENA_IMG[imgArea()] ? imgArea() : bioma; // áreas com fundo próprio (oculta, bosque, castelo, farol)
+      if (ARENA_IMG[chaveImg]) g.drawImage(ARENA_IMG[chaveImg], 0, 0, W, H); else cenarioPL(g); // fundo pronto por bioma; o mapa de terreno acima continua valendo para os objetos
+      if (window.PixmonCenarios && opc.area && !ARENA_IMG[imgArea()]) window.PixmonCenarios.area(g, opc.area, semente); // F6: tom e detalhes da área do mapa
       return c;
     }
     drawGround(g, W, H);
@@ -417,7 +470,7 @@
   const S = 1.15; // escala da geometria dos monstros (era 1.8: 25% menores); contorno e pixels continuam de 1 px
   const r = (n) => Math.round(n * S);
 
-  function monstro(g, m, x, y, t, flip, flash, alpha, prog, pulo = 0, forma = null) { // prog: 0..1 durante a investida, null fora dela; pulo: px acima do chão
+  function monstro(g, m, x, y, t, flip, flash, alpha, prog, pulo = 0, forma = null, pose = null) { // prog: 0..1 durante a investida, null fora dela; pulo: px acima do chão
     const f = FORMAS[m.id], k = CORES[m.tipo];
     const col = (c) => (flash ? '#ffffff' : c);
     const sx = (dx, w = 0) => x + (flip ? -(r(dx) + r(w)) : r(dx));
@@ -428,7 +481,8 @@
     y -= pulo;
     if (USA_PL && PL[m.id]) {
       const an = PL_ANIM[m.id], parado = prog == null; // sem quadros de animação, fica a sprite parada
-      const quadros = an && (parado ? an.andar : an.ataque), i = parado ? Math.floor(t / 250) % 4 : Math.min(3, Math.floor(prog * 4));
+      let quadros = an && (parado ? an.andar : an.ataque); const nq = quadros ? quadros.length : 4; let i = parado ? Math.floor(t / 250) % nq : Math.min(nq - 1, Math.floor(prog * nq));
+      if (pose && an && an[pose.n] && an[pose.n][0]) { quadros = an[pose.n]; i = pose.p != null ? Math.min(quadros.length - 1, Math.floor(pose.p * quadros.length)) : Math.floor(t / (250 * 4 / quadros.length)) % quadros.length; } // pose extra (só se os quadros existirem)
       desenharPL(g, m.id, x, y + 2, flip, alpha, (quadros && quadros[i]) || PL[m.id], flash, forma);
       g.globalAlpha = 1; return;
     }
@@ -566,6 +620,8 @@
   // ---------- objetos demolíveis: barris, caixotes e jarros que quebram quando uma investida, um projétil ou um impacto passa perto ----------
   let objetos = [], restos = [];
   const OBJ_COR = { barril: ['#6b4a2a', '#a07c4f', '#3a3a44'], caixote: ['#7a5a34', '#b8945a', '#4a3320'], jarro: ['#b8542a', '#e08a4a', '#7a3418'] };
+  const ARENA_IMG = {}; const IMG_DA_AREA = { bosquel: 'trilha', bosquen: 'trilha', lago: 'pier', lago2: 'pier' }; const imgArea = () => IMG_DA_AREA[opc.area] || opc.area;
+  ['campo', 'floresta', 'lago', 'montanha', 'vila', 'oculta', 'bosque', 'castelo', 'farol', 'trilha', 'pier', 'gin_tati', 'gin_laura', 'gin_du', 'gin_guto', 'gin_dan'].forEach((b) => { const im = new Image(); im.onload = () => { ARENA_IMG[b] = im; fundo = null; }; im.src = 'ui/arenas/arena_' + b + '.png'; }); // fundos prontos (PixelLab) por bioma
   let GINASIO = null; { const im = new Image(); im.onload = () => { GINASIO = im; fundo = null; }; im.src = 'ui/mundo/novo/arena_ginasio.png'; }
   function criarObjetos() {
     objetos = []; restos = [];
@@ -604,10 +660,15 @@
   const quebraPerto = (x, y, r, quem) => objetos.forEach((o) => { if (o.vivo && Math.hypot(o.x - x, o.y - y) < r * (quem != null && bt.tt[quem].has('demolidor') ? 1.5 : 1)) quebrar(o, quem); });
   function desenharRestos() { for (const r of restos) { const c = OBJ_COR[r.k]; px(g, r.x - 7, r.y - 1, 4, 2, c[2]); px(g, r.x - 1, r.y, 5, 2, c[0]); px(g, r.x + 5, r.y - 1, 3, 2, c[1]); px(g, r.x - 3, r.y + 2, 3, 1, c[2]); } }
 
-  function iniciar(canvas, batalha, cena) {
+  // F6: op = { area, ginasio, pre: { a, b, selvagem } }; a pré-batalha (VS) congela a luta por 1 a 1,8 s e pula com um toque
+  let opc = {}, pre = null;
+  const preAtiva = () => !!pre;
+  const pularPre = () => { pre = null; };
+  function iniciar(canvas, batalha, cena, op) {
+    opc = op || {}; pre = opc.pre ? { t0: null, info: opc.pre } : null;
     biomaPedido = cena || null; // cenário escolhido na tela de escolha; sem ele, sorteia
     cv = canvas; g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
-    if (USA_PL) fundo = null; // cenário novo (bioma e props) a cada luta
+    fundo = null; // cenário novo (bioma, props, área e ginásio) a cada luta
     fundo = fundo || montarFundo();
     criarObjetos();
     bt = batalha;
@@ -701,7 +762,7 @@
       g.globalAlpha = 1;
     }
   }
-  const FEIXE_ARCANO = true; // teste (2026-11-20): o Lightbeam usa a folha do pixelfx arcane-beam (fx/feixe-arcano, roxa) em vez do feixe desenhado em código; false volta ao antigo
+  const FEIXE_ARCANO = false; // (era true) o feixe agora é em camadas na cor do elemento, com orbes em sprite nas pontas; true volta à folha roxa do pixelfx. Antigo: // teste (2026-11-20): o Lightbeam usa a folha do pixelfx arcane-beam (fx/feixe-arcano, roxa) em vez do feixe desenhado em código; false volta ao antigo
   const NOME_GOLPE_LIGADO = false; // teste do George (2026-11-19): sem o nome do golpe sobre o monstro; true volta
   const ONO_LIGADAS = false; // teste do George (2026-11-19): sem onomatopeias; só os números de dano e o rótulo de crítico. true volta as raras e pequenas
   // Onomatopeias: raras e pequenas (no máximo 1 na tela, tamanho 55%) para não poluir a luta; só o impacto do ultimate e o crítico têm a sua
@@ -736,7 +797,7 @@
       carga: (e, pa) => som('supernovaCarga', e.dur / 1000, pa),
       lanca: (e, a, d, pa, pp) => { // Esfera gigante: a esfera que cresceu sobre o monstro é arremessada no alvo
         som('lance', e.tipo, pa);
-        esferas.push({ a, d, e, t0: relogio, dur: 650, x0: pp.x, y0: pp.y - 64, tipo: e.tipo, trail: [], fixo: null });
+        esferas.push({ a, d, e, t0: relogio, dur: 650, x0: pp.x, y0: pp.y - 82, tipo: e.tipo, trail: [], fixo: null });
         const ag = performance.now(); clarao = { t0: ag, dur: 140 }; tremor = { t0: ag, dur: 300, mag: 3 };
       },
     },
@@ -762,6 +823,7 @@
         nuvem(p.x, p.y, 'poeira', 8, { anel: true, r0: 3, r1: 11 });
         const ag = performance.now(); clarao = { t0: ag, dur: 160 }; tremor = { t0: ag, dur: 320, mag: 4 };
         som('frenesi', pa);
+        fxAbs('lib/buff-cima', p.x, p.y + 2, { escala: 0.9, dur: 1800 }); fxAbs('lib/impacto-onda', p.x, p.y + 4, { escala: 0.9 }); // setas de poder subindo e onda no chão
       },
     },
   };
@@ -775,6 +837,7 @@
     recuo[a] = { t0: relogio, dur: Math.max(200, e.dur) }; // um passo atrás para tomar impulso
     const pv = PODERES_VIS[e.poder] || {}; // cada poder do ultimate tem o seu som de carga (se não, o padrão do elemento)
     if (pv.carga) pv.carga(e, pa);
+    if (e.idx === 2 && FX['lib/carga']) for (const [nome, dx, dy, esc] of ULT_CARGA[e.tipo] || []) fxAbs('lib/' + nome, pp.x + dx, pp.y + dy, { escala: esc, dur: e.dur + 300 }); // carga do ultimate: camadas do elemento no atacante
     if (e.idx >= 1) { if (!pv.carga) som('carga', e.tipo, pa); }
     if (e.idx === 2 && !pv.carga) som('ultimate', pa);
   }
@@ -868,6 +931,7 @@
     if (e.idx === 1) { // forte: projétil do elemento
       som('projetil', e.tipo, pa);
       if (e.tipo === 'fogo') nuvem(pp.x, pp.y - 8, 'fumaca', 3, { r0: 2, r1: 7, vida: 700 });
+      if (e.fx === 'onda' && FX['lib/proj-arco-' + e.tipo]) fxAbs('lib/proj-arco-' + e.tipo, pp.x + (pos(d, relogio).x < pp.x ? -10 : 10), pp.y - 12, { escala: 0.9, flip: pos(d, relogio).x < pp.x });
       proj.push({ d, t0: relogio, dur: e.fx === 'area' ? 430 : e.fx === 'onda' ? 440 : 380, x0: pp.x, y0: pp.y - 12, tipo: e.tipo, e, trail: [], forma: e.fx || 'proj' });
       ondas.push({ x: pp.x, y: pp.y - 12, t0: relogio, cor: corDe(e.tipo).a, grande: false });
     } else if (PODERES_VIS[e.poder] && PODERES_VIS[e.poder].lanca) {
@@ -945,13 +1009,28 @@
       parts.push({ x: p.x, y: p.y - 12, vx: Math.cos(an) * v, vy: Math.sin(an) * v - 0.6, g: est.grav, t0: relogio, vida: 460, c: est.cores[k % 3], tam: e.tipo === 'terra' ? 3 : 2 });
     }
     quebraPerto(p.x, p.y, ult ? 44 : 28, e.atq);
+    const bib = !!FX['lib/impacto-estrela']; // biblioteca carregada: ela assume o impacto e o ultimate; senão ficam os efeitos antigos
     const empilha = (nome, dx, dy, k = 1, flip = false) => { if (FX[nome]) fxs.push({ nome, x: p.x + dx, y: p.y + dy, t0: relogio, escala: ESCALA_FX[nome] * k, flip }); return !!FX[nome]; };
     if (crit) empilha('critico', 0, -14);
     if (ult && e.tipo === 'terra') empilha('terra-espinhos', 0, 4); else if (e.tipo === 'terra' || ult || crit) empilha('terra-rachadura', 0, 4, ult ? 1.2 : 0.9);
-    if (ult && e.tipo === 'fogo') empilha('fogo-explosao', 0, -6);
-    if (ult && e.tipo === 'agua') empilha('agua-splash', 0, 4);
-    if (ult && e.tipo === 'eletrico') empilha('eletrico-raio', 0, 4);
-    if (ult && e.tipo === 'ar') { const dir = pos(e.atq, relogio).x > p.x; empilha('ar-corte', dir ? 28 : -28, -14, 1, dir); }
+    if (!bib) {
+      if (ult && e.tipo === 'fogo') empilha('fogo-explosao', 0, -6);
+      if (ult && e.tipo === 'agua') empilha('agua-splash', 0, 4);
+      if (ult && e.tipo === 'eletrico') empilha('eletrico-raio', 0, 4);
+      if (ult && e.tipo === 'ar') { const dir = pos(e.atq, relogio).x > p.x; empilha('ar-corte', dir ? 28 : -28, -14, 1, dir); }
+    } else {
+      const pAt = pos(e.atq, relogio), dirA = pAt.x > p.x; // atacante à direita do alvo
+      if (ult) for (const [t, nome, dx, dy, esc, dur, esp] of ULT_SIG[e.tipo] || []) agendar(t, () => fxAbs('lib/' + nome, p.x + dx, p.y + dy, { escala: esc, dur, flip: esp ? dirA : false }));
+      else {
+        const il = (IMPACTO_LIB[e.tipo] || [])[Math.min(e.idx, 1)]; if (il) fxAbs('lib/' + il[0], p.x, p.y - 4, { escala: il[1], flip: dirA });
+        const est = escolhe(GOLPE_RAPIDO, e.golpe || e.tipo); // golpe rápido: garra, estrela, corte triplo, corte em cruz ou mordida, na cor do elemento
+        if (e.idx === 0 && FX['lib/golpe-' + est + '-' + e.tipo]) fxAbs('lib/golpe-' + est + '-' + e.tipo, p.x, p.y - 14, { escala: est === 'estrela' ? 0.9 : 1.0, flip: dirA });
+        else if (e.idx === 0 && !crit) fxAbs('lib/impacto-estrela', p.x, p.y - 12, { escala: 0.55 });
+        if (e.idx === 1 && FX['lib/golpe-cruz-' + e.tipo] && hs(e.golpe || '') % 3 === 0) fxAbs('lib/golpe-cruz-' + e.tipo, p.x, p.y - 14, { escala: 1.2, flip: dirA }); // alguns golpes fortes também cortam em cruz
+      }
+      const jt = e.idx === 1 && escolhe(PROJ_VAR[e.tipo] || ['bola'], e.golpe || e.tipo) === 'jato' && JATO_LIB[e.tipo]; // o jato continua mais um instante depois de bater
+      if (jt && FX['lib/' + jt[0]]) { const x0 = pAt.x, y0 = pAt.y - 12, x1 = p.x, y1 = p.y - 12; fxs.push({ t0: relogio, fn: (ms) => ms < 330 && fluxo('lib/' + jt[0], x0, y0, x1, y1, ms + 380, jt[1]) }); }
+    }
     if (e.poder === 'esfera') { // esfera gigante: explosão que enche a tela, anéis largos, quebra tudo e deixa cratera
       novas.push({ a: e.atq, x: p.x, y: p.y, t0: relogio, dur: 900, tipo: e.tipo });
       som('supernova', pa); racha(p.x, p.y, true); racha(p.x - 12, p.y + 4, true);
@@ -966,6 +1045,7 @@
       ondas.push({ x: p.x, y: p.y, t0: relogio, cor: '#ffffff', grande: true }); agendar(90, () => ondas.push({ x: p.x, y: p.y, t0: relogio, cor: cor.a, grande: true }));
       for (let k = 0; k < 14; k++) parts.push({ x: p.x, y: p.y - 4, vx: (hash(k, 21) - 0.5) * 4.5, vy: -1.5 - hash(k, 23) * 2.2, g: 0.14, t0: relogio, vida: 600, c: ['#74502c', '#a8793f', '#d8b878'][k % 3], tam: 3 });
       tremor = { t0: agoraReal, dur: 520, mag: 7 };
+      fxAbs('lib/pulo-queda', p.x, p.y + 2, { escala: 0.9 }); // queda pesada: onda, rachaduras de lava, detritos e estrelas de atordoado
     }
     if (ult || crit || e.tipo === 'terra') { racha(p.x, p.y, ult || crit); nuvem(p.x, p.y, 'poeira', ult ? 10 : 6, { anel: true, r0: 3, r1: ult ? 11 : 8 }); }
     else if (idxForte(e)) nuvem(p.x, p.y, 'poeira', area ? 8 : 4, { anel: true, r1: area ? 10 : 8, vida: 500 });
@@ -974,7 +1054,7 @@
     if (e.tipo === 'eletrico') raios.push({ x: p.x, y: p.y - 12, t0: relogio });
     if (e.fx === 'garra' && e.idx === 0 && FX['garra']) fxs.push({ nome: 'garra', x: p.x, y: p.y - 14, t0: relogio, escala: ESCALA_FX['garra'], flip: pos(e.atq, relogio).x > p.x });
     const nomeImp = IMPACTO_FX[e.tipo];
-    if (nomeImp && FX[nomeImp] && !(area && FX['area-' + e.tipo])) fxs.push({ nome: nomeImp, x: p.x, y: p.y - 3, t0: relogio, escala: ult ? ESCALA_FX[nomeImp] * 1.8 : crit || area ? ESCALA_FX[nomeImp] * 1.4 : ESCALA_FX[nomeImp] });
+    if (!bib && nomeImp && FX[nomeImp] && !(area && FX['area-' + e.tipo])) fxs.push({ nome: nomeImp, x: p.x, y: p.y - 3, t0: relogio, escala: ult ? ESCALA_FX[nomeImp] * 1.8 : crit || area ? ESCALA_FX[nomeImp] * 1.4 : ESCALA_FX[nomeImp] });
     som('golpe', e.tipo, e.dano, e.idx, pa);
     if (ult) som('ultimateImpacto', pa);
     if (crit) som('critico', pa);
@@ -1050,6 +1130,7 @@
   function desenharProjetil(q, x, y, agora) {
     const c = corDe(q.tipo);
     x = Math.round(x); y = Math.round(y);
+    if (q.forma === 'mini' && FX['lib/dardo-' + q.tipo]) { drawFx('lib/dardo-' + q.tipo, x, y, agora - q.t0, { escala: 0.55, flip: pos(q.d, agora).x < x }); return; } // rajada: dardinhos de sprite
     if (q.forma === 'mini') { q.trail.forEach((t, k) => px(g, Math.round(t.x) - 1, Math.round(t.y) - 1, 2, 2, k % 2 ? c.l : c.c)); ellipse(g, x, y, 3, 3, c.c); ellipse(g, x, y, 2, 2, c.l); px(g, x - 1, y - 1, 2, 2, '#ffffff'); return; }
     if (q.forma === 'area') { if (FX['area-' + q.tipo]) drawFx('area-' + q.tipo, x, (q.fixo || pos(q.d, agora)).y, agora - q.t0, { escala: ESCALA_FX['area-' + q.tipo] }); else marcaArea(q, x, y, agora); return; }
     if (q.forma === 'onda') {
@@ -1059,7 +1140,15 @@
       return;
     }
     const f = Math.floor(agora / 60) % 2;
-    const nomeFx = PROJ_FX[q.tipo];
+    const vari = q.forma === 'proj' && FX['lib/dardo-' + q.tipo] ? escolhe(PROJ_VAR[q.tipo] || ['bola'], (q.e && q.e.golpe) || q.tipo) : 'bola';
+    if ((vari === 'dardo' || vari === 'lanca') && FX['lib/' + vari + '-' + q.tipo]) { // dardo ou lança de sprite no elemento do golpe, com um rastrinho
+      q.trail.forEach((t, k) => { const tam = Math.max(1, Math.round(((k + 1) / q.trail.length) * 3)); ellipse(g, Math.round(t.x), Math.round(t.y), tam, tam, k % 2 ? c.l : c.c); });
+      drawFx('lib/' + vari + '-' + q.tipo, x, y, agora - q.t0, { escala: vari === 'lanca' ? 0.9 : 1.2, flip: pos(q.d, agora).x < x }); return;
+    }
+    if (vari === 'pedras') { /* terra: segue o desenho de pedras girando abaixo */ }
+    const jato = vari === 'jato' ? JATO_LIB[q.tipo] : null;
+    if (jato && FX['lib/' + jato[0]] && q.forma === 'proj') { fluxo('lib/' + jato[0], q.x0, q.y0, x, y, agora - q.t0, jato[1]); return; } // labareda / jato d'água do atacante até a ponta
+    const nomeFx = vari === 'pedras' ? null : FX['lib/' + PROJ_LIB[q.tipo]] ? 'lib/' + PROJ_LIB[q.tipo] : PROJ_FX[q.tipo];
     if (nomeFx && FX[nomeFx]) {
       q.trail.forEach((t, k) => { // rastro simples atrás do projétil
         const tam = Math.max(1, Math.round(((k + 1) / q.trail.length) * 4));
@@ -1145,7 +1234,8 @@
     const treme = on('paralisia') ? Math.round(Math.sin(agora / 25) * 1.5) : vib ? Math.round(Math.sin(agora / 22) * (acT.slot === 'ultimate' ? 1.5 : 1)) : 0, tomb = perd ? Math.min(1, (agora - kd.t0) / 500) : 0; // paralisia treme; o derrotado tomba
     const frA = bt.lados[i].st.frenesi && bt.lados[i].st.frenesi.ate > bt.t && !perd; // frenesi ativo: aura de chamas atrás, rastro de imagens e brasas
     if (frA) {
-      if (FX['frenesi-aura']) { g.globalAlpha = 0.8; drawFx('frenesi-aura', p.x, p.y + 3, agora, { escala: ESCALA_FX['frenesi-aura'] }); g.globalAlpha = 1; }
+      if (FX['lib/aura-chamas']) drawFx('lib/aura-chamas', p.x, p.y + 3, agora, { escala: 0.7 });
+      else if (FX['frenesi-aura']) { g.globalAlpha = 0.8; drawFx('frenesi-aura', p.x, p.y + 3, agora, { escala: ESCALA_FX['frenesi-aura'] }); g.globalAlpha = 1; }
       if (!ultFan[i] || agora - ultFan[i] > 110) { ultFan[i] = agora; fantasmas.push({ i, x: p.x, y: p.y, flip, t0: agora }); }
       if (hash(Math.floor(agora / 40), i + 9) < 0.5) parts.push({ x: p.x + (hash(Math.floor(agora / 40), i) - 0.5) * 18, y: p.y - 6, vx: 0, vy: -0.9, g: 0, t0: agora, vida: 500, c: hash(Math.floor(agora / 40), i + 2) < 0.5 ? '#ff6a4a' : '#ffd890', tam: 2 });
     }
@@ -1162,7 +1252,19 @@
     if (alpha > 0) {
       g.save();
       if (perd) { g.translate(Math.round(p.x), Math.round(p.y)); g.rotate((flip ? 1 : -1) * 1.4 * tomb); g.translate(-Math.round(p.x), -Math.round(p.y) + Math.round(8 * tomb)); }
-      monstro(g, m, Math.round(p.x) + treme, Math.round(p.y), agora * 1.8 + i * 170, flip, flash, alpha, prog, (on('stun') || perd ? 0 : venc ? 8 * Math.abs(Math.sin(agora / 140)) : pulo) + alt, perd ? null : formaDe(i, m, agora));
+      else if (en < 1) { g.translate(Math.round(p.x), Math.round(p.y) - 10); g.rotate((flip ? -1 : 1) * en * Math.PI * 2); g.translate(-Math.round(p.x), -Math.round(p.y) + 10); } // cambalhota ao entrar em campo
+      const carga = acT && !bt.fim && acT.slot !== 'defesa' && 1 - (acT.fim - bt.t) / acT.dur > 0.35, ah2 = acerto[i];
+      let pose = null; // prioridade: levar golpe > carga do poder > esquiva/salto > entrar em campo > frenesi > pouca vida > voar
+      if (prog == null && !perd) {
+        if (ah2 && agora - ah2.t0 < 420) pose = { n: 'hit', p: (agora - ah2.t0) / 420 };
+        else if (carga) pose = { n: 'preparar' };
+        else if (el > 0 || alt > 0 || venc) pose = { n: 'pular' };
+        else if (en < 1) pose = { n: 'cambalhota', p: en };
+        else if (frA) pose = { n: 'correr' };
+        else if (hpVis[i] / m.hp < 0.3) pose = { n: 'machucado' };
+        else if (m.tipo === 'ar') pose = { n: 'voar' };
+      }
+      monstro(g, m, Math.round(p.x) + treme, Math.round(p.y), agora * 1.8 + i * 170, flip, flash, alpha, prog, (on('stun') || perd ? 0 : venc ? 8 * Math.abs(Math.sin(agora / 140)) : pulo) + alt, perd ? null : formaDe(i, m, agora), pose);
       g.restore();
     }
     if (on('veneno')) for (let k = 0; k < 4; k++) { const ph = (agora / 900 + k / 4) % 1; g.globalAlpha = 1 - ph; ellipse(g, Math.round(p.x + (hash(k, i) - 0.5) * 20), Math.round(p.y - 8 - ph * 28), ph < 0.8 ? 2 : 1, ph < 0.8 ? 2 : 1, '#5cc84a'); g.globalAlpha = 1; }
@@ -1185,7 +1287,7 @@
     // Forte: esfera do elemento com faíscas orbitando. Rápido: brilho curto na boca.
     const acF = bt.lados[i].acao;
     if (acF && !bt.fim && acF.slot === 'ultimate') {
-      const poderE = bt.lados[i].m.golpes.ultimate.poder === 'esfera', poderN = bt.lados[i].m.golpes.ultimate.poder === 'nova', poderF = bt.lados[i].m.golpes.ultimate.poder === 'frenesi', pr = Math.max(0, Math.min(1, 1 - (acF.fim - bt.t) / acF.dur)), cc = poderF ? CORES_FRENESI : corDe(bt.lados[i].m.golpes.ultimate.tipo), fac = poderN ? 0 : flip ? -1 : 1; // na supernova a luz se concentra no corpo, não na boca
+      const poderE = bt.lados[i].m.golpes.ultimate.poder === 'esfera', poderN = bt.lados[i].m.golpes.ultimate.poder === 'nova', poderB = bt.lados[i].m.golpes.ultimate.poder === 'feixe', poderF = bt.lados[i].m.golpes.ultimate.poder === 'frenesi', pr = Math.max(0, Math.min(1, 1 - (acF.fim - bt.t) / acF.dur)), cc = poderF ? CORES_FRENESI : corDe(bt.lados[i].m.golpes.ultimate.tipo), fac = poderN ? 0 : flip ? -1 : 1; // na supernova a luz se concentra no corpo, não na boca
       // Lightbeam: a carga usa a folha arcane/spell-charge do pixelfx (esfera na mão, motes em espiral, anéis e arcos), crescendo com a carga; sem a folha, o desenho em código
       const arcC = FEIXE_ARCANO && bt.lados[i].m.golpes.ultimate.poder === 'feixe' && FX['carga-arcana'];
       if (arcC) {
@@ -1195,16 +1297,16 @@
       } else {
       g.globalAlpha = 0.2 + 0.4 * pr; ellipse(g, Math.round(p.x), Math.round(p.y), Math.round(10 + 16 * pr), Math.round(4 + 6 * pr), cc.l); g.globalAlpha = 1;
       if (pr > 0.5 && !poderE) { g.globalAlpha = (pr - 0.5) * 1.2; const ap = Math.floor(agora / 60) % 2; px(g, Math.round(p.x) - 4 - ap, Math.round(p.y) - 46, 2, 46, cc.l); px(g, Math.round(p.x) + 3 + ap, Math.round(p.y) - 46, 2, 46, cc.l); g.globalAlpha = 1; }
-      const cxo = poderE ? p.x : p.x + fac * 12, cyo = poderE ? p.y - 40 - 24 * pr : p.y - 14, RR = poderE ? 90 : 34; // na esfera gigante a luz é sugada para a esfera acima do monstro, de bem mais longe
+      const cxo = poderE ? p.x : p.x + fac * 12, cyo = poderE ? p.y - 40 - 42 * pr : p.y - 14, RR = poderE ? 90 : 34; // na esfera gigante a luz é sugada para a esfera acima do monstro, de bem mais longe
       for (let k = 0; k < (poderE ? 20 : 12); k++) { // partículas entram em espiral e aceleram ao chegar
         const ph = ((agora / (700 - 300 * pr) + k / 12) % 1), an = k * 2.4 + ph * 2, r = 4 + RR * (1 - ph) * (1 - ph);
         g.globalAlpha = Math.min(1, ph * 3);
         px(g, Math.round(cxo + Math.cos(an) * r), Math.round(cyo + Math.sin(an) * r * 0.8), ph > 0.8 ? 3 : 2, ph > 0.8 ? 3 : 2, k % 3 === 0 ? '#ffffff' : k % 3 === 1 ? cc.l : cc.c);
       }
       g.globalAlpha = 1;
-      const ro = Math.round(2 + (poderE ? 31 : poderN ? 15 : 9) * pr + Math.sin(agora / 40) * (1 + 2 * pr)), ox = Math.round(p.x + fac * 14), oy = Math.round(poderE ? p.y - 40 - 24 * pr : p.y - 14);
+      const ro = Math.round(2 + (poderE ? 31 : poderN ? 15 : poderB ? 14 : 9) * pr + Math.sin(agora / 40) * (1 + 2 * pr)), ox = Math.round(p.x + fac * 14), oy = Math.round(poderE ? p.y - 40 - 42 * pr : p.y - 14);
       if (poderE && pr > 0.2) { anel(ox, oy, ro + 6 + Math.sin(agora / 70) * 2, cc.l, 0.6, Math.max(2, 200 / (ro + 6))); g.globalAlpha = 0.18 * pr; ellipse(g, ox, oy, ro + 14, Math.round((ro + 14) * 0.8), cc.l); g.globalAlpha = 1; } // halo
-      if (!poderF) { ellipse(g, ox, oy, ro + 2, ro + 2, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 3), Math.max(1, ro - 3), '#ffffff'); } // o frenesi não tem orbe: o poder fica no corpo
+      if (!poderF && !orbe(bt.lados[i].m.golpes.ultimate.tipo, ox, oy, Math.round((ro + 2) * (poderE ? 1.7 : 1.15)), agora)) { ellipse(g, ox, oy, ro + 2, ro + 2, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 3), Math.max(1, ro - 3), '#ffffff'); } // o frenesi não tem orbe: o poder fica no corpo
       if (pr > 0.3) { anel(p.x, p.y - 12, 8 + 22 * pr, cc.l, 0.5 * pr, 14); anel(p.x, p.y - 12, 4 + 12 * pr, '#ffffff', 0.4 * pr, 18); }
       }
       const agoraReal = performance.now(); if (pr > 0.5 && (!tremor || agoraReal - tremor.t0 >= tremor.dur)) tremor = { t0: agoraReal, dur: 90, mag: pr > 0.85 ? 2 : 1 }; // o chão treme mais perto do disparo
@@ -1213,7 +1315,7 @@
       if (acF.slot === 'forte') {
         const ro = Math.round(2 + 6 * pr + Math.sin(agora / 50) * pr);
         for (let k = 0; k < 5; k++) { const an = agora / 150 + (k * Math.PI * 2) / 5; px(g, Math.round(ox + Math.cos(an) * (ro + 6)), Math.round(oy + Math.sin(an) * (ro + 6) * 0.8), 2, 2, ESTILO[bt.lados[i].m.golpes.forte.tipo].cores[k % 3]); }
-        ellipse(g, ox, oy, ro + 1, ro + 1, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 2), Math.max(1, ro - 2), '#ffffff');
+        if (!orbe(bt.lados[i].m.golpes.forte.tipo, ox, oy, ro + 3, agora)) { ellipse(g, ox, oy, ro + 1, ro + 1, cc.c); ellipse(g, ox, oy, ro, ro, cc.l); ellipse(g, ox, oy, Math.max(1, ro - 2), Math.max(1, ro - 2), '#ffffff'); }
       } else {
         const ro = Math.round(1 + 3 * pr); ellipse(g, ox, oy, ro + 1, ro + 1, cc.l); ellipse(g, ox, oy, ro, ro, '#ffffff');
         if (Math.floor(agora / 60) % 2) px(g, ox + Math.round((hash(Math.floor(agora / 60), i) - 0.5) * 10), oy + Math.round((hash(Math.floor(agora / 60), i + 4) - 0.5) * 8), 2, 2, cc.a);
@@ -1238,6 +1340,31 @@
     }
   }
 
+  // Água animada dos ginásios com cenário próprio (tiras de 8 quadros do PixelLab em ui/arenas/anim/): peças [arquivo, x, y, largura, altura, espelhar]
+  // peças: [arquivo, x, y, largura, altura, espelhar]; espelhar = a mesma tira virada, colocada no lado oposto
+  const AGUA_GIN = {
+    tati: [['fonteE', 18, 275, 80, 80], ['fonteE', 268, 275, 80, 80, 1], ['lagoTL', 45, 95, 80, 64], ['lagoTR', 243, 75, 96, 80], ['lagoE', 18, 390, 64, 96], ['lagoD', 285, 390, 64, 96]],
+    laura: [['moinhoE', 5, 5, 96, 112], ['moinhoE', 259, 5, 96, 112, 1], ['moinhoB', 5, 508, 96, 120], ['moinhoB', 259, 508, 96, 120, 1], ['lagoA', 292, 222, 64, 48], ['lagoB', 296, 372, 64, 72]],
+    du: [['bobina', 30, 315, 96, 96], ['bobina', 234, 315, 96, 96, 1], ['raio', 130, 40, 96, 112], ['torre', 28, 60, 112, 104], ['torre', 220, 60, 112, 104, 1], ['poste', 40, 480, 80, 96], ['poste', 240, 480, 80, 96, 1]],
+    guto: [['cristalA', 150, 78, 64, 40], ['cristalB', 22, 100, 48, 48], ['cristalC', 236, 168, 48, 48]],
+    dan: [['fogoG', 118, 362, 128, 128], ['fogoP', 128, 162, 96, 88], ['braseiroA', 100, 248, 48, 56], ['braseiroA', 212, 248, 48, 56, 1], ['braseiroB', 98, 520, 48, 64], ['braseiroB', 214, 520, 48, 64, 1], ['braseiroC', 24, 330, 48, 56], ['braseiroD', 24, 490, 48, 56], ['braseiroE', 296, 112, 48, 56]],
+    bosque: [['cascata', 144, 48, 96, 84], ['lagoa', 296, 408, 64, 64], ['lanternaA', 56, 262, 40, 48], ['lanternaA', 266, 262, 40, 48, 1], ['lanternaB', 58, 474, 40, 48], ['lanternaB', 262, 474, 40, 48, 1], ['lanternaC', 62, 48, 40, 48]],
+    castelo: [['tochaA', 36, 197, 40, 56], ['tochaA', 36, 320, 40, 56], ['tochaA', 290, 320, 40, 56, 1], ['tochaA', 36, 460, 40, 56], ['tochaA', 290, 460, 40, 56, 1], ['tochaB', 128, 93, 40, 56], ['tochaB', 212, 93, 40, 56, 1], ['tochaC', 98, 555, 40, 56], ['tochaC', 236, 555, 40, 56, 1]],
+    farol: [['mar1', 0, 0, 64, 160], ['mar2', 0, 160, 64, 160], ['mar3', 0, 320, 64, 160], ['mar4', 0, 480, 64, 160], ['marBE', 0, 576, 176, 64], ['marBD', 250, 576, 110, 64], ['lampada', 84, 12, 40, 48]],
+    pier: [['aguaA', 0, 96, 144, 128], ['aguaB', 0, 224, 144, 128], ['aguaC', 0, 352, 144, 128]],
+  };
+  const AGUA_IMG = {};
+  function desenharAgua(t) {
+    const cena = bioma === 'ginasio' ? opc.ginasio : imgArea(), pecas = cena && AGUA_GIN[cena]; if (!pecas) return;
+    const q = Math.floor(t / 130) % 8;
+    for (const [nome, x, y, w, h, esp] of pecas) {
+      const k = cena + '_' + nome;
+      if (!AGUA_IMG[k]) { const im = new Image(); im.src = 'ui/arenas/anim/' + k + '.png'; AGUA_IMG[k] = im; }
+      const im = AGUA_IMG[k]; if (!im.complete || !im.naturalWidth) continue;
+      if (esp) { g.save(); g.translate(x + w, y); g.scale(-1, 1); g.drawImage(im, q * w, 0, w, h, 0, 0, w, h); g.restore(); } else g.drawImage(im, q * w, 0, w, h, x, y, w, h);
+    }
+  }
+
   function quadro(agoraReal) {
     if (!bt) return;
     const dt = Math.min(50, agoraReal - ultimoReal);
@@ -1255,6 +1382,12 @@
     }
     if (!fundo) { fundo = montarFundo(); criarObjetos(); } // um sprite que terminou de carregar no meio da luta refaz o fundo e os objetos juntos
     g.drawImage(fundo, 0, 0);
+    desenharAgua(agoraReal);
+    if (pre) { // pré-batalha: o relógio da luta não anda enquanto ela roda
+      relogio -= dt; if (pre.t0 == null) pre.t0 = agoraReal;
+      const fim = window.PixmonCenarios ? window.PixmonCenarios.pre(g, Object.assign({ icone: iconeCanvas }, pre.info), agoraReal - pre.t0, (m, x, y, flip) => monstro(g, m, x, y, agoraReal * 1.8, flip, false, 1, null)) : true;
+      g.restore(); if (fim) pre = null; return;
+    }
 
     desenharChaoFx(agora);
     colideObjetos(agora); desenharRestos(); desenharFumaca(agora);
@@ -1303,7 +1436,7 @@
         }
       }
       g.globalAlpha = 1;
-      if (!arc) for (const [x, y, r] of [[x0, y0, 7], [x1, y1, 10]]) { const rr = Math.round(r * w + Math.sin(t / 30) * 1.5); if (rr > 1) { ellipse(g, Math.round(x), Math.round(y), rr + 2, rr + 2, cc.c); ellipse(g, Math.round(x), Math.round(y), rr, rr, cc.l); ellipse(g, Math.round(x), Math.round(y), Math.max(1, rr - 3), Math.max(1, rr - 3), '#ffffff'); } }
+      if (!arc) for (const [x, y, r] of [[x0, y0, 7], [x1, y1, 10]]) { const rr = Math.round(r * w + Math.sin(t / 30) * 1.5); if (rr > 1 && orbe(b.tipo, x, y, Math.round(rr * 1.9), agora)) continue; if (rr > 1) { ellipse(g, Math.round(x), Math.round(y), rr + 2, rr + 2, cc.c); ellipse(g, Math.round(x), Math.round(y), rr, rr, cc.l); ellipse(g, Math.round(x), Math.round(y), Math.max(1, rr - 3), Math.max(1, rr - 3), '#ffffff'); } }
       if (t > 100) for (let k = 0; k < 2; k++) { // faíscas saltando do ponto de impacto
         const an = hash(Math.floor(t / 16), k + 3) * Math.PI * 2;
         parts.push({ x: x1, y: y1, vx: Math.cos(an) * 1.8, vy: Math.sin(an) * 1.8 - 0.8, g: 0.06, t0: agora, vida: 320, c: ESTILO[b.tipo].cores[k % 3], tam: 2 });
@@ -1326,6 +1459,7 @@
       q.trail.push({ x, y }); if (q.trail.length > 7) q.trail.shift();
       const cc = corDe(q.tipo), ang = agora / 45;
       q.trail.forEach((p, j) => { g.globalAlpha = (j + 1) / q.trail.length * 0.4; ellipse(g, Math.round(p.x), Math.round(p.y), 8, 8, cc.c); }); g.globalAlpha = 1;
+      if (orbe(q.tipo, x, y, 20, agora, 'disco')) { anel(x, y, 24, '#ffffff', 0.35, 20); return true; }
       for (let k = 0; k < 6; k++) { const an = ang + (k * Math.PI) / 3; px(g, Math.round(x + Math.cos(an) * 13) - 1, Math.round(y + Math.sin(an) * 13) - 1, 3, 3, k % 2 ? '#ffffff' : cc.l); } // dentes girando
       ellipse(g, x, y, 11, 11, cc.c); ellipse(g, x, y, 9, 9, cc.l); ellipse(g, x, y, 5, 5, cc.c); ellipse(g, x, y, 3, 3, '#ffffff');
       anel(x, y, 12, '#ffffff', 0.5, 20);
@@ -1338,7 +1472,7 @@
       const al = bq.fixo || pos(bq.d, agora), k = Math.pow(p, 1.7), x = Math.round(bq.x0 + (al.x - bq.x0) * k), y = Math.round(bq.y0 + (al.y - 12 - bq.y0) * k), cc = corDe(bq.tipo), ro = 32 + Math.round(5 * p) + Math.round(Math.sin(agora / 40) * 2);
       bq.trail.push({ x, y }); if (bq.trail.length > 8) bq.trail.shift();
       bq.trail.forEach((t, j) => { g.globalAlpha = (j + 1) / bq.trail.length * 0.5; ellipse(g, Math.round(t.x), Math.round(t.y), Math.round(ro * (j + 1) / bq.trail.length), Math.round(ro * (j + 1) / bq.trail.length * 0.9), cc.c); }); g.globalAlpha = 1;
-      anel(x, y, ro + 5, cc.l, 0.7, 4); ellipse(g, x, y, ro + 2, ro + 2, cc.c); ellipse(g, x, y, ro, ro, cc.l); ellipse(g, x, y, Math.max(1, ro - 8), Math.max(1, ro - 8), '#ffffff');
+      if (!orbe(bq.tipo, x, y, Math.round((ro + 2) * 1.7), agora)) { anel(x, y, ro + 5, cc.l, 0.7, 4); ellipse(g, x, y, ro + 2, ro + 2, cc.c); ellipse(g, x, y, ro, ro, cc.l); ellipse(g, x, y, Math.max(1, ro - 8), Math.max(1, ro - 8), '#ffffff'); }
       quebraPerto(x, y, 30, bq.e.atq);
       if (p >= 1) { impacto(bq.e); return false; }
       return true;
@@ -1346,6 +1480,10 @@
 
     novas = novas.filter((n) => { // Supernova: disco de luz que some e três anéis largos saindo do atacante
       const t = agora - n.t0; if (t >= n.dur) return false;
+      if (FX['lib/nova-onda-' + n.tipo]) { // onda de impacto em sprite (fx/lib/nova-onda-*): dois anéis do elemento e um clarão, em vez dos anéis de pontinhos
+        if (!n.sp) { n.sp = 1; const nome = 'lib/nova-onda-' + n.tipo; fxAbs(nome, n.x, n.y - 6, { escala: 1.6 }); agendar(150, () => fxAbs(nome, n.x, n.y - 6, { escala: 2.3 })); fxAbs('lib/impacto-flash', n.x, n.y - 14, { escala: 2.2 }); }
+        return true;
+      }
       const q = t / n.dur, cc = corDe(n.tipo);
       g.globalAlpha = 0.22 * (1 - q); const R = Math.round(430 * Math.pow(q, 0.6)); ellipse(g, Math.round(n.x), Math.round(n.y - 12), R, Math.round(R * 0.8), '#ffffff'); g.globalAlpha = 1;
       [['#ffffff', 0], [cc.l, 70], [cc.c, 140]].forEach(([cor, atraso]) => { const qq = (t - atraso) / (n.dur - 140); if (qq <= 0 || qq >= 1) return; const rr = 430 * Math.pow(qq, 0.6); for (let w = 0; w < 3; w++) anel(n.x, n.y - 12, rr - w * 2, cor, 1 - qq, Math.max(0.6, 340 / Math.max(rr, 20))); });
@@ -1361,7 +1499,7 @@
     raios = raios.filter((w) => agora - w.t0 < 240); // descarga elétrica no ponto do impacto
     for (const w of raios) for (let k = 0; k < 5; k++) { const an = (k / 5) * Math.PI * 2 + hash(Math.floor(agora / 50), k); raioZig(w.x, w.y, w.x + Math.cos(an) * 26, w.y + Math.sin(an) * 22, Math.floor(agora / 50) + k, 3); }
     desenharNuvens(agora);
-    fxs = fxs.filter((f) => drawFx(f.nome, f.x, f.y, agora - f.t0, { escala: f.escala, flip: f.flip }));
+    fxs = fxs.filter((f) => (!f.fim || agora < f.fim) && (f.fn ? f.fn(agora - f.t0) : drawFx(f.nome, f.x, f.y, agora - f.t0, { escala: f.escala, flip: f.flip })));
     parts = parts.filter((p) => agora - p.t0 < p.vida);
     for (const p of parts) { const t = (agora - p.t0) / 16; px(g, p.x + p.vx * t, p.y + p.vy * t + p.g * t * t, p.tam, p.tam, p.c); }
 
@@ -1407,5 +1545,32 @@
     g.restore();
   }
 
-  window.PixmonArena = { iniciar, eventos, quadro, monstro, icone, CORES }; // monstro e CORES expostos para a folha de conferência (?folha)
+  // Toca um efeito da biblioteca em cima do monstro do lado i (0 = você, 1 = adversário). nome sem o prefixo ("impacto-estrela"); o = { dx, dy, escala, flip, dur }.
+  // Efeito em loop (aura, escudo, bolhas...) precisa de dur em ms, senão fica na tela até a luta acabar. Devolve false se o efeito não existe ou ainda não carregou.
+  function tocarFx(nome, i, o = {}) { const p = pos(i, relogio); return fxAbs('lib/' + nome, p.x + (o.dx || 0), p.y + (o.dy || 0), o); }
+  // Efeito da biblioteca numa posição da tela (o.escala, o.flip, o.dur para loops). Devolve false se não existe ou ainda não carregou.
+  function fxAbs(nome, x, y, o = {}) {
+    if (!FX[nome] || !fxs) return false;
+    fxs.push({ nome, x, y, t0: relogio, escala: o.escala || ESCALA_FX[nome], flip: o.flip, fim: o.dur ? relogio + o.dur : 0 });
+    return true;
+  }
+  // Orbe de energia da carga e do arremesso (sprite fx/lib/orbe-<elemento>, loop de 8 quadros): desenha centrado em (x, y) com o raio visível 'raio'. Devolve false se a biblioteca não carregou (aí valem os círculos em código).
+  function orbe(tipo, x, y, raio, agora, pref = 'orbe') { // pref: 'orbe' (bola de energia) ou 'disco' (disco de lâminas do Kienzan)
+    const f = FX['lib/' + pref + '-' + tipo]; if (!f || raio < 1) return false;
+    const pf = f.j.meta.pixelfx, fr = f.j.frames[Math.floor((agora / 1000) * pf.fps) % f.j.frames.length].frame, k = (raio * 2) / (pref === 'disco' ? 70 : 88), w = Math.round(fr.w * k), h = Math.round(fr.h * k); // o corpo do orbe tem ~88 px de diâmetro na folha
+    g.save(); g.imageSmoothingEnabled = false; g.drawImage(f.im, fr.x, fr.y, fr.w, fr.h, Math.round(x - pf.pivot[0] * k), Math.round(y - pf.pivot[1] * k), w, h); g.restore(); return true;
+  }
+  // Fluxo contínuo (labareda, jato d'água): o efeito se repete emendado do ponto (x0, y0) até (x1, y1), cada trecho com um quadro defasado e um pouco mais largo (abre em cone).
+  function fluxo(nome, x0, y0, x1, y1, ms, esc) {
+    const f = FX[nome]; if (!f) return false;
+    const pf = f.j.meta.pixelfx, n = f.j.frames.length, q = Math.floor((ms / 1000) * pf.fps), dist = Math.hypot(x1 - x0, y1 - y0), ang = Math.atan2(y1 - y0, x1 - x0), espelho = Math.cos(ang) < 0 ? -1 : 1;
+    const len = (f.j.frames[0].frame.w - pf.pivot[0]) * esc * 0.8; if (len < 1) return false;
+    g.save(); g.imageSmoothingEnabled = false; g.translate(Math.round(x0), Math.round(y0)); g.rotate(ang);
+    for (let k = 0, off = 0; off < dist; k++, off += len * 0.85) {
+      const fr = f.j.frames[(q + k * 3) % n].frame, w = 1 + k * 0.12;
+      g.drawImage(f.im, fr.x, fr.y, fr.w, fr.h, Math.round(off - pf.pivot[0] * esc * 0.8), Math.round(-pf.pivot[1] * esc * 0.8 * w * espelho), Math.round(fr.w * esc * 0.8), Math.round(fr.h * esc * 0.8 * w * espelho));
+    }
+    g.restore(); return true;
+  }
+  window.PixmonArena = { tocarFx, FX_LIB, iniciar, preAtiva, pularPre, eventos, quadro, monstro, icone, CORES }; // monstro e CORES expostos para a folha de conferência (?folha)
 })();

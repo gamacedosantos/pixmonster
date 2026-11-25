@@ -881,7 +881,7 @@
     width: 100%;
     pointer-events: none;
   }
-  .mundo-bar > *, .m-btns > * { pointer-events: auto; }
+  .mundo-bar > *, .m-btns > *, #mundoTeste > * { pointer-events: auto; }
   .m-btns { display: flex; align-items: center; gap: 4px; margin-left: auto; flex: none; }
   .m-pill {
     width: auto;
@@ -1321,6 +1321,7 @@
             <button id="mundoSair" class="m-pill">Menu</button>
           </div>
         </div>
+        <div id="mundoTeste" style="display:flex;gap:4px;margin-top:4px"><button class="m-pill" data-g="tati">Maré</button><button class="m-pill" data-g="laura">Brisa</button><button class="m-pill" data-g="du">Faísca</button><button class="m-pill" data-g="guto">Rocha</button><button class="m-pill" data-g="dan">Brasa</button></div>
         <div id="mundoToast" class="mundo-toast" hidden></div>
       </div>
 
@@ -1356,6 +1357,17 @@
           <div class="sobre-bubble">Toque em um Pixmon para pôr ou tirar da equipe ativa (de 1 a 3 monstros).</div>
           <div class="lista" id="caixaLista"></div>
           <button class="tg-cta azul" id="caixaMapa" style="margin-top:12px">Mapa e viagem rápida</button>
+        </div>
+      </div>
+      <div id="servico" class="sobre loja" hidden>
+        <div class="sobre-head">
+          <div class="sobre-av" id="avServico"></div>
+          <div class="sobre-tit"><h3 id="servicoTit"></h3><small id="servicoSub"></small></div>
+          <button class="sobre-x" id="servicoFechar">Fechar</button>
+        </div>
+        <div class="sobre-body">
+          <div class="sobre-bubble" id="servicoFala"></div>
+          <div id="servicoLista"></div>
         </div>
       </div>
       <div id="mapaV" class="sobre" hidden>
@@ -1401,6 +1413,7 @@
 <script src="icones.js"></script>
 <script src="som.js"></script>
 <script src="battle.js"></script>
+<script src="cenarios.js"></script>
 <script src="arena.js"></script>
 <script src="mundo2.js"></script>
 <script src="mundo3.js"></script>
@@ -1422,6 +1435,8 @@
 <script src="mundo18.js"></script>
 <script src="mundo19.js"></script>
 <script src="mundo20.js"></script>
+<script src="mundo-vilanova-dados.js"></script>
+<script src="mundo-vilanova.js"></script>
 <script src="mundo.js"></script>
 <script>
 (function () {
@@ -1501,6 +1516,7 @@
   document.querySelectorAll('.msg-meta[data-meta]').forEach((el) => { el.innerHTML = el.dataset.meta + ' ' + L('check-check', 12); });
 
   const cv = document.getElementById('arena');
+  cv.addEventListener('pointerdown', () => { if (A.preAtiva()) A.pularPre(); }); // F6: um toque pula a pré-batalha
   let bt = null, rng = null, ultimoT = 0, noMundo = false, selvagem = 0;
   let evoSel = new Set(); try { evoSel = new Set(JSON.parse(localStorage.getItem('pixmon-evo') || '[]')); } catch (e) { /* ok */ }
   let evoSel2 = new Set(); try { evoSel2 = new Set(JSON.parse(localStorage.getItem('pixmon-evo2') || '[]')); } catch (e) { /* ok */ }
@@ -1522,7 +1538,8 @@
   const novoTorneio = (dif = 'normal') => ({ fase: 1, vidas: TORN.dificuldades[dif].vidas, dif, time: null, dt: [...TORN.iniciais.time], dm: [...TORN.iniciais.mon], bonus: 0, hp: [1, 1, 1], hpIni: [1, 1, 1] });
   const emTorneio = () => modo === 'torneio' && !!torneio;
   const orcAtual = () => (emTorneio() ? TORN.orcBase + torneio.bonus : noMundo ? pontosMundo() : ORC_LIVRE);
-  const liberadoTime = (id) => !emTorneio() || torneio.dt.includes(id), liberadoMon = (id) => !emTorneio() || torneio.dm.includes(id);
+  const nvJogador = () => B.nivelJogador(jogo.xpJ).nv; // F1: o nível do jogador libera o degrau dos talentos de time (só no Explorar; torneio usa dt)
+  const liberadoTime = (id) => emTorneio() ? torneio.dt.includes(id) : nvJogador() >= B.NV_TIME_DEGRAU[((B.ARVORE[id] || {}).degrau || 1) - 1], liberadoMon = (id) => !emTorneio() || torneio.dm.includes(id);
   const timeTravado = () => emTorneio() && !!torneio.time;
   function talEfetivo(meuTime) {
     const nvDe = (i) => (noMundo && jogo.col[B.MONSTROS[i].id] ? jogo.col[B.MONSTROS[i].id].nv : 99);
@@ -1608,6 +1625,7 @@
   // ---------- luta em tempo real ----------
   function logica(t) {
     if (!bt || bt.fim) return;
+    if (A.preAtiva()) { ultimoT = t; return; } // pré-batalha: a luta espera
     const dt = Math.min(50, t - ultimoT);
     ultimoT = t;
     if (dt <= 0) return;
@@ -1660,7 +1678,7 @@
     else { const resto = B.MONSTROS.filter((_, i) => !meuTime.includes(i)); while (adv.length < meuTime.length) adv.push(resto.splice(Math.floor(Math.random() * resto.length), 1)[0]); talAdv = B.sortearTalentos(Math.random, adv.length); iaAdv = B.IA_FACIL; polAdv = null; }
     rng = B.criarRng(Date.now() >>> 0);
     const meus = talEfetivo(meuTime);
-    bt = B.novaBatalha(meuTime.map((i) => (noMundo ? monDoMundo(i) : monDe(i))), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : null);
+    bt = B.novaBatalha(meuTime.map((i) => (noMundo ? monDoMundo(i) : monDe(i))), adv, bioma, [meus, talAdv], emTorneio() ? [torneio.hp, null] : noMundo && !emTreino ? [meuTime.map((i) => hpF(B.MONSTROS[i].id)), null] : null); // F3: no Explorar a vida vem do que sobrou na última luta
     treino = emTreino; if (emTreino) bt.maxMs = 1e12;
     {
       const bf = document.getElementById('treinoSair');
@@ -1681,18 +1699,23 @@
     montarTime();
     capt = false; evoTentou = new Set(); itensEl.hidden = !noMundo; esferaBtn.hidden = esferaFBtn.hidden = !!trMundo; pocaoT = -1e9; atualizarEsfera();
     if (noMundo && trMundo) mostrarIntro({ f: ORDEM_GINASIOS.includes(trMundo.id) ? 'LÍDER DO GINÁSIO' : 'TREINADOR', n: trMundo.nome, q: trMundo.frase, chefe: ORDEM_GINASIOS.includes(trMundo.id) });
-    A.iniciar(cv, bt, bioma);
+    // F6: cenário por área/ginásio e pré-batalha (VS); treino não tem pré
+    const emGin = noMundo && trMundo && ORDEM_GINASIOS.includes(trMundo.id) ? trMundo.id : null, areaId = noMundo ? window.PixmonMundo.estado().area : null;
+    const fam = (m) => { const F = B.FAMILIAS[m.familia]; return F ? F.nome : ''; };
+    const ia = bt.lados[0].m, ib = bt.lados[1].m, selv = noMundo && !trMundo;
+    A.iniciar(cv, bt, bioma, { area: areaId, ginasio: emGin, pre: emTreino ? null : { selvagem: selv, a: { m: ia, nome: 'Você', el: ia.tipo, fam: fam(ia) }, b: { m: ib, nome: trMundo ? trMundo.nome : emTreinador() ? B.treinadorPorId(treinadorSel).nome : emTorneio() ? cfg.nome : 'Rival', el: ib.tipo, fam: fam(ib), lider: !!emGin }, area: emGin ? ((window.PixmonCenarios.CENARIO_GINASIO[emGin] || {}).nome || '') : ((window.PixmonCenarios.CENARIO_DA_AREA[areaId] || {}).nome || ''), rotuloEl: (el, f) => NOMES[el] + (f ? ' · ' + f : '') } });
   }
 
   const timeEl = document.getElementById('time');
+  let introT = 0;
   function mostrarIntro(info) {
     const el = document.getElementById('intro');
     if (!info) { el.hidden = true; return; }
-    el.className = info.chefe ? 'chefe' : ''; el.hidden = false; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+    el.className = info.chefe ? 'chefe' : ''; el.hidden = true; clearTimeout(introT); introT = setTimeout(() => { el.hidden = false; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
     el.innerHTML = '<div class="f"></div><div class="n"></div><div class="q"></div>';
     el.querySelector('.f').textContent = info.f;
     el.querySelector('.n').textContent = info.n; el.querySelector('.q').textContent = '“' + info.q + '”';
-    setTimeout(() => { el.hidden = true; }, 3300);
+    introT = setTimeout(() => { el.hidden = true; }, 3300); }, 1900); // espera a pré-batalha (F6)
   }
   function montarTime() {
     timeEl.innerHTML = '';
@@ -1860,7 +1883,7 @@
       b.className = 'tcard' + (s ? ' sel' : '') + (lib && !mot ? '' : ' trava'); b.dataset.g = GRUPO[n.ramo] || 'defesa'; b.disabled = !lib || (!s && (usados + t.custo > orc || !!mot));
       b.innerHTML = '<div class="timg"><img alt=""></div><b class="tnome"></b><span class="tdesc"></span><span class="tcusto"></span>';
       b.querySelector('img').src = window.PixmonIcones.talento(id); b.querySelector('.tnome').textContent = (mot ? '🔒 ' : '') + t.nome;
-      b.querySelector('.tdesc').textContent = t.desc + (emTorneio() ? '' : ' · ' + RAMO[n.ramo] + ' ' + n.degrau + (mot ? ' · ' + nomeNos(mot) : ''));
+      b.querySelector('.tdesc').textContent = t.desc + (emTorneio() ? '' : ' · ' + RAMO[n.ramo] + ' ' + n.degrau + (!lib ? ' · pede nível ' + B.NV_TIME_DEGRAU[n.degrau - 1] + ' de treinador' : mot ? ' · ' + nomeNos(mot) : ''));
       b.querySelector('.tcusto').textContent = t.custo + ' pt' + (t.custo > 1 ? 's' : '');
       b.onclick = () => { tal.time = s ? (emTorneio() ? tal.time.filter((x) => x !== id) : limparArvore(tal.time.filter((x) => x !== id))) : [...tal.time, id]; salvarTal(); S.tocar('toque'); renderTal(); };
       tt.appendChild(b);
@@ -1998,8 +2021,8 @@
   btnRev.onclick = () => acaoRev(); btnOutro.onclick = () => acaoOutro();
   // ---------- jogo do mundo (Fase B): coleção, níveis, captura ----------
   const JOGO_K = 'pixmon-jogo', INICIAIS = ['fagulhao', 'mareal', 'brotinho'];
-  let jogo = { v: 1, col: {}, eq: [], esf: 5, venc: {}, din: 40, esfF: 0, poc: 2 }, capt = false, nvSel = 5, biomaMundo = null, trMundo = null, selvagemEvo = false, evoTentou = new Set(); // trMundo: treinador do mapa que está lutando
-  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.achados = Array.isArray(jogo.achados) ? jogo.achados : []; jogo.visit = Array.isArray(jogo.visit) ? jogo.visit : []; jogo.din = jogo.din || 0; jogo.esfF = jogo.esfF || 0; jogo.poc = jogo.poc || 0; } catch (e) { /* começa do zero */ }
+  let jogo = { v: 1, col: {}, eq: [], bag: { esf: 5, esfF: 0, poc: 2 }, xpJ: 0, venc: {}, din: 40 }, capt = false, nvSel = 5, biomaMundo = null, trMundo = null, apostaAtual = null, selvagemEvo = false, evoTentou = new Set(); // trMundo: treinador do mapa que está lutando
+  try { const j = JSON.parse(localStorage.getItem(JOGO_K)); if (j && j.col && Array.isArray(j.eq)) jogo = j; jogo.venc = jogo.venc || {}; jogo.lutas = jogo.lutas || 0; jogo.ins = Array.isArray(jogo.ins) ? jogo.ins : []; jogo.achados = Array.isArray(jogo.achados) ? jogo.achados : []; jogo.visit = Array.isArray(jogo.visit) ? jogo.visit : []; jogo.din = jogo.din || 0; B.migrarBag(jogo); } catch (e) { /* começa do zero */ }
   // Ginásios (PLANO-fases.md): ordem obrigatória Água, Vento, Raio, Pedra, Fogo; para desafiar qualquer um: 6 pixmons capturados e 20 batalhas contra treinadores (vitória ou derrota).
   // As regras ficaram LIGADAS na W8; ?livre no endereço as desliga para testar. jogo.lutas conta as lutas com treinadores do mapa; jogo.ins guarda os ids dos líderes vencidos.
   const REGRAS_GINASIO = !/[?&]livre/.test(location.search), // W8: ligadas; ?livre no endereço abre todos os ginásios (teste)
@@ -2028,6 +2051,7 @@
   const CHANCE_SELVAGEM_EVO = 0.3; // chance de o selvagem (das 4 linhas que evoluem) já aparecer evoluído
   const EVO_LUTA = { chance: 0.6, hpMax: 0.5, nvMin: 1 }; // evolução no meio da luta: ao cair abaixo de 50% da vida, 60% de chance (1 tentativa por monstro por luta)
   function verEvolucaoLuta() {
+    return; // F2: evolução só com Pedra (evoluirPixmon); este atalho do meio da luta ficou desligado
     if (!noMundo || !bt || bt.fim) return;
     const l = bt.lados[0], m = l.m, E = B.EVOLUI(m.id) ? B.EVOLUCOES[m.id] : null, c = jogo.col[m.id];
     if (!E || !c || c.evo || l.hp <= 0 || l.hp / m.hp >= EVO_LUTA.hpMax || c.nv < EVO_LUTA.nvMin || evoTentou.has(m.id)) return;
@@ -2039,16 +2063,35 @@
     montarTime();
   }
   function textoXp(id, xp) {
-    const c = jogo.col[id], nomeAntes = forma(id).nome, nvAntes = c.nv, subiu = ganhaXp(id, xp), E = B.EVOLUI(id) ? B.EVOLUCOES[id] : null;
+    const c = jogo.col[id], nomeAntes = forma(id).nome, subiu = ganhaXp(id, xp);
     if (!subiu) return null;
-    if (E && !c.evo && c.nv >= E.nv) { c.evo = true; return nomeAntes + ' evoluiu para ' + E.nome + '!'; }
-    { const E2 = E && B.EVOLUCOES[E.id]; if (E2 && c.evo && c.evo !== 2 && c.nv >= E2.nv) { c.evo = 2; return nomeAntes + ' evoluiu de novo para ' + E2.nome + '!'; } } // linha de 3 estágios
-    return nomeAntes + ' subiu para Nv ' + c.nv + '!';
+    const pe = B.podeEvoluir(id, c); // F2: não evolui sozinho; avisa quando já pode usar a Pedra
+    return nomeAntes + ' subiu para Nv ' + c.nv + '!' + (pe && c.nv >= pe.nvMin && c.nv - 1 < pe.nvMin ? ' Já pode evoluir com a ' + B.BAG_CAT[pe.pedra].nome + '.' : '');
   }
   function ganhaXp(id, xp) { // devolve true se subiu de nível
-    const c = jogo.col[id]; let subiu = false; c.xp += xp;
-    while (c.nv < 30 && c.xp >= 15 * c.nv) { c.xp -= 15 * c.nv; c.nv++; subiu = true; }
+    const c = jogo.col[id]; let subiu = false; c.xp += Math.round(xp * (cansado() ? 0.5 : 1)); // F5: com fome ou cansaço o XP cai pela metade
+    while (c.nv < B.NV_MAX && c.xp >= 15 * c.nv) { c.xp -= 15 * c.nv; c.nv++; subiu = true; }
     return subiu;
+  }
+  // F2: evolução com Pedra do elemento. A pedra é gasta mesmo na falha (50%). Devolve o texto do resultado ou null se não pode tentar.
+  function evoluirPixmon(id, aoFim) {
+    const c = jogo.col[id], pe = c && B.podeEvoluir(id, c);
+    if (!pe || c.nv < pe.nvMin || !(jogo.bag[pe.pedra] > 0)) return null;
+    jogo.bag[pe.pedra]--; const antes = forma(id), ok = Math.random() < B.CHANCE_PEDRA;
+    if (ok) c.evo = c.evo ? 2 : true; salvarJogo();
+    animarEvolucao(antes, ok ? forma(id) : null, aoFim);
+    return ok;
+  }
+  function animarEvolucao(antes, depois, aoFim) { // pisca entre a forma antiga e a nova, clarão e nome; toque para fechar
+    const ov = document.createElement('div'); ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font:700 18px system-ui;gap:12px;text-align:center';
+    const box = document.createElement('div'); box.style.cssText = 'width:180px;height:180px;display:flex;align-items:center;justify-content:center'; const txt = document.createElement('div'); ov.append(box, txt); document.body.appendChild(ov);
+    const mostra = (m, claro) => { box.innerHTML = ''; iconeMonstro(box, 0, 180, m); box.style.filter = claro ? 'brightness(8)' : 'none'; };
+    txt.textContent = antes.nome + ' está reagindo à pedra...'; S.tocar('pronto'); mostra(antes, false);
+    let n = 0; const alvo = depois || antes, passo = () => {
+      n++; if (n <= 16) { mostra(n % 2 ? alvo : antes, n % 2 === 0 && depois); setTimeout(passo, Math.max(70, 280 - n * 14)); }
+      else if (depois) { mostra(depois, true); setTimeout(() => { mostra(depois, false); txt.textContent = antes.nome + ' evoluiu para ' + depois.nome + '!'; S.tocar('pronto'); ov.onclick = () => { ov.remove(); if (aoFim) aoFim(true); }; }, 350); }
+      else { mostra(antes, false); txt.textContent = 'A pedra brilhou, mas nada aconteceu... e ela se desfez.'; ov.onclick = () => { ov.remove(); if (aoFim) aoFim(false); }; }
+    }; setTimeout(passo, 400);
   }
   const esferaBtn = document.getElementById('esfera');
   const itensEl = document.getElementById('itensLuta'), esferaFBtn = document.getElementById('esferaF'), pocaoBtn = document.getElementById('pocao');
@@ -2060,33 +2103,42 @@
   let bonusEsf = 0, pocaoT = -1e9;
   function atualizarEsfera() {
     const vivo = !!bt && !bt.fim, sem = !vivo || capt;
-    pintaItem(esferaBtn, 'esfera', 'Esfera', jogo.esf); esferaBtn.disabled = jogo.esf < 1 || sem;
-    pintaItem(esferaFBtn, 'esferaF', 'Esfera Forte', jogo.esfF); esferaFBtn.disabled = jogo.esfF < 1 || sem;
-    pintaItem(pocaoBtn, 'pocao', 'Poção', jogo.poc); pocaoBtn.disabled = jogo.poc < 1 || !vivo;
+    pintaItem(esferaBtn, 'esfera', 'Esfera', jogo.bag.esf); esferaBtn.disabled = jogo.bag.esf < 1 || sem;
+    pintaItem(esferaFBtn, 'esferaF', 'Esfera Forte', jogo.bag.esfF); esferaFBtn.disabled = jogo.bag.esfF < 1 || sem;
+    pintaItem(pocaoBtn, 'pocao', 'Poção', jogo.bag.poc); pocaoBtn.disabled = jogo.bag.poc < 1 || !vivo;
+    if (window.PixmonMundo) { // F3: botão da bicicleta (só aparece quem comprou)
+      let bk = document.getElementById('mundoBike');
+      if (jogo.bag.bike && !bk) { bk = document.createElement('button'); bk.id = 'mundoBike'; bk.className = 'm-pill'; bk.onclick = () => { jogo.bikeOn = !jogo.bikeOn; salvarJogo(); atualizarEsfera(); }; const mb = document.querySelector('.m-btns'); mb.insertBefore(bk, mb.firstChild); }
+      if (bk) bk.textContent = 'Bike ' + (jogo.bikeOn ? 'ON' : 'off');
+      window.PixmonMundo.bike(!!jogo.bag.bike && !!jogo.bikeOn);
+    }
+    { const mb = document.querySelector('.m-btns'); let bo = document.getElementById('mundoBolsa'); // F5: botão da Bolsa
+      if (!bo) { bo = document.createElement('button'); bo.id = 'mundoBolsa'; bo.className = 'm-pill'; bo.textContent = 'Bolsa'; bo.onclick = abrirBolsa; mb.insertBefore(bo, mb.firstChild); }
+      if (window.PixmonMundo) window.PixmonMundo.lento(cansado()); }
     document.getElementById('mundoEq').innerHTML = L('backpack', 13) + ' <span class="eq-lbl">Equipe </span>(' + jogo.eq.length + '/3)';
     document.getElementById('mundoSair').innerHTML = L('arrow-left', 13) + ' Menu';
-    document.getElementById('mundoRecursos').innerHTML = '<span>' + L('coins', 12) + ' ' + jogo.din + '</span><span>' + L('circle-dot', 12) + ' ' + (jogo.esf + jogo.esfF) + '</span><span>' + L('heart', 12) + ' ' + jogo.poc + '</span>';
+    document.getElementById('mundoRecursos').innerHTML = '<span>' + L('coins', 12) + ' ' + jogo.din + '</span><span>' + L('circle-dot', 12) + ' ' + (jogo.bag.esf + jogo.bag.esfF) + '</span><span>' + L('heart', 12) + ' ' + jogo.bag.poc + '</span><span' + (cansado() ? ' style="color:#ff8a7a"' : '') + '>F' + Math.round(jogo.fome) + ' E' + Math.round(jogo.energia) + '</span>';
   }
-  esferaFBtn.onclick = () => { if (jogo.esfF < 1 || !bt || bt.fim || capt) return; jogo.esfF--; jogo.esf++; bonusEsf = 0.2; esferaBtn.onclick(); bonusEsf = 0; atualizarEsfera(); };
+  esferaFBtn.onclick = () => { if (jogo.bag.esfF < 1 || !bt || bt.fim || capt) return; jogo.bag.esfF--; jogo.bag.esf++; bonusEsf = 0.2; esferaBtn.onclick(); bonusEsf = 0; atualizarEsfera(); };
   pocaoBtn.onclick = () => {
-    if (jogo.poc < 1 || !bt || bt.fim) return;
+    if (jogo.bag.poc < 1 || !bt || bt.fim) return;
     if (bt.t - pocaoT < 8000) { mostrarIntro({ f: 'POÇÃO', n: 'Espere um pouco', q: 'Uma poção a cada 8 s.' }); return; }
     const l = bt.lados[0]; if (l.hp <= 0) return;
-    jogo.poc--; pocaoT = bt.t; l.hp = Math.min(l.m.hp, l.hp + 0.35 * l.m.hp); salvarJogo();
+    jogo.bag.poc--; pocaoT = bt.t; l.hp = Math.min(l.m.hp, l.hp + 0.35 * l.m.hp); salvarJogo();
     mostrarIntro({ f: 'POÇÃO', n: '+35% de vida', q: l.m.nome + ' se recupera' }); atualizarEsfera();
   };
-  const LOJA = [['esf', 'Esfera', 15, 'captura um selvagem'], ['esfF', 'Esfera Forte', 40, '+20% de chance de captura'], ['poc', 'Poção', 20, 'cura 35% da vida em luta']];
+  const LOJA = [['esf', 'Esfera', 15, 'captura um selvagem'], ['esfF', 'Esfera Forte', 40, 'dobra a chance de captura'], ['poc', 'Poção', 20, 'cura 35% da vida em luta'], ...Object.values(B.PEDRA_DE).map((k) => [k, B.BAG_CAT[k].nome, 400, 'evolui um pixmon do mesmo elemento (nível ' + B.NV_EVO.join('/') + '+, 50%)']), ['bike', 'Bicicleta', 300, 'anda 50% mais rápido (uma só; liga e desliga no mapa)'], ['pao', 'Pão', 10, '+30 de fome'], ['ensopado', 'Ensopado', 25, '+60 de fome']];
   function abrirLoja() {
     window.PixmonMundo.pausar(); S.loja(true); const el = document.getElementById('loja'); el.hidden = false;
-    const h = new Date().getHours(); document.getElementById('lojaFala').textContent = (h < 12 ? 'Bom dia!' : h < 18 ? 'Boa tarde!' : 'Boa noite!') + ' O que vai ser hoje?';
+    const h = new Date().getHours(); const FALAS = ['Chegue, chegue! Tem pão quentinho hoje.', 'No meu tempo uma esfera custava uma moeda só...', 'Pedra de evolução? Só para quem treinou de verdade.', 'Coma direito, jovem. Barriga vazia não luta.', 'A bicicleta? Eu andava de bicicleta... antes da coluna.', 'Treinador esperto compra poção antes da luta.']; document.getElementById('lojaFala').textContent = (h < 12 ? 'Bom dia! ' : h < 18 ? 'Boa tarde! ' : 'Boa noite! ') + FALAS[Math.floor(Math.random() * FALAS.length)]; // Vovô lojista
     const desenhar = () => {
       document.getElementById('lojaMoedas').textContent = 'Você tem ' + jogo.din + ' moedas';
       const lista = document.getElementById('lojaLista'); lista.innerHTML = '';
       LOJA.forEach(([k, nome, preco, desc]) => {
         const d = document.createElement('div'); d.className = 'it';
-        const t = document.createElement('span'); t.textContent = nome + ' (' + (jogo[k] || 0) + ') · ' + desc; d.appendChild(t);
-        const b = document.createElement('button'); b.textContent = preco + ' moedas'; b.disabled = jogo.din < preco;
-        b.onclick = () => { if (jogo.din < preco) return; jogo.din -= preco; jogo[k] = (jogo[k] || 0) + 1; salvarJogo(); atualizarEsfera(); S.tocar('toque'); desenhar(); };
+        const t = document.createElement('span'); t.textContent = nome + ' (' + (jogo.bag[k] || 0) + ') · ' + desc; d.appendChild(t);
+        const b = document.createElement('button'); b.textContent = preco + ' moedas'; b.disabled = jogo.din < preco || (k === 'bike' && jogo.bag.bike > 0);
+        b.onclick = () => { if (jogo.din < preco) return; jogo.din -= preco; jogo.bag[k] = (jogo.bag[k] || 0) + 1; if (k === 'bike') jogo.bikeOn = true; salvarJogo(); atualizarEsfera(); S.tocar('toque'); desenhar(); };
         d.appendChild(b); lista.appendChild(d);
       });
     };
@@ -2094,11 +2146,11 @@
   }
   document.getElementById('lojaFechar').onclick = () => { document.getElementById('loja').hidden = true; S.mundo(window.PixmonMundo.estado().area); window.PixmonMundo.retomar(); };
   esferaBtn.onclick = () => {
-    if (!bt || bt.fim || jogo.esf < 1 || capt) return;
-    jogo.esf--; salvarJogo();
-    const l = bt.lados[1], falta = 1 - Math.max(0, l.hp) / l.m.hp, chance = Math.min(0.97, (0.12 + 0.78 * falta + bonusEsf) * (B.CAPTURA_RARIDADE[l.m.raridade] || 1));
+    if (!bt || bt.fim || jogo.bag.esf < 1 || capt) return;
+    jogo.bag.esf--; salvarJogo();
+    const l = bt.lados[1], chance = B.capturaChance(Math.max(0, l.hp) / l.m.hp, l.m.raridade, bonusEsf ? 2 : 1);
     if (Math.random() < chance) { capt = true; l.hp = 0; mostrarIntro({ f: 'ESFERA', n: 'Capturado!', q: l.m.nome + ' é seu', chefe: false }); }
-    else mostrarIntro({ f: 'ESFERA', n: 'Escapou!', q: 'Chance era ' + Math.round(chance * 100) + '%. Enfraqueça mais.', chefe: false });
+    else mostrarIntro({ f: 'ESFERA', n: 'Escapou!', q: 'Chance era ' + (chance < 0.01 ? 'menos de 1' : Math.round(chance * 100)) + '%. Só passa de 1% abaixo de 30% da vida.', chefe: false });
     atualizarEsfera();
   };
   function mostrarEscolha(lista, qual, ao) {
@@ -2121,6 +2173,54 @@
     desenhar();
   }
   document.getElementById('mundoEq').onclick = abrirCaixa;
+
+  // F3: vida persistente no Explorar (jogo.col[id].hpF, fração 0..1; sem o campo = cheia) e serviços das 4 casas da Vila.
+  const hpF = (id) => { const c = jogo.col[id]; return c && typeof c.hpF === 'number' ? c.hpF : 1; };
+  const forma2 = (r) => { const m = B.MONSTROS[idxDe(r.id)]; return r.c.evo && B.EVOLUI(r.id) ? B.evoluidaN(m, r.c.evo === 2 ? 2 : 1).nome : m.nome; };
+  const cansado = () => jogo.fome < 20 || jogo.energia < 20; // F5: fome ou energia abaixo de 20 = lento e metade do XP
+  const vivosIdx = () => jogo.eq.filter((id) => hpF(id) > 0).map(idxDe);
+  function guardarHp() { if (bt && ultimoTime) bt.times[0].forEach((l, k) => { const c = jogo.col[B.MONSTROS[ultimoTime[k]].id]; if (c) c.hpF = Math.max(0, l.hp) / l.m.hp; }); }
+  const semForcas = () => { if (vivosIdx().length) return false; window.PixmonMundo.aviso('Sua equipe está sem forças. Vá ao Hospital da Vila.'); window.PixmonMundo.retomar(); return true; };
+  function abrirServico(tit, sub, fala, desenhar) { // modal genérico das construções (mesmo visual da loja)
+    window.PixmonMundo.pausar(); S.loja(true); document.getElementById('servico').hidden = false;
+    document.getElementById('servicoTit').textContent = tit; document.getElementById('servicoSub').textContent = sub; document.getElementById('servicoFala').textContent = fala;
+    const lista = document.getElementById('servicoLista'), redo = () => { lista.innerHTML = ''; desenhar(lista, redo); }; redo();
+  }
+  const fecharServico = () => { document.getElementById('servico').hidden = true; };
+  document.getElementById('servicoFechar').onclick = () => { fecharServico(); S.mundo(window.PixmonMundo.estado().area); window.PixmonMundo.retomar(); };
+  const linhaServ = (lista, txt, rotulo, fn, off) => {
+    const d = document.createElement('div'), t = document.createElement('span'); d.className = 'it'; t.textContent = txt; d.appendChild(t);
+    if (rotulo) { const b = document.createElement('button'); b.textContent = rotulo; b.disabled = !!off; b.onclick = fn; d.appendChild(b); } lista.appendChild(d);
+  };
+  const COMIDA = { pao: 30, ensopado: 60 };
+  function abrirBolsa() { // F5: fome e energia, e comer
+    abrirServico('Bolsa', 'inventário', '', (lista, redo) => {
+      document.getElementById('servicoFala').textContent = 'Fome ' + Math.round(jogo.fome) + '/100 · Energia ' + Math.round(jogo.energia) + '/100' + (cansado() ? ' · você está lento e ganha metade do XP' : '');
+      Object.entries(B.BAG_CAT).forEach(([k, d]) => { const n = jogo.bag[k] || 0; if (n) linhaServ(lista, d.nome + ' x' + n + ' · ' + d.cat, COMIDA[k] ? 'Comer' : '', () => { jogo.bag[k]--; jogo.fome = Math.min(100, jogo.fome + COMIDA[k]); salvarJogo(); atualizarEsfera(); S.tocar('pronto'); redo(); }, jogo.fome >= 100); });
+    });
+  }
+  const SERVICOS = {
+    hospital: () => abrirServico('Hospital · ' + window.PixmonMundo.AREAS[window.PixmonMundo.estado().area].nome, 'cuidados · 24 h', ['Lessi: Bem-vindo ao hospital! Cuidamos dos seus pixmon sem custo.', 'Lessi: Seus pixmon parecem cansados. Deixe comigo!', 'Lessi: Respire fundo, eu cuido de tudo.', 'Lessi: Hospital limpo, pixmon feliz!'][Math.floor(Math.random() * 4)], (lista, redo) => {
+      const ids = Object.keys(jogo.col), feridos = ids.filter((id) => hpF(id) < 1);
+      ids.forEach((id) => linhaServ(lista, forma(id).nome + ' · Nv ' + jogo.col[id].nv + ' · vida ' + Math.round(hpF(id) * 100) + '%'));
+      linhaServ(lista, feridos.length ? feridos.length + ' pixmon precisam de cuidados' : 'Todos estão ótimos.', 'Curar todos', () => { feridos.forEach((id) => { jogo.col[id].hpF = 1; }); salvarJogo(); S.tocar('pronto'); redo(); }, !feridos.length);
+    }),
+    hotel: () => abrirServico('Hotel de Pixmon', 'dormir e guardar', 'Descanse à vontade e deixe seus pixmon guardados.', (lista, redo) => {
+      linhaServ(lista, 'Dormir (energia ' + Math.round(jogo.energia) + '/100)', 'Dormir', () => { jogo.energia = 100; jogo.fome = Math.max(0, jogo.fome - 5); salvarJogo(); atualizarEsfera(); S.tocar('pronto'); redo(); }, jogo.energia >= 100);
+      linhaServ(lista, 'Depósito: sua equipe e todos os pixmon', 'Abrir', () => { fecharServico(); abrirCaixa(); });
+    }),
+    escola: () => abrirServico('Escola de Treino', 'sem risco · sem prêmios', 'Aqui o treino não vale nada de verdade: ótimo para testar sua equipe.', (lista) => {
+      linhaServ(lista, 'Luta rápida (3v3)', 'Entrar', () => { fecharServico(); sairMundo(); abrirChat('jogar'); });
+      linhaServ(lista, 'Simulação de torneio (não oficial)', 'Entrar', () => { fecharServico(); sairMundo(); abrirChat('torneio'); });
+    }),
+    prefeitura: () => abrirServico('Prefeitura', 'registro de treinadores', 'Só aqui você consulta a lista de treinadores. Vencidos: ' + B.TREINADORES.filter((t) => jogo.venc[t.id]).length + '/' + B.TREINADORES.length + '.', (lista) => {
+      const ins = document.createElement('div'); ins.className = 'it'; ins.style.cssText = 'justify-content:space-around'; // F3: as 5 insígnias dos ginásios
+      ORDEM_GINASIOS.forEach((g) => { const im = document.createElement('img'), t = jogo.ins.includes(g); im.src = 'ui/insignias/' + g + '.png'; im.style.cssText = 'width:48px;height:48px;image-rendering:pixelated;' + (t ? '' : 'filter:grayscale(1) brightness(.4)'); im.title = B.treinadorPorId(g).nome.replace('Líder ', 'Ginásio de ') + (t ? '' : ' (não conquistada)'); ins.appendChild(im); });
+      lista.appendChild(ins);
+      Object.entries(jogo.retido).forEach(([tid, rs]) => linhaServ(lista, '⚠ ' + B.treinadorPorId(tid).nome + ' está com ' + rs.map((r) => forma2(r)).join(', ') + ' (vença-o para recuperar)'));
+      B.TREINADORES.slice().sort((a, b) => a.nivel - b.nivel).forEach((t) => linhaServ(lista, (jogo.venc[t.id] ? '✓ ' : '· ') + t.nome + ' · nível ' + t.nivel + (jogo.venc[t.id] ? '' : ' · "' + t.frase + '"')));
+    }),
+  };
 
   // Toast legível de notificações do Mundo estilo Telegram
   let toastTimer = null;
@@ -2166,26 +2266,55 @@
 
   // ---------- mundo andável ----------
   const mundoEl = document.getElementById('mundo');
+  let passosAnt = null, tiqueFome = 0; // F5: andar dá fome (1 ponto a cada 25 passos) e cansa (1 a cada 40); lutar também (resultadoModo)
+  setInterval(() => {
+    if (!noMundo || mundoEl.hidden || !window.PixmonMundo || !window.PixmonMundo.estado().rodando) return;
+    const p = window.PixmonMundo.estado().passos, d = passosAnt === null || p < passosAnt ? 0 : p - passosAnt; passosAnt = p; if (!d) return;
+    jogo.fome = Math.max(0, jogo.fome - d / 25); jogo.energia = Math.max(0, jogo.energia - d / 40); if (++tiqueFome % 8 === 0) salvarJogo(); atualizarEsfera();
+  }, 1000);
   function abrirMundo(novo) {
     modo = 'rapido'; noMundo = true;
     document.getElementById('escolha').hidden = true; document.getElementById('luta').hidden = true; mundoEl.hidden = false;
     S.tocar('toque'); atualizarEsfera();
-    const desafioMundo = (id) => {
+    const lutar = (id) => {
       trMundo = B.treinadorPorId(id); nvSel = B.nivelNoMundo(trMundo, window.PixmonMundo.estado().area); mundoEl.hidden = true;
       const AR = window.PixmonMundo.AREAS[window.PixmonMundo.estado().area] || {};
-      iniciar(jogo.eq.map(idxDe), ORDEM_GINASIOS.includes(id) ? 'ginasio' : (AR.bioma || null));
+      iniciar(vivosIdx(), ORDEM_GINASIOS.includes(id) ? 'ginasio' : (AR.bioma || null));
     };
-    const comecar = () => {
+    const desafioMundo = (id) => { // F4: antes de lutar com um treinador (menos os líderes de ginásio), aposta opcional; os ladrões levam um pixmon de quem perde
+      if (semForcas()) return;
+      apostaAtual = null;
+      const tr = B.treinadorPorId(id), cands = B.candidatosPerda(jogo.col), comeca = (ap) => { apostaAtual = ap; fecharServico(); lutar(id); };
+      if (ORDEM_GINASIOS.includes(id)) { lutar(id); return; }
+      if (B.TREINADORES_LADROES.includes(id)) {
+        abrirServico('Desafio: ' + tr.nome, 'treinador perigoso', '"' + tr.frase + '" Quem perde para ele deixa um pixmon (o de menor nível). Vença-o depois para recuperar.', (lista) => {
+          linhaServ(lista, cands.length ? 'Aceitar o desafio' : 'Você só tem o seu inicial: ele não pode ser tomado', 'Lutar', () => comeca(cands.length ? { tipo: 'rouba' } : null));
+        }); return;
+      }
+      abrirServico('Desafio: ' + tr.nome, 'aposta opcional', '"' + tr.frase + '" Quer apostar? O treinador cobre a mesma aposta.', (lista, redo) => {
+        linhaServ(lista, 'Sem aposta', 'Lutar', () => comeca(null));
+        [50, 150].forEach((v) => linhaServ(lista, 'Apostar ' + v + ' moedas', 'Apostar', () => comeca({ tipo: 'moeda', v }), jogo.din < v));
+        linhaServ(lista, cands.length ? 'Apostar um pixmon (ele aposta um do time dele)' : 'Aposta de pixmon: só com 2 ou mais pixmon', 'Escolher', () => {
+          lista.innerHTML = ''; cands.forEach((cid) => linhaServ(lista, forma(cid).nome + ' · Nv ' + jogo.col[cid].nv, 'Apostar', () => comeca({ tipo: 'pixmon', meu: cid, dele: tr.time[Math.floor(Math.random() * tr.time.length)] })));
+          linhaServ(lista, 'Voltar', 'Voltar', redo);
+        }, !cands.length);
+      });
+    };
+    // teste de cenário: abre qualquer ginásio sem as regras de entrada (não conta como vitória salva)
+    document.querySelectorAll('#mundoTeste button[data-g]').forEach((b) => { b.onclick = () => { window.PixmonMundo.pausar(); desafioMundo(b.dataset.g); }; });
+  const comecar = () => {
       window.PixmonMundo.iniciar(document.getElementById('mundoCv'), {
         encontro: (a) => {
+          if (semForcas()) return;
           const AR = window.PixmonMundo.AREAS[a] || {}; biomaMundo = AR.bioma || null;
           trMundo = null; selvagem = sortearSelvagem(a, AR.soEvo); selvagemEvo = B.EVOLUI(B.MONSTROS[selvagem].id) && (AR.soEvo || Math.random() < CHANCE_SELVAGEM_EVO);
-          const med = jogo.eq.reduce((a, id) => a + jogo.col[id].nv, 0) / jogo.eq.length; nvSel = Math.max(2, Math.min(30, Math.round(med) + Math.floor(Math.random() * 3) - 1 + (AR.nvMais || 0)));
-          mundoEl.hidden = true; iniciar(jogo.eq.map(idxDe), biomaMundo);
+          const med = jogo.eq.reduce((a, id) => a + jogo.col[id].nv, 0) / jogo.eq.length; nvSel = Math.max(2, Math.min(B.NV_MAX, Math.round(med) + Math.floor(Math.random() * 3) - 1 + (AR.nvMais || 0)));
+          mundoEl.hidden = true; iniciar(vivosIdx(), biomaMundo);
         },
         evento: (tipo, a, ch) => {
+          if (SERVICOS[tipo]) { SERVICOS[tipo](); return; } // F3: hospital, hotel, escola, prefeitura (o modal devolve o controle ao fechar)
           const M = window.PixmonMundo, k = a + ':' + ch, tem = jogo.achados.includes(k), chave = jogo.achados.includes('castelo:K');
-          if (tipo === 'bau') { if (tem) M.aviso('O baú está vazio.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; jogo.esfF += 3; jogo.poc += 3; jogo.din += 150; salvarJogo(); atualizarEsfera(); M.aviso('Baú: +3 Esferas Fortes, +3 Poções e +150 moedas!'); } }
+          if (tipo === 'bau') { if (tem) M.aviso('O baú está vazio.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; jogo.bag.esfF += 3; jogo.bag.poc += 3; jogo.din += 150; salvarJogo(); atualizarEsfera(); M.aviso('Baú: +3 Esferas Fortes, +3 Poções e +150 moedas!'); } }
           else if (tipo === 'chave') { if (tem) M.aviso('Você já pegou a chave.'); else { jogo.achados.push(k); window.PixmonColetados[k] = true; salvarJogo(); M.aviso('Você pegou a Chave do Castelo!'); } }
           else if (tipo === 'porta') M.aviso(chave ? 'Selada por magia (em breve)' : 'Trancada: falta a Chave do Castelo');
           M.retomar();
@@ -2249,17 +2378,34 @@
     const out = []; while (out.length < 3 && pool.length) { const p = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; if (!((p.t === 'pt' || p.t === 'cura') && out.some((o) => o.t === p.t))) out.push(p); }
     return out;
   }
+  function resolverAposta(venceu, tr, tx) { // F4: paga a aposta e devolve pixmon retidos por este treinador
+    const ap = apostaAtual; apostaAtual = null;
+    if (venceu) B.devolverRetidos(jogo, tr.id).forEach((id) => tx.push('Você recuperou ' + forma(id).nome + '!'));
+    if (!ap) return;
+    if (ap.tipo === 'moeda') { if (venceu) { jogo.din += ap.v; tx.push('Aposta ganha: +' + ap.v + ' moedas.'); } else { const p = Math.min(ap.v, jogo.din); jogo.din -= p; tx.push('Aposta perdida: -' + p + ' moedas.'); } }
+    else if (venceu && ap.tipo === 'pixmon') {
+      const n = B.MONSTROS[idxDe(ap.dele)].nome;
+      if (!jogo.col[ap.dele]) { jogo.col[ap.dele] = { nv: nvSel, xp: 0 }; if (jogo.eq.length < 3) jogo.eq.push(ap.dele); tx.push('Aposta ganha: ' + n + ' (Nv ' + nvSel + ') agora é seu!'); }
+      else { ganhaXp(ap.dele, 15 * nvSel); tx.push('Aposta ganha: ' + n + ' você já tinha, virou XP extra.'); }
+    } else if (!venceu && (ap.tipo === 'pixmon' || ap.tipo === 'rouba')) {
+      const id = ap.tipo === 'pixmon' ? ap.meu : B.escolherRoubo(jogo.col);
+      const nome = id && jogo.col[id] ? forma(id).nome : ''; if (id && B.tomarPixmon(jogo, tr.id, id)) tx.push(tr.nome + ' ficou com ' + nome + '! Vença-o para recuperar.');
+    }
+  }
   function resultadoModo(v) {
+    if (noMundo) { guardarHp(); jogo.energia = Math.max(0, jogo.energia - 3); jogo.fome = Math.max(0, jogo.fome - 2); } // F3: a vida que sobrou fica salva (hospital cura); F5: lutar cansa e dá fome
     if (noMundo && trMundo) {
       const tr = trMundo, tx = []; jogo.lutas++;
-      if (v === 0 && ORDEM_GINASIOS.includes(tr.id) && !jogo.ins.includes(tr.id)) { jogo.ins.push(tr.id); tx.push('Insígnia do ginásio de ' + tr.nome.replace('Líder ', '') + '!'); }
+      if (v === 0 && ORDEM_GINASIOS.includes(tr.id) && !jogo.ins.includes(tr.id)) { jogo.ins.push(tr.id); const pk = B.PEDRA_DE[{ tati: 'agua', laura: 'ar', du: 'eletrico', guto: 'terra', dan: 'fogo' }[tr.id]]; jogo.bag[pk] = (jogo.bag[pk] || 0) + 1; tx.push('Insígnia do ginásio de ' + tr.nome.replace('Líder ', '') + '! +1 ' + B.BAG_CAT[pk].nome + '.'); }
       if (v === 0) {
         const ganho = B.PONTOS_TREINADOR.primeira(tr.nivel), xp = 12 * nvSel;
-        jogo.venc[tr.id] = 1; jogo.esf += 2; jogo.din += 30 * tr.nivel; trein.venceu[tr.id] = (trein.venceu[tr.id] || 0) + 1; trein.pontos += ganho; salvarTrein(); try { renderTrein(); } catch (e) { /* ok */ }
+        { const n0 = nvJogador(); jogo.xpJ += 20 * tr.nivel; if (nvJogador() > n0) tx.push('Você subiu para nível ' + nvJogador() + ' de treinador!'); }
+        jogo.venc[tr.id] = 1; jogo.bag.esf += 2; jogo.din += 30 * tr.nivel; trein.venceu[tr.id] = (trein.venceu[tr.id] || 0) + 1; trein.pontos += ganho; salvarTrein(); try { renderTrein(); } catch (e) { /* ok */ }
         tx.push('Você venceu ' + tr.nome + '! +' + ganho + ' pontos de treinador, +2 esferas, +' + (30 * tr.nivel) + ' moedas, +' + xp + ' XP.');
         if (tr.id === 'tomas' && !trein.insignias.includes('bronze')) { trein.insignias.push('bronze'); salvarTrein(); tx.push('Você ganhou a Insígnia de Bronze!'); try { renderTrein(); } catch (e) { /* ok */ } }
         jogo.eq.forEach((id) => { const f = textoXp(id, xp); if (f) tx.push(f); });
       } else tx.push(tr.nome + ': "' + tr.frase + '" (ele vai querer a revanche)');
+      resolverAposta(v === 0, tr, tx);
       salvarJogo(); document.getElementById('resSub').textContent = tx.join(' ');
       botoes('Continuar explorando', () => voltarMundo(), 'Menu', () => sairMundo()); document.getElementById('premios').innerHTML = ''; return;
     }
@@ -2267,13 +2413,13 @@
       const w = B.MONSTROS[selvagem], tx = [], nomeSel = selvagemEvo ? B.EVOLUCOES[w.id].nome : w.nome;
       if (v === 0) {
         if (capt) {
-          if (jogo.col[w.id] && selvagemEvo && !jogo.col[w.id].evo) { jogo.col[w.id].evo = true; tx.push(w.nome + ' já era seu e agora está evoluído para ' + B.EVOLUCOES[w.id].nome + '!'); }
-          else if (jogo.col[w.id]) { ganhaXp(w.id, 15 * nvSel); tx.push(nomeSel + ' já era seu: virou XP extra.'); }
+          if (jogo.col[w.id]) { ganhaXp(w.id, 15 * nvSel); tx.push(nomeSel + ' já era seu: virou XP extra.'); }
           else { jogo.col[w.id] = { nv: nvSel, xp: 0 }; if (selvagemEvo) jogo.col[w.id].evo = true; if (jogo.eq.length < 3) jogo.eq.push(w.id); tx.push('Você capturou ' + nomeSel + ' (Nv ' + nvSel + ')!' + (jogo.eq.includes(w.id) ? '' : ' Foi para a caixa.')); }
         }
         const xp = Math.round(8 * nvSel * (capt ? 0.6 : 1)); const din = 6 + 2 * nvSel; jogo.din += din; tx.push('+' + xp + ' XP, +' + din + ' moedas');
+        { const n0 = nvJogador(); jogo.xpJ += capt ? 10 : 4; if (nvJogador() > n0) tx.push('Você subiu para nível ' + nvJogador() + ' de treinador!'); }
         jogo.eq.forEach((id) => { const f = textoXp(id, xp); if (f) tx.push(f); });
-        if (!capt && Math.random() < 0.4) { jogo.esf++; tx.push('Achou 1 esfera.'); }
+        if (!capt && Math.random() < 0.4) { jogo.bag.esf++; tx.push('Achou 1 esfera.'); }
       } else tx.push('Você foi derrotado, mas segue explorando.');
       salvarJogo(); if (capt) document.getElementById('resTitulo').textContent = 'CAPTURADO!';
       document.getElementById('resSub').textContent = tx.join(' ');
@@ -2546,8 +2692,15 @@
           const card = document.createElement('div'); card.className = 'mundo-eq-card';
           iconeMonstro(card, 0, 44, m);
           const b = document.createElement('b'); b.textContent = m.nome;
-          const sm = document.createElement('small'); sm.textContent = c.nv >= 30 ? 'Nv 30 · Máx' : 'Nv ' + c.nv + ' · XP ' + c.xp + '/' + (15 * c.nv);
+          const sm = document.createElement('small'); sm.textContent = c.nv >= B.NV_MAX ? 'Nv ' + B.NV_MAX + ' · Máx' : 'Nv ' + c.nv + ' · XP ' + c.xp + '/' + (15 * c.nv);
           card.appendChild(b); card.appendChild(sm);
+          const pe = jogo.col[id] && B.podeEvoluir(id, c);
+          if (pe) { // F2: evolução com Pedra
+            const ev = document.createElement('button'), n = jogo.bag[pe.pedra] || 0; ev.className = 'btn'; ev.style.cssText = 'font-size:11px;padding:3px 6px;margin-top:4px';
+            ev.textContent = c.nv < pe.nvMin ? 'Evolui no nv ' + pe.nvMin : 'Evoluir (' + B.BAG_CAT[pe.pedra].nome + ' x' + n + ')'; ev.disabled = c.nv < pe.nvMin || n < 1;
+            ev.title = 'Evolui para ' + pe.prox.nome + ': 50% de chance e a pedra se gasta mesmo se falhar';
+            ev.onclick = (e) => { e.stopPropagation(); evoluirPixmon(id, () => { atualizarEsfera(); renderMundoChat(); }); }; card.appendChild(ev);
+          }
           grid.appendChild(card);
         });
       } else {
@@ -2558,9 +2711,10 @@
     }
     if (bag) {
       const chip = (ico, txt) => '<span class="hero-chip">' + L(ico, 12) + ' ' + txt + '</span>';
-      bag.innerHTML = chip('coins', jogo.din + ' moedas')
-        + chip('circle-dot', (jogo.esf + jogo.esfF) + ' esferas' + (jogo.esfF ? ' (' + jogo.esfF + ' forte)' : ''))
-        + chip('heart', jogo.poc + ' poções')
+      const nj = B.nivelJogador(jogo.xpJ), icoCat = { esferas: 'circle-dot', curas: 'heart' }, cats = {};
+      Object.entries(B.BAG_CAT).forEach(([k, d]) => { (cats[d.cat] = cats[d.cat] || []).push(d.nome + ' ' + (jogo.bag[k] || 0)); });
+      bag.innerHTML = chip('user', 'Treinador nv ' + nj.nv + (nj.falta ? ' · ' + nj.xp + '/' + nj.falta + ' XP' : ' · Máx')) + chip('coins', jogo.din + ' moedas')
+        + Object.entries(cats).map(([c, l]) => chip(icoCat[c] || 'package', l.join(' · '))).join('')
         + chip('award', jogo.ins.length + '/5 ginásios')
         + chip('map-pin', jogo.visit.length + ' áreas');
     }
@@ -2693,7 +2847,7 @@
         ? chip('award', jogo.ins.length + '/5 Ginásios')
           + chip('sparkles', nCap + ' Capturados')
           + chip('coins', jogo.din + ' Moedas')
-          + chip('circle-dot', (jogo.esf + jogo.esfF) + ' Esferas')
+          + chip('circle-dot', (jogo.bag.esf + jogo.bag.esfF) + ' Esferas')
           + chip('map-pin', jogo.visit.length + ' Áreas')
         : chip('sparkles', 'Escolha seu inicial')
           + chip('map-pin', '19 Áreas abertas')

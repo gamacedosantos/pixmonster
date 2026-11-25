@@ -13,6 +13,7 @@ window.PixmonMundo13 = window.PixmonBase.criar({
     ret(0, 0, 59, 1, 'T'); ret(0, 108, 59, 109, 'T'); ret(0, 0, 1, 109, 'T'); ret(58, 0, 59, 109, 'T');
     ret(29, 108, 30, 109, ','); grade[109][29] = grade[109][30] = 'v';
     grade[19][29] = grade[19][30] = 'G'; grade[61][24] = grade[61][25] = 'L';
+    grade[49][20] = grade[49][21] = 'H';                                                 // F3: porta do hospital (a casa em cima)
   },
   predios: [['ginasio_f', 26, 14, 8, 5], ['loja_f', 22, 58, 6, 3], ['fonte', 28, 64, 4, 3],
     ['casa_1_f', 18, 36, 6, 3], ['casa_3_f', 38, 36, 6, 3], ['casa_2_f', 18, 46, 6, 3], ['casa_1_f', 38, 46, 6, 3],
@@ -24,7 +25,10 @@ window.PixmonMundo13 = window.PixmonBase.criar({
     [[10, 36], [44, 38], [8, 50], [50, 52], [10, 70], [48, 70]].forEach(([c, r]) => pr('pedra', c, r));
     [[17, 39], [44, 39], [17, 49], [44, 49]].forEach(([c, r]) => pr('correio_manual', c, r));
   },
+  eventos: { H: 'hospital' }, correios: [{ c: 17, r: 49, msg: 'Hospital' }], // tratados em index.html (cb.evento)
   npcs: [
+    window.PixmonLessi('lessi4', 23, 50),
+    { id: 'vovo4', nome: 'Vovô', sprite: 'vovo', servico: 'loja', c: 26, r: 62, vis: 0, cor: '#5a3a20', dir: 'baixo', paradas: [{ c: 26, r: 62, espera: [6000, 11000] }, { c: 27, r: 62, espera: [2500, 4000] }, { c: 27, r: 63, espera: [2500, 4000] }] }, 
     { id: 'pedro', nome: 'Pedro', pele: '#e8c090', c: 14, r: 89, dir: 'cima', vis: 3, cor: '#2a1a10', camisa: '#f0d048', cab: '#6fd6ff' },
     { id: 'lara', nome: 'Lara', pele: '#f0c8a0', c: 30, r: 48, dir: 'esq', vis: 3, cor: '#0e0e12', camisa: '#e8b830', cab: '#fff2a0' },
   ],

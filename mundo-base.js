@@ -84,7 +84,7 @@
     const tc = tabela(mc), ta = tabela(ma), c = document.createElement('canvas'); c.width = W * T; c.height = H * T; const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
     const cl = (x, y) => [Math.max(0, Math.min(W - 1, x)), Math.max(0, Math.min(H - 1, y))];
     const vert = (f) => (vx, vy) => [[vx - 1, vy - 1], [vx, vy - 1], [vx - 1, vy], [vx, vy]].some(([x, y]) => { const [a, b] = cl(x, y); return f(a, b); });
-    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v<>LGCKDX'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
+    const vA = vert((x, y) => agua.has(cel(x, y))), vS = vert((x, y) => ',^v<>LGCKDXH'.includes(mapa[y][x])), k = (v) => (v ? 'l' : 'u');
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const ka = k(vA(x, y)) + k(vA(x + 1, y)) + k(vA(x, y + 1)) + k(vA(x + 1, y + 1));
       if (ka === 'llll') brilhos.push([x, y]);
@@ -161,7 +161,7 @@
   }
 
   const out = { desenhar, RES,
-    area: { nome: spec.nome, largura: W, bioma: spec.bioma || 'floresta', elemento: spec.elemento || null, soEvo: spec.soEvo, nvMais: spec.nvMais, v2: true, T, res: RES, mapa, bloq, desenhar, npcs: spec.npcs || [], portais: spec.portais || {}, ginasios: spec.ginasios || null, eventos: spec.eventos || null } };
+    area: { nome: spec.nome, largura: W, bioma: spec.bioma || 'floresta', elemento: spec.elemento || null, soEvo: spec.soEvo, nvMais: spec.nvMais, v2: true, T, res: RES, mapa, bloq, desenhar, npcs: spec.npcs || [], portais: spec.portais || {}, ginasios: spec.ginasios || null, eventos: spec.eventos || null, correios: spec.correios || null } };
   if (spec.id) (window.PixmonAreasExtra = window.PixmonAreasExtra || {})[spec.id] = out.area;
   return out;
   }
